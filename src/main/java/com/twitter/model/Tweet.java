@@ -2,21 +2,41 @@ package com.twitter.model;
 
 import org.joda.time.DateTime;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Created by mariusz on 11.07.16.
  */
+@Entity
 public class Tweet {
+    @Id
+    @GeneratedValue
     private int id;
+    @NotNull
     private boolean banned;
+    @NotNull
     private DateTime date;
+    @NotNull
     private String content;
+    @NotNull
+    @ManyToOne
     private User owner;
+    @NotNull
+    @ManyToMany
     private Set<Tag> tags;
+    @NotNull
+    @ManyToMany
+    @JoinTable(joinColumns = @JoinColumn(name = "tweetId"),
+            inverseJoinColumns = @JoinColumn(name = "commentId"))
     private Set<Tweet> comments;
+    @NotNull
+    @ManyToMany
     private Set<UserVote> votes;
+    @NotNull
+    @OneToMany
     private Set<Report> reports;
 
     public Tweet() {

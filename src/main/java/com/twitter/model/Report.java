@@ -1,14 +1,31 @@
 package com.twitter.model;
 
+import com.sun.istack.internal.Nullable;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
+
 /**
  * Created by mariusz on 11.07.16.
  */
+@Entity
 public class Report {
+    @Id
+    @GeneratedValue
     private int id;
+    @NotNull
     private ReportStatus status;
+    @NotNull
     private ReportCategory category;
+    @Nullable
     private String message;
+    @NotNull
+    @ManyToOne
     private User user;
+    @Nullable
     private User judge;
 
     public Report(ReportCategory category, String message, User user, User judge) {

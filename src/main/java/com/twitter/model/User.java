@@ -3,6 +3,8 @@ package com.twitter.model;
 import org.joda.time.DateTime;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -11,20 +13,48 @@ import java.util.Set;
 /**
  * Created by mariusz on 11.07.16.
  */
+@Entity
+@Table(name = "users")
 public class User implements UserDetails {
+    @Id
+    @GeneratedValue
     private int id;
+    @NotNull
+    @OneToOne
+    @JoinColumn
     private Avatar avatar;
+    @NotNull
+    @Column(unique = true)
     private String username;
+    @NotNull
     private String password;
+    @NotNull
     private DateTime passwordExpireDate;
+    @NotNull
     private boolean enable;
+    @NotNull
     private boolean banned;
+    @NotNull
     private Role role;
-
+    @NotNull
+    @OneToMany
     private Set<Report> reports;
+    @NotNull
+    @OneToMany
     private Set<Tweet> tweets;
+    @NotNull
+    @ManyToMany
     private Set<Tag> favouriteTags;
-
+    @NotNull
+    @ManyToMany
+    @JoinTable(joinColumns = @JoinColumn(name = "userId"),
+            inverseJoinColumns = @JoinColumn(name = "followerId"))
+    private Set<User> followers;
+    @NotNull
+    @ManyToMany
+    @JoinTable(joinColumns = @JoinColumn(name = "userId"),
+            inverseJoinColumns = @JoinColumn(name = "followingUserId"))
+    private Set<User> following;
 
     public User() {
         this.passwordExpireDate = DateTime.now();
@@ -34,6 +64,8 @@ public class User implements UserDetails {
         this.reports = new HashSet<>();
         this.tweets = new HashSet<>();
         this.favouriteTags = new HashSet<>();
+        this.followers = new HashSet<>();
+        this.following = new HashSet<>();
     }
 
     public User(Avatar avatar, String username, String password) {
@@ -41,6 +73,22 @@ public class User implements UserDetails {
         this.avatar = avatar;
         this.username = username;
         this.password = password;
+    }
+
+    public Set<User> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(Set<User> followers) {
+        this.followers = followers;
+    }
+
+    public Set<User> getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(Set<User> following) {
+        this.following = following;
     }
 
     public int getId() {

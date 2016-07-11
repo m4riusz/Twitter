@@ -1,11 +1,23 @@
 package com.twitter.model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.validation.constraints.NotNull;
+
 /**
  * Created by mariusz on 11.07.16.
  */
+
+@Entity
 public class Avatar {
+    @Id
+    @GeneratedValue
     private int id;
+    @NotNull
     private int fileName;
+    @Lob
     private byte[] bytes;
 
     public Avatar(int fileName, byte[] bytes) {
