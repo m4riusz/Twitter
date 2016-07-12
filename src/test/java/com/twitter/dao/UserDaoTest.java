@@ -50,31 +50,29 @@ public class UserDaoTest {
 
     @Test
     public void fetchOneUserTest() {
-        long count = userDao.count();
-        User user = a(user().withId(count + 1).withUsername("Mariusz"));
-        User otherUser = a(user().withId(count + 2).withUsername("Marcin"));
-        userDao.save(aUserListWith(user, otherUser));
-        User userFromDatabase = userDao.findOne(count + 1);
-        assertThat(userFromDatabase, is(user));
+        User expectedUser = a(user().withId(1).withUsername("Mariusz"));
+        User otherUser = a(user().withId(2).withUsername("Marcin"));
+        userDao.save(aUserListWith(expectedUser, otherUser));
+        User userFromDatabase = userDao.findOne(1L);
+        assertThat(userFromDatabase, is(expectedUser));
     }
 
     @Test
     public void fetchUserThatDoesNotExist() {
-        User user = a(user().withId(1).withUsername("Mariusz"));
-        User otherUser = a(user().withId(2).withUsername("Marcin"));
-        userDao.save(aUserListWith(user, otherUser));
+        User user1 = a(user().withId(1).withUsername("Mariusz"));
+        User user2 = a(user().withId(2).withUsername("Marcin"));
+        userDao.save(aUserListWith(user1, user2));
         User userFromDatabase = userDao.findOne(3L);
         assertThat(userFromDatabase, is(nullValue()));
     }
 
     @Test
     public void updateUserTest() {
-        long count = userDao.count();
-        User user = a(user().withId(count + 1).withUsername("Mariusz"));
+        User user = a(user().withId(1).withUsername("Mariusz"));
         userDao.save(aUserListWith(user));
         user.setUsername("Marcin");
         userDao.save(user);
-        User userFromDatabase = userDao.findOne(count + 1);
+        User userFromDatabase = userDao.findOne(1L);
         assertThat(userFromDatabase.getUsername(), is("Marcin"));
         assertThat(userDao.findAll().size(), is(1));
     }
