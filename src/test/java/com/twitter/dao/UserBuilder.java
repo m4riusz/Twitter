@@ -1,36 +1,38 @@
 package com.twitter.dao;
 
+import com.twitter.Builder;
 import com.twitter.model.*;
 import org.joda.time.DateTime;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Created by mariusz on 12.07.16.
  */
-public final class UserBuilder {
-    private int id;
-    private Avatar avatar;
-    private String username;
-    private String password;
-    private DateTime passwordExpireDate;
-    private boolean enable;
-    private boolean banned;
-    private Role role;
-    private Set<Report> reports;
-    private Set<Tweet> tweets;
-    private Set<Tag> favouriteTags;
-    private Set<User> followers;
-    private Set<User> following;
+public final class UserBuilder implements Builder<User> {
+    private long id = 0;
+    private Avatar avatar = new Avatar("file.jpg", new byte[10]);
+    private String username = "Username";
+    private String password = "Password";
+    private DateTime passwordExpireDate = DateTime.now().withYear(2100);
+    private boolean enable = true;
+    private boolean banned = false;
+    private Role role = Role.USER;
+    private Set<Report> reports = new HashSet<>();
+    private Set<Tweet> tweets = new HashSet<>();
+    private Set<Tag> favouriteTags = new HashSet<>();
+    private Set<User> followers = new HashSet<>();
+    private Set<User> following = new HashSet<>();
 
     private UserBuilder() {
     }
 
-    public static UserBuilder anUser() {
+    public static UserBuilder user() {
         return new UserBuilder();
     }
 
-    public UserBuilder withId(int id) {
+    public UserBuilder withId(long id) {
         this.id = id;
         return this;
     }
@@ -95,6 +97,7 @@ public final class UserBuilder {
         return this;
     }
 
+    @Override
     public User build() {
         User user = new User();
         user.setId(id);
