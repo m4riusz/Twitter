@@ -15,6 +15,7 @@ import java.util.List;
 
 import static com.twitter.dao.UserBuilder.user;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -58,6 +59,15 @@ public class UserDaoTest {
     }
 
     @Test
+    public void fetchUserThatDoesNotExist() {
+        User user = a(user().withId(1).withUsername("Mariusz"));
+        User otherUser = a(user().withId(2).withUsername("Marcin"));
+        userDao.save(aUserListWith(user, otherUser));
+        User userFromDatabase = userDao.findOne(3L);
+        assertThat(userFromDatabase, is(nullValue()));
+    }
+
+    @Test
     public void updateUserTest() {
         long count = userDao.count();
         User user = a(user().withId(count + 1).withUsername("Mariusz"));
@@ -68,6 +78,20 @@ public class UserDaoTest {
         assertThat(userFromDatabase.getUsername(), is("Marcin"));
         assertThat(userDao.findAll().size(), is(1));
     }
+
+    @Test
+    public void deleteUserTest() {
+        User user1 = a(user().withId(1).withUsername("u1"));
+        User user2 = a(user().withId(2).withUsername("u2"));
+        User user3 = a(user().withId(3).withUsername("u3"));
+        userDao.save(aUserListWith(user1, user2, user3));
+        userDao.delete(1L);
+        List<User> allUsers = userDao.findAll();
+        assertThat(allUsers.contains(user1), is(false));
+        assertThat(allUsers.contains(user2), is(true));
+        assertThat(allUsers.contains(user3), is(true));
+    }
+
 
     private List<User> aUserListWith(User... users) {
         return Arrays.asList(users);
