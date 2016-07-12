@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
@@ -52,9 +51,22 @@ public class UserDaoTest {
     public void fetchOneUserTest() {
         long count = userDao.count();
         User user = a(user().withId(count + 1).withUsername("Mariusz"));
-        userDao.save(aUserListWith(user));
+        User otherUser = a(user().withId(count + 2).withUsername("Marcin"));
+        userDao.save(aUserListWith(user, otherUser));
         User userFromDatabase = userDao.findOne(count + 1);
-        assertThat(user, is(userFromDatabase));
+        assertThat(userFromDatabase, is(user));
+    }
+
+    @Test
+    public void updateUserTest() {
+        long count = userDao.count();
+        User user = a(user().withId(count + 1).withUsername("Mariusz"));
+        userDao.save(aUserListWith(user));
+        user.setUsername("Marcin");
+        userDao.save(user);
+        User userFromDatabase = userDao.findOne(count + 1);
+        assertThat(userFromDatabase.getUsername(), is("Marcin"));
+        assertThat(userDao.findAll().size(), is(1));
     }
 
     private List<User> aUserListWith(User... users) {
