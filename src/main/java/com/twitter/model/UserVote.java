@@ -1,9 +1,6 @@
 package com.twitter.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -13,24 +10,28 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class UserVote {
     @Id
-    @GeneratedValue
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
     @NotNull
     private Vote vote;
     @NotNull
     @ManyToOne
     private User user;
 
+    public UserVote() {
+    }
+
     public UserVote(Vote vote, User user) {
+        this();
         this.vote = vote;
         this.user = user;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

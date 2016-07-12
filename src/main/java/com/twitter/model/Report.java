@@ -2,10 +2,7 @@ package com.twitter.model;
 
 import com.sun.istack.internal.Nullable;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -14,8 +11,8 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class Report {
     @Id
-    @GeneratedValue
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
     @NotNull
     private ReportStatus status;
     @NotNull
@@ -28,19 +25,23 @@ public class Report {
     @Nullable
     private User judge;
 
-    public Report(ReportCategory category, String message, User user, User judge) {
+    public Report() {
         this.status = ReportStatus.WAITING_FOR_REALIZATION;
+    }
+
+    public Report(ReportCategory category, String message, User user, User judge) {
+        this();
         this.category = category;
         this.message = message;
         this.user = user;
         this.judge = judge;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

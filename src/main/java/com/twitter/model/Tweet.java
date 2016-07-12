@@ -13,8 +13,8 @@ import java.util.Set;
 @Entity
 public class Tweet {
     @Id
-    @GeneratedValue
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
     @NotNull
     private boolean banned;
     @NotNull
@@ -49,16 +49,16 @@ public class Tweet {
     }
 
     public Tweet(String content, User owner) {
-        super();
+        this();
         this.content = content;
         this.owner = owner;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

@@ -17,10 +17,10 @@ import java.util.Set;
 @Table(name = "users")
 public class User implements UserDetails {
     @Id
-    @GeneratedValue
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
     @NotNull
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn
     private Avatar avatar;
     @NotNull
@@ -69,7 +69,7 @@ public class User implements UserDetails {
     }
 
     public User(Avatar avatar, String username, String password) {
-        super();
+        this();
         this.avatar = avatar;
         this.username = username;
         this.password = password;
@@ -91,11 +91,11 @@ public class User implements UserDetails {
         this.following = following;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -204,5 +204,24 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enable;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        if (id != user.id) return false;
+        return username.equals(user.username);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + username.hashCode();
+        return result;
     }
 }

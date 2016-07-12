@@ -1,9 +1,6 @@
 package com.twitter.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -13,31 +10,36 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class Avatar {
     @Id
-    @GeneratedValue
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
     @NotNull
-    private int fileName;
+    private String fileName;
     @Lob
     private byte[] bytes;
 
-    public Avatar(int fileName, byte[] bytes) {
+    public Avatar() {
+
+    }
+
+    public Avatar(String fileName, byte[] bytes) {
+        this();
         this.fileName = fileName;
         this.bytes = bytes;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    public int getFileName() {
+    public String getFileName() {
         return fileName;
     }
 
-    public void setFileName(int fileName) {
+    public void setFileName(String fileName) {
         this.fileName = fileName;
     }
 
