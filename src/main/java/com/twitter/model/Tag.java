@@ -15,6 +15,9 @@ public class Tag {
     @Column(unique = true)
     private String text;
 
+    @Version
+    private long version;
+
     public Tag(String text) {
         this.text = text;
     }

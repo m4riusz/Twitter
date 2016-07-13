@@ -1,5 +1,7 @@
 package com.twitter.model;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
@@ -15,6 +17,7 @@ public class Avatar {
     @NotNull
     private String fileName;
     @Lob
+    @Type(type = "org.hibernate.type.BinaryType")
     private byte[] bytes;
 
     public Avatar() {

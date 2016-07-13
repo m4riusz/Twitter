@@ -23,7 +23,10 @@ public class Report {
     @ManyToOne
     private User user;
     @Nullable
+    @OneToOne
     private User judge;
+    @Version
+    private long version;
 
     public Report() {
         this.status = ReportStatus.WAITING_FOR_REALIZATION;

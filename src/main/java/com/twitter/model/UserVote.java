@@ -17,6 +17,8 @@ public class UserVote {
     @NotNull
     @ManyToOne
     private User user;
+    @Version
+    private long version;
 
     public UserVote() {
     }

@@ -39,6 +39,9 @@ public class Tweet {
     @OneToMany
     private Set<Report> reports;
 
+    @Version
+    private long version;
+
     public Tweet() {
         this.banned = false;
         this.date = DateTime.now();

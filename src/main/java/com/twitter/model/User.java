@@ -51,6 +51,9 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "followerId"))
     private Set<User> followers;
 
+    @Version
+    private long version;
+
     public User() {
         this.passwordExpireDate = DateTime.now();
         this.enable = true;
@@ -209,5 +212,14 @@ public class User implements UserDetails {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + username.hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "role=" + role +
+                ", id=" + id +
+                ", username='" + username + '\'' +
+                '}';
     }
 }
