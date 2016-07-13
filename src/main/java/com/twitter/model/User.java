@@ -50,11 +50,6 @@ public class User implements UserDetails {
     @JoinTable(joinColumns = @JoinColumn(name = "userId"),
             inverseJoinColumns = @JoinColumn(name = "followerId"))
     private Set<User> followers;
-    @NotNull
-    @ManyToMany
-    @JoinTable(joinColumns = @JoinColumn(name = "userId"),
-            inverseJoinColumns = @JoinColumn(name = "followingUserId"))
-    private Set<User> following;
 
     public User() {
         this.passwordExpireDate = DateTime.now();
@@ -65,7 +60,6 @@ public class User implements UserDetails {
         this.tweets = new HashSet<>();
         this.favouriteTags = new HashSet<>();
         this.followers = new HashSet<>();
-        this.following = new HashSet<>();
     }
 
     public User(Avatar avatar, String username, String password) {
@@ -81,14 +75,6 @@ public class User implements UserDetails {
 
     public void setFollowers(Set<User> followers) {
         this.followers = followers;
-    }
-
-    public Set<User> getFollowing() {
-        return following;
-    }
-
-    public void setFollowing(Set<User> following) {
-        this.following = following;
     }
 
     public long getId() {
