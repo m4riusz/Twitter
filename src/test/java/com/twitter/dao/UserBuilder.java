@@ -23,7 +23,6 @@ public final class UserBuilder implements Builder<User> {
     private Set<Tweet> tweets = new HashSet<>();
     private Set<Tag> favouriteTags = new HashSet<>();
     private Set<User> followers = new HashSet<>();
-    private Set<User> following = new HashSet<>();
 
     private UserBuilder() {
     }
@@ -92,11 +91,6 @@ public final class UserBuilder implements Builder<User> {
         return this;
     }
 
-    public UserBuilder withFollowing(Set<User> following) {
-        this.following = following;
-        return this;
-    }
-
     @Override
     public User build() {
         User user = new User();
@@ -112,7 +106,6 @@ public final class UserBuilder implements Builder<User> {
         user.setTweets(tweets);
         user.setFavouriteTags(favouriteTags);
         user.setFollowers(followers);
-        user.setFollowing(following);
         return user;
     }
 }
