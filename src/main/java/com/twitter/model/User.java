@@ -1,14 +1,13 @@
 package com.twitter.model;
 
-import org.joda.time.DateTime;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 /**
  * Created by mariusz on 11.07.16.
@@ -18,61 +17,42 @@ import java.util.Set;
 public class User extends AbstractEntity implements UserDetails {
     @NotNull
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn
     private Avatar avatar;
     @NotNull
     @Column(unique = true)
     private String username;
     @NotNull
-    private String password;
-    @NotNull
-    private DateTime passwordExpireDate;
-    @NotNull
-    private boolean enable;
-    @NotNull
-    private boolean banned;
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Password password;
     @NotNull
     private Role role;
     @NotNull
-    @OneToMany
-    private Set<Report> reports;
+    private Gender gender;
     @NotNull
-    @OneToMany
-    private Set<Tweet> tweets;
+    private boolean banned;
     @NotNull
-    @ManyToMany
-    private Set<Tag> favouriteTags;
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Actions actions;
     @NotNull
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(joinColumns = @JoinColumn(name = "userId"),
             inverseJoinColumns = @JoinColumn(name = "followerId"))
-    private Set<User> followers;
+    private List<User> followers;
 
     public User() {
         super();
-        this.passwordExpireDate = DateTime.now();
-        this.enable = true;
         this.banned = false;
         this.role = Role.USER;
-        this.reports = new HashSet<>();
-        this.tweets = new HashSet<>();
-        this.favouriteTags = new HashSet<>();
-        this.followers = new HashSet<>();
+        this.actions = new Actions();
+        this.followers = new ArrayList<>();
+        this.avatar = new Avatar("undef", new byte[100]); // FIXME: 14.07.16 fix
     }
 
-    public User(Avatar avatar, String username, String password) {
+    public User(String username, String password, Gender gender) {
         this();
-        this.avatar = avatar;
         this.username = username;
-        this.password = password;
-    }
-
-    public Set<User> getFollowers() {
-        return followers;
-    }
-
-    public void setFollowers(Set<User> followers) {
-        this.followers = followers;
+        this.password = new Password(password);
+        this.gender = gender;
     }
 
     public Avatar getAvatar() {
@@ -87,32 +67,8 @@ public class User extends AbstractEntity implements UserDetails {
         this.username = username;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(Password password) {
         this.password = password;
-    }
-
-    public DateTime getPasswordExpireDate() {
-        return passwordExpireDate;
-    }
-
-    public void setPasswordExpireDate(DateTime passwordExpireDate) {
-        this.passwordExpireDate = passwordExpireDate;
-    }
-
-    public boolean isEnable() {
-        return enable;
-    }
-
-    public void setEnable(boolean enable) {
-        this.enable = enable;
-    }
-
-    public boolean isBanned() {
-        return banned;
-    }
-
-    public void setBanned(boolean banned) {
-        this.banned = banned;
     }
 
     public Role getRole() {
@@ -123,28 +79,36 @@ public class User extends AbstractEntity implements UserDetails {
         this.role = role;
     }
 
-    public Set<Report> getReports() {
-        return reports;
+    public Gender getGender() {
+        return gender;
     }
 
-    public void setReports(Set<Report> reports) {
-        this.reports = reports;
+    public void setGender(Gender gender) {
+        this.gender = gender;
     }
 
-    public Set<Tweet> getTweets() {
-        return tweets;
+    public boolean isBanned() {
+        return banned;
     }
 
-    public void setTweets(Set<Tweet> tweets) {
-        this.tweets = tweets;
+    public void setBanned(boolean banned) {
+        this.banned = banned;
     }
 
-    public Set<Tag> getFavouriteTags() {
-        return favouriteTags;
+    public Actions getActions() {
+        return actions;
     }
 
-    public void setFavouriteTags(Set<Tag> favouriteTags) {
-        this.favouriteTags = favouriteTags;
+    public void setActions(Actions actions) {
+        this.actions = actions;
+    }
+
+    public List<User> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(List<User> followers) {
+        this.followers = followers;
     }
 
     @Override
@@ -154,7 +118,7 @@ public class User extends AbstractEntity implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        return password.getPassword();
     }
 
     @Override
@@ -174,12 +138,12 @@ public class User extends AbstractEntity implements UserDetails {
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return passwordExpireDate.isAfterNow();
+        return password.getPasswordExpireDate().isAfterNow();
     }
 
     @Override
     public boolean isEnabled() {
-        return enable;
+        return true;
     }
 
     @Override
