@@ -1,7 +1,5 @@
 package com.twitter.model;
 
-import org.joda.time.DateTime;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
@@ -11,14 +9,10 @@ import java.util.Set;
  * Created by mariusz on 11.07.16.
  */
 @Entity
-public class Tweet {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+public class Tweet extends AbstractEntity {
+
     @NotNull
     private boolean banned;
-    @NotNull
-    private DateTime date;
     @NotNull
     private String content;
     @NotNull
@@ -39,12 +33,10 @@ public class Tweet {
     @OneToMany
     private Set<Report> reports;
 
-    @Version
-    private long version;
 
     public Tweet() {
+        super();
         this.banned = false;
-        this.date = DateTime.now();
         this.tags = new HashSet<>();
         this.comments = new HashSet<>();
         this.votes = new HashSet<>();
@@ -57,28 +49,12 @@ public class Tweet {
         this.owner = owner;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
     public boolean isBanned() {
         return banned;
     }
 
     public void setBanned(boolean banned) {
         this.banned = banned;
-    }
-
-    public DateTime getDate() {
-        return date;
-    }
-
-    public void setDate(DateTime date) {
-        this.date = date;
     }
 
     public String getContent() {

@@ -1,3 +1,4 @@
+/*
 package com.twitter.dao;
 
 import com.twitter.Builder;
@@ -18,9 +19,11 @@ import static com.twitter.dao.UserBuilder.user;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
+*/
 /**
  * Created by mariusz on 12.07.16.
- */
+ *//*
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -91,11 +94,14 @@ public class UserDaoTest {
     @Test
     public void updateUserTest() {
         User user = a(user().withId(1).withUsername("Mariusz"));
-        userDao.save(aUserListWith(user));
-        user.setUsername("Marcin");
-        userDao.save(user);
+        userDao.saveAndFlush(user);
+
         User userFromDatabase = userDao.findOne(1L);
-        assertThat(userFromDatabase.getUsername(), is("Marcin"));
+        userFromDatabase.setUsername("Marcin");
+        userDao.flush();
+
+        User userFromDatabase2 = userDao.findOne(1L);
+        assertThat(userFromDatabase2.getUsername(), is("Marcin"));
         assertThat(userDao.findAll().size(), is(1));
     }
 
@@ -195,3 +201,4 @@ public class UserDaoTest {
 
 
 }
+*/

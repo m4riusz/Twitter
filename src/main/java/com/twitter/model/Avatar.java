@@ -10,10 +10,7 @@ import javax.validation.constraints.NotNull;
  */
 
 @Entity
-public class Avatar {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+public class Avatar extends AbstractEntity{
     @NotNull
     private String fileName;
     @Lob
@@ -21,21 +18,13 @@ public class Avatar {
     private byte[] bytes;
 
     public Avatar() {
-
+        super();
     }
 
     public Avatar(String fileName, byte[] bytes) {
         this();
         this.fileName = fileName;
         this.bytes = bytes;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getFileName() {

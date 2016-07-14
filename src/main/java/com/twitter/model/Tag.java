@@ -1,33 +1,26 @@
 package com.twitter.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
 
 /**
  * Created by mariusz on 11.07.16.
  */
 @Entity
-public class Tag {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+public class Tag extends AbstractEntity {
+
     @NotNull
     @Column(unique = true)
     private String text;
 
-    @Version
-    private long version;
+    public Tag() {
+        super();
+    }
 
     public Tag(String text) {
+        this();
         this.text = text;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getText() {

@@ -5,8 +5,14 @@ spring:
     username: postgres
     password: postgres
     url: jdbc:postgresql://localhost:5432/twitterApp
+    dbcp:
+      driver-class-name:
   jpa:
     database: postgresql
     show-sql: true
     hibernate:
       ddl-auto: create
+    properties:
+      hibernate:
+        current_session_context_class: org.springframework.orm.hibernate4.SpringSessionContext
+

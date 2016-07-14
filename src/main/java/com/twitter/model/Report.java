@@ -9,10 +9,7 @@ import javax.validation.constraints.NotNull;
  * Created by mariusz on 11.07.16.
  */
 @Entity
-public class Report {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+public class Report extends AbstractEntity{
     @NotNull
     private ReportStatus status;
     @NotNull
@@ -25,10 +22,9 @@ public class Report {
     @Nullable
     @OneToOne
     private User judge;
-    @Version
-    private long version;
 
     public Report() {
+        super();
         this.status = ReportStatus.WAITING_FOR_REALIZATION;
     }
 
@@ -38,14 +34,6 @@ public class Report {
         this.message = message;
         this.user = user;
         this.judge = judge;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public ReportStatus getStatus() {

@@ -15,10 +15,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "users")
-public class User implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+public class User extends AbstractEntity implements UserDetails {
     @NotNull
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn
@@ -51,10 +48,8 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "followerId"))
     private Set<User> followers;
 
-    @Version
-    private long version;
-
     public User() {
+        super();
         this.passwordExpireDate = DateTime.now();
         this.enable = true;
         this.banned = false;
@@ -78,14 +73,6 @@ public class User implements UserDetails {
 
     public void setFollowers(Set<User> followers) {
         this.followers = followers;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public Avatar getAvatar() {
@@ -199,27 +186,18 @@ public class User implements UserDetails {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         User user = (User) o;
 
-        if (id != user.id) return false;
         return username.equals(user.username);
 
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
+        int result = super.hashCode();
         result = 31 * result + username.hashCode();
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "role=" + role +
-                ", id=" + id +
-                ", username='" + username + '\'' +
-                '}';
     }
 }

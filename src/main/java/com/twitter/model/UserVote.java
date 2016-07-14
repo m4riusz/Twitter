@@ -8,33 +8,22 @@ import javax.validation.constraints.NotNull;
  */
 
 @Entity
-public class UserVote {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+public class UserVote extends AbstractEntity{
+
     @NotNull
     private Vote vote;
     @NotNull
     @ManyToOne
     private User user;
-    @Version
-    private long version;
 
     public UserVote() {
+        super();
     }
 
     public UserVote(Vote vote, User user) {
         this();
         this.vote = vote;
         this.user = user;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public Vote getVote() {
