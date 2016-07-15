@@ -39,11 +39,11 @@ public interface UserService extends UserDetailsService {
 
     public List<User> getAllUsers(Pageable pageable);
 
-    public long getUserFollowersCount();
+    public long getUserFollowersCountById(long userId);
 
     public List<User> getUserFollowersById(long userId, Pageable pageable);
 
-    public long getUserFollowingCount();
+    public long getUserFollowingCountById(long userId);
 
     public List<User> getUserFollowingsById(long userId, Pageable pageable);
 
