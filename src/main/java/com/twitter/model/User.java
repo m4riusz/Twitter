@@ -154,14 +154,15 @@ public class User extends AbstractEntity implements UserDetails {
 
         User user = (User) o;
 
-        return username.equals(user.username);
+        if (username != null ? !username.equals(user.username) : user.username != null) return false;
 
+        return true;
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + username.hashCode();
+        result = 31 * result + (username != null ? username.hashCode() : 0);
         return result;
     }
 }
