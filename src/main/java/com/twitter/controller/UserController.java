@@ -15,9 +15,9 @@ import java.util.List;
  * Created by mariusz on 18.07.16.
  */
 @RestController
-@RequestMapping(UserController.API)
+@RequestMapping(Route.API)
 public class UserController {
-    public static final String API = "/api";
+
     private UserService userService;
 
     @Autowired
