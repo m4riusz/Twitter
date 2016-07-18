@@ -68,30 +68,34 @@ public class UserServiceImpl implements UserService {
         userToUnfollow.getFollowers().remove(user);
     }
 
-    @Override   // TODO: 15.07.16 add security to moderator and admin
-    public void banUser(User user, long userToBanId) {
+    @Override
+    public void banUser(long userToBanId) {
         User userToBan = getUser(userToBanId);
         userToBan.setBanned(true);
     }
 
-    @Override   // TODO: 15.07.16 add security to moderator and admin
-    public void unbanUser(User user, long userToUnbanId) {
+    @Override
+    public void unbanUser(long userToUnbanId) {
         User userToUnban = getUser(userToUnbanId);
         userToUnban.setBanned(false);
     }
 
-    @Override   // TODO: 15.07.16 add security
-    public void changeUserRole(User user, long userToChangeId, Role role) {
+    @Override
+    public void changeUserRole(long userToChangeId, Role role) {
         User userToChange = getUser(userToChangeId);
         userToChange.setRole(role);
     }
 
-    @Override   // TODO: 15.07.16 add security
+    @Override
     public void deleteUserById(long userId) {
-        userDao.delete(userId);
+        if (userDao.exists(userId)) {
+            userDao.delete(userId);
+            return;
+        }
+        throw new UserNotFoundException();
     }
 
-    @Override // TODO: 15.07.16 add security
+    @Override
     public void changeUserPasswordById(long userId, String password) {
         User userToChange = getUser(userId);
         userToChange.setPassword(new Password(password));
@@ -109,26 +113,34 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public long getUserFollowersCountById(long userId) {
-        getUser(userId);
-        return userDao.findFollowersCountByUserId(userId);
+        if (userDao.exists(userId)) {
+            return userDao.findFollowersCountByUserId(userId);
+        }
+        throw new UserNotFoundException();
     }
 
     @Override
     public List<User> getUserFollowersById(long userId, Pageable pageable) {
-        getUser(userId);
-        return userDao.findFollowersByUserId(userId, pageable);
+        if (userDao.exists(userId)) {
+            return userDao.findFollowersByUserId(userId, pageable);
+        }
+        throw new UserNotFoundException();
     }
 
     @Override
     public long getUserFollowingCountById(long userId) {
-        getUser(userId);
-        return userDao.findFollowingCountByUserId(userId);
+        if (userDao.exists(userId)) {
+            return userDao.findFollowingCountByUserId(userId);
+        }
+        throw new UserNotFoundException();
     }
 
     @Override
     public List<User> getUserFollowingsById(long userId, Pageable pageable) {
-        getUser(userId);
-        return userDao.findFollowingByUserId(userId, pageable);
+        if (userDao.exists(userId)) {
+            return userDao.findFollowingByUserId(userId, pageable);
+        }
+        throw new UserNotFoundException();
     }
 
     private User getUser(long userId) {

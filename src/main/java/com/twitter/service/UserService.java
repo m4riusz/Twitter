@@ -3,6 +3,8 @@ package com.twitter.service;
 import com.twitter.model.Role;
 import com.twitter.model.User;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -25,15 +27,20 @@ public interface UserService extends UserDetailsService {
 
     public void unfollow(User user, long userToUnfollowId);
 
-    public void banUser(User user, long userToBanId);
+    @PreAuthorize("hasAnyRole('ADMIN','MODERATOR')")
+    public void banUser(long userToBanId);
 
-    public void unbanUser(User user, long userToUnbanId);
+    @PreAuthorize("hasAnyRole('ADMIN','MODERATOR')")
+    public void unbanUser(long userToUnbanId);
 
-    public void changeUserRole(User user, long userToChangeId, Role role);
+    @PreAuthorize("hasRole('ADMIN')")
+    public void changeUserRole(long userToChangeId, Role role);
 
+    @PreAuthorize("hasAnyRole('ADMIN','MODERATOR')")
     public void deleteUserById(long userId);
 
-    public void changeUserPasswordById(long userId, String password);
+    @PreAuthorize("#userToChangeId == principal.id")
+    public void changeUserPasswordById(@Param("userToChangeId") long userId, String password);
 
     public long getAllUsersCount();
 
