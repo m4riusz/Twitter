@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
  * Created by mariusz on 14.07.16.
  */
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class AbstractEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
