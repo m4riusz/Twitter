@@ -15,9 +15,14 @@ public class Password extends AbstractEntity {
     @NotNull
     private DateTime passwordExpireDate;
 
-    public Password(String password) {
-        this.password = password;
+    public Password() {
+        super();
         this.passwordExpireDate = DateTime.now();
+    }
+
+    public Password(String password) {
+        this();
+        this.password = password;
     }
 
     public String getPassword() {
