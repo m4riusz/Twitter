@@ -2,8 +2,8 @@ package com.twitter.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by mariusz on 11.07.16.
@@ -19,28 +19,26 @@ public class Tweet extends AbstractEntity {
     @ManyToOne
     private User owner;
     @NotNull
-    @ManyToMany
-    private Set<Tag> tags;
+    @ManyToMany(cascade = CascadeType.ALL)
+    private List<Tag> tags;
     @NotNull
-    @ManyToMany
-    @JoinTable(joinColumns = @JoinColumn(name = "tweetId"),
-            inverseJoinColumns = @JoinColumn(name = "commentId"))
-    private Set<Tweet> comments;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Tweet> comments;
     @NotNull
-    @ManyToMany
-    private Set<UserVote> votes;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserVote> votes;
     @NotNull
-    @OneToMany
-    private Set<Report> reports;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Report> reports;
 
 
     public Tweet() {
         super();
         this.banned = false;
-        this.tags = new HashSet<>();
-        this.comments = new HashSet<>();
-        this.votes = new HashSet<>();
-        this.reports = new HashSet<>();
+        this.tags = new ArrayList<>();
+        this.comments = new ArrayList<>();
+        this.votes = new ArrayList<>();
+        this.reports = new ArrayList<>();
     }
 
     public Tweet(String content, User owner) {
@@ -73,35 +71,54 @@ public class Tweet extends AbstractEntity {
         this.owner = owner;
     }
 
-    public Set<Tag> getTags() {
+    public List<Tag> getTags() {
         return tags;
     }
 
-    public void setTags(Set<Tag> tags) {
+    public void setTags(List<Tag> tags) {
         this.tags = tags;
     }
 
-    public Set<Tweet> getComments() {
+    public List<Tweet> getComments() {
         return comments;
     }
 
-    public void setComments(Set<Tweet> comments) {
+    public void setComments(List<Tweet> comments) {
         this.comments = comments;
     }
 
-    public Set<UserVote> getVotes() {
+    public List<UserVote> getVotes() {
         return votes;
     }
 
-    public void setVotes(Set<UserVote> votes) {
+    public void setVotes(List<UserVote> votes) {
         this.votes = votes;
     }
 
-    public Set<Report> getReports() {
+    public List<Report> getReports() {
         return reports;
     }
 
-    public void setReports(Set<Report> reports) {
+    public void setReports(List<Report> reports) {
         this.reports = reports;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Tweet)) return false;
+        if (!super.equals(o)) return false;
+
+        Tweet tweet = (Tweet) o;
+
+        return content.equals(tweet.content);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + content.hashCode();
+        return result;
     }
 }
