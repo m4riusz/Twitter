@@ -96,11 +96,4 @@ public final class UserBuilder implements Builder<User> {
         return user;
     }
 
-    public static List<User> aUserListWith(User... users) {
-        return Arrays.asList(users);
-    }
-
-    public static <T> T a(Builder<T> builder) {
-        return builder.build();
-    }
 }
