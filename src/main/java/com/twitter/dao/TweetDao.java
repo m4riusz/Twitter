@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.twitter.dao.Query.GET_COMMENTS_FROM_TWEET_BY_ID;
+
 /**
  * Created by mariusz on 19.07.16.
  */
@@ -16,7 +18,7 @@ public interface TweetDao extends JpaRepository<Tweet, Long> {
 
     public List<Tweet> findByOwnerId(long userId, Pageable pageable);
 
-    @Query("SELECT tweet.comments FROM Tweet tweet WHERE tweet.id = ?1")
+    @Query(GET_COMMENTS_FROM_TWEET_BY_ID)
     public List<Tweet> findCommentsById(long tweetId, Pageable pageable);
 }
 

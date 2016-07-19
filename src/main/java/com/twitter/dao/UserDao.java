@@ -17,13 +17,7 @@ import static com.twitter.dao.Query.*;
 public interface UserDao extends JpaRepository<User, Long> {
 
     @Query(GET_USER_FOLLOWERS_BY_ID)
-    public List<User> findFollowersByUserId(long userId);
-
-    @Query(GET_USER_FOLLOWERS_BY_ID)
     public List<User> findFollowersByUserId(long userId, Pageable pageable);
-
-    @Query(GET_USER_FOLLOWING_BY_ID)
-    public List<User> findFollowingByUserId(long userId);
 
     @Query(GET_USER_FOLLOWING_BY_ID)
     public List<User> findFollowingByUserId(long userId, Pageable pageable);
