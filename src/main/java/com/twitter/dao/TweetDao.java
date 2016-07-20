@@ -2,13 +2,14 @@ package com.twitter.dao;
 
 import com.twitter.model.Tweet;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 import static com.twitter.dao.Query.GET_COMMENTS_FROM_TWEET_BY_ID;
+import static com.twitter.dao.Query.SELECT_MOST_POPULAR_TWEETS_BY_TIME;
 
 /**
  * Created by mariusz on 19.07.16.
@@ -20,5 +21,9 @@ public interface TweetDao extends JpaRepository<Tweet, Long> {
 
     @Query(GET_COMMENTS_FROM_TWEET_BY_ID)
     public List<Tweet> findCommentsById(long tweetId, Pageable pageable);
+
+    @Query(value = SELECT_MOST_POPULAR_TWEETS_BY_TIME)
+    public List<Tweet> findMostPopularByVotes(int hours, Pageable pageable);
+
 }
 
