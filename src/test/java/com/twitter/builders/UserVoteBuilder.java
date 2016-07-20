@@ -1,23 +1,28 @@
 package com.twitter.builders;
 
+import com.twitter.Builder;
+import com.twitter.model.Tweet;
 import com.twitter.model.User;
 import com.twitter.model.UserVote;
 import com.twitter.model.Vote;
-import org.joda.time.DateTime;
+
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by mariusz on 19.07.16.
  */
-public final class UserVoteBuilder {
-    private Vote vote;
+public final class UserVoteBuilder implements Builder<UserVote> {
+    private Vote vote = Vote.UP;
     private User user;
-    private long id;
-    private DateTime createDate;
+    private long id = 0;
+    private Tweet tweet;
+    private Date createDate = Calendar.getInstance().getTime();
 
     private UserVoteBuilder() {
     }
 
-    public static UserVoteBuilder anUserVote() {
+    public static UserVoteBuilder userVote() {
         return new UserVoteBuilder();
     }
 
@@ -36,8 +41,13 @@ public final class UserVoteBuilder {
         return this;
     }
 
-    public UserVoteBuilder withCreateDate(DateTime createDate) {
+    public UserVoteBuilder withCreateDate(Date createDate) {
         this.createDate = createDate;
+        return this;
+    }
+
+    public UserVoteBuilder withTweet(Tweet tweet) {
+        this.tweet = tweet;
         return this;
     }
 
@@ -47,6 +57,7 @@ public final class UserVoteBuilder {
         userVote.setUser(user);
         userVote.setId(id);
         userVote.setCreateDate(createDate);
+        userVote.setTweet(tweet);
         return userVote;
     }
 }

@@ -1,6 +1,8 @@
 package com.twitter.model;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -8,22 +10,34 @@ import javax.validation.constraints.NotNull;
  */
 
 @Entity
-public class UserVote extends AbstractEntity{
+public class UserVote extends AbstractEntity {
 
     @NotNull
     private Vote vote;
     @NotNull
     @ManyToOne
     private User user;
+    @NotNull
+    @ManyToOne
+    private Tweet tweet;
 
     public UserVote() {
         super();
     }
 
-    public UserVote(Vote vote, User user) {
+    public UserVote(Vote vote, User user, Tweet tweet) {
         this();
+        this.tweet = tweet;
         this.vote = vote;
         this.user = user;
+    }
+
+    public Tweet getTweet() {
+        return tweet;
+    }
+
+    public void setTweet(Tweet tweet) {
+        this.tweet = tweet;
     }
 
     public Vote getVote() {

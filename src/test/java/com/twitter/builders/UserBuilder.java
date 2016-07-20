@@ -3,10 +3,10 @@ package com.twitter.builders;
 
 import com.twitter.Builder;
 import com.twitter.model.*;
-import org.joda.time.DateTime;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,7 +22,7 @@ public final class UserBuilder implements Builder<User> {
     private boolean banned = false;
     private Actions actions = new Actions();
     private List<User> followers = new ArrayList<>();
-    private DateTime createDate = DateTime.now();
+    private Date createDate = Calendar.getInstance().getTime();
 
     private UserBuilder() {
     }
@@ -76,7 +76,7 @@ public final class UserBuilder implements Builder<User> {
         return this;
     }
 
-    public UserBuilder withCreateDate(DateTime createDate) {
+    public UserBuilder withCreateDate(Date createDate) {
         this.createDate = createDate;
         return this;
     }

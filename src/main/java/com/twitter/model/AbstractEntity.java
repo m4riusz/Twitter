@@ -1,25 +1,29 @@
 package com.twitter.model;
 
-import org.joda.time.DateTime;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by mariusz on 14.07.16.
  */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class AbstractEntity {
+public abstract class AbstractEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @NotNull
-    private DateTime createDate;
+    @CreatedDate
+    private Date createDate;
 
     public AbstractEntity() {
-        this.createDate = DateTime.now();
+        this.createDate = Calendar.getInstance().getTime();
     }
 
     public long getId() {
@@ -30,11 +34,11 @@ public abstract class AbstractEntity {
         this.id = id;
     }
 
-    public DateTime getCreateDate() {
+    public Date getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(DateTime createDate) {
+    public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
 

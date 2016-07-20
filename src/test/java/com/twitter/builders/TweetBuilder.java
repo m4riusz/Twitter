@@ -2,9 +2,10 @@ package com.twitter.builders;
 
 import com.twitter.Builder;
 import com.twitter.model.*;
-import org.joda.time.DateTime;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,7 +20,7 @@ public final class TweetBuilder implements Builder<Tweet> {
     private List<UserVote> votes = new ArrayList<>();
     private List<Report> reports = new ArrayList<>();
     private long id = 0;
-    private DateTime createDate = DateTime.now();
+    private Date createDate = Calendar.getInstance().getTime();
 
     private TweetBuilder() {
     }
@@ -68,7 +69,7 @@ public final class TweetBuilder implements Builder<Tweet> {
         return this;
     }
 
-    public TweetBuilder withCreateDate(DateTime createDate) {
+    public TweetBuilder withCreateDate(Date createDate) {
         this.createDate = createDate;
         return this;
     }
