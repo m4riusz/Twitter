@@ -1,9 +1,6 @@
 package com.twitter.dao;
 
-import com.twitter.model.Tweet;
-import com.twitter.model.User;
-import com.twitter.model.UserVote;
-import com.twitter.model.Vote;
+import com.twitter.model.*;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +15,7 @@ import java.util.List;
 
 import static com.twitter.Util.a;
 import static com.twitter.Util.aListWith;
+import static com.twitter.builders.CommentBuilder.comment;
 import static com.twitter.builders.TweetBuilder.tweet;
 import static com.twitter.builders.UserBuilder.user;
 import static com.twitter.builders.UserVoteBuilder.userVote;
@@ -40,6 +38,9 @@ public class TweetDaoTest {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private CommentDao commentDao;
 
     @Test
     public void findAllTweetsByOwnerId_noTweets() {
@@ -91,7 +92,7 @@ public class TweetDaoTest {
 
         Tweet tweet = a(tweet().withOwner(user));
         tweetDao.save(tweet);
-        List<Tweet> commentsFromTweet = tweetDao.findCommentsById(tweet.getId(), new PageRequest(0, 10));
+        List<Comment> commentsFromTweet = commentDao.findCommentsById(tweet.getId(), new PageRequest(0, 10));
         assertThat(commentsFromTweet, is(emptyList()));
     }
 
@@ -101,12 +102,12 @@ public class TweetDaoTest {
         User commentator = a(user().withUsername("Commentator"));
         userDao.save(aListWith(user, commentator));
 
-        Tweet comment = a(tweet().withOwner(commentator));
-        Tweet tweet = a(tweet().withOwner(user).withComments(aListWith(comment)));
-        tweetDao.save(aListWith(comment, tweet));
-        List<Tweet> commentsFromTweet = tweetDao.findCommentsById(tweet.getId(), new PageRequest(0, 10));
+        Tweet tweet = a(tweet().withOwner(user));
+        Comment comment = a(comment().withTweet(tweet).withOwner(commentator));
+        commentDao.save(aListWith(comment));
+        tweetDao.save(aListWith(tweet));
+        List<Comment> commentsFromTweet = commentDao.findCommentsById(tweet.getId(), new PageRequest(0, 10));
         assertThat(commentsFromTweet, hasItem(comment));
-        assertThat(commentsFromTweet.get(0).getOwner(), is(commentator));
     }
 
     @Test
@@ -119,17 +120,18 @@ public class TweetDaoTest {
         User commentator4 = a(user().withUsername("Commentator4"));
         userDao.save(aListWith(userOne, userTwo, commentator1, commentator2, commentator3, commentator4));
 
-        Tweet comment1 = a(tweet().withOwner(commentator1));
-        Tweet comment2 = a(tweet().withOwner(commentator2));
-        Tweet comment3 = a(tweet().withOwner(commentator3));
-        Tweet comment4 = a(tweet().withOwner(commentator4));
-        Tweet ownerComment = a(tweet().withOwner(userOne));
-        Tweet tweetFromUserOne = a(tweet().withOwner(userOne).withComments(aListWith(comment1, comment2, comment3, ownerComment)));
-        Tweet tweetFromUserTwo = a(tweet().withOwner(userTwo).withComments(aListWith(comment4)));
-        tweetDao.save(aListWith(comment1, comment2, comment3, comment4, ownerComment, tweetFromUserOne, tweetFromUserTwo));
+        Tweet tweetFromUserOne = a(tweet().withOwner(userOne));
+        Tweet tweetFromUserTwo = a(tweet().withOwner(userTwo));
+        Comment comment1 = a(comment().withOwner(commentator1).withTweet(tweetFromUserOne));
+        Comment comment2 = a(comment().withOwner(commentator2).withTweet(tweetFromUserOne));
+        Comment comment3 = a(comment().withOwner(commentator3).withTweet(tweetFromUserOne));
+        Comment comment4 = a(comment().withOwner(commentator4).withTweet(tweetFromUserTwo));
+        Comment ownerComment = a(comment().withOwner(userOne).withTweet(tweetFromUserOne));
+        commentDao.save(aListWith(comment1, comment2, comment3, comment4, ownerComment));
+        tweetDao.save(aListWith(tweetFromUserOne, tweetFromUserTwo));
 
-        List<Tweet> commentsFromTweetOne = tweetDao.findCommentsById(tweetFromUserOne.getId(), new PageRequest(0, 10));
-        List<Tweet> commentsFromTweetTwo = tweetDao.findCommentsById(tweetFromUserTwo.getId(), new PageRequest(0, 10));
+        List<Comment> commentsFromTweetOne = commentDao.findCommentsById(tweetFromUserOne.getId(), new PageRequest(0, 10));
+        List<Comment> commentsFromTweetTwo = commentDao.findCommentsById(tweetFromUserTwo.getId(), new PageRequest(0, 10));
         assertThat(commentsFromTweetOne, hasItems(comment1, comment2, comment3, ownerComment));
         assertThat(commentsFromTweetTwo, hasItem(comment4));
     }
