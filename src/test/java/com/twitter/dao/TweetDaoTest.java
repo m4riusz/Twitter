@@ -18,12 +18,12 @@ import java.util.List;
 
 import static com.twitter.Util.a;
 import static com.twitter.Util.aListWith;
+import static com.twitter.builders.TagBuilder.tag;
 import static com.twitter.builders.TweetBuilder.tweet;
 import static com.twitter.builders.UserBuilder.user;
 import static com.twitter.builders.UserVoteBuilder.userVote;
 import static java.util.Collections.emptyList;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
 
@@ -148,6 +148,68 @@ public class TweetDaoTest {
 
         assertThat(mostPopularOnFirstPage, hasItems(tweetOne, tweetTwo));
         assertThat(mostPopularSecondPage, hasItem(tweetThree));
+    }
+
+    @Test
+    public void findByTagsTextOrderByCreateDateDesc_noTags() {
+        User user = a(user());
+        userDao.save(aListWith(user));
+        Tweet tweet = a(tweet().withOwner(user));
+        tweetDao.save(aListWith(tweet));
+        List<Tweet> tweetsWithTag = tweetDao.findByTagsTextOrderByCreateDateDesc("", new PageRequest(0, 10));
+        assertThat(tweetsWithTag, is(emptyList()));
+    }
+
+    @Test
+    public void findByTagsTextOrderByCreateDateDesc_oneTag() {
+        String tag = "tag";
+        User user = a(user());
+        userDao.save(aListWith(user));
+        Tweet tweet = a(tweet().withOwner(user).withTags(aListWith(a(tag().withText(tag)))));
+        tweetDao.save(aListWith(tweet));
+        List<Tweet> tweetsWithTag = tweetDao.findByTagsTextOrderByCreateDateDesc(tag, new PageRequest(0, 10));
+        assertThat(tweetsWithTag, hasItem(tweet));
+    }
+
+
+    @Test
+    public void findByTagsTextOrderByCreateDateDesc_someTags() {
+        String tagOne = "tag1";
+        String tagTwo = "tag2";
+
+        User user = a(user());
+        userDao.save(aListWith(user));
+        Tweet tweet = a(tweet().withOwner(user).withTags(aListWith(a(tag().withText(tagOne)), a(tag().withText(tagTwo)))));
+        tweetDao.save(aListWith(tweet));
+        List<Tweet> tweetsWithTag = tweetDao.findByTagsTextOrderByCreateDateDesc(tagOne, new PageRequest(0, 10));
+        assertThat(tweetsWithTag, hasItem(tweet));
+    }
+
+    @Test
+    public void findByTagsTextOrderByCreateDateDesc_oneTagAndManyTweets() {
+        String tag = "tag";
+        User user = a(user());
+        userDao.save(aListWith(user));
+        Tweet tweetOne = a(tweet().withOwner(user).withTags(aListWith(a(tag().withText(tag)))));
+        Tweet tweetTwo = a(tweet().withOwner(user).withTags(aListWith(a(tag().withText(tag)))));
+        tweetDao.save(aListWith(tweetOne, tweetTwo));
+        List<Tweet> tweetsWithTag = tweetDao.findByTagsTextOrderByCreateDateDesc(tag, new PageRequest(0, 10));
+        assertThat(tweetsWithTag, hasItems(tweetOne, tweetTwo));
+    }
+
+    @Test
+    public void findByTagsTextOrderByCreateDateDesc_tweetOrderedByNewest() {
+        String tag = "tag";
+        User user = a(user());
+        userDao.save(aListWith(user));
+        Tweet tweetOne = a(tweet().withCreateDate(DateTime.now().minusDays(1).toDate()).withOwner(user).withTags(aListWith(a(tag().withText(tag)))));
+        Tweet tweetTwo = a(tweet().withCreateDate(DateTime.now().minusDays(2).toDate()).withOwner(user).withTags(aListWith(a(tag().withText(tag)))));
+        Tweet tweetThree = a(tweet().withCreateDate(DateTime.now().minusDays(3).toDate()).withOwner(user).withTags(aListWith(a(tag().withText(tag)))));
+        tweetDao.save(aListWith(tweetOne, tweetTwo, tweetThree));
+        List<Tweet> firstPageTweets = tweetDao.findByTagsTextOrderByCreateDateDesc(tag, new PageRequest(0, 2));
+        List<Tweet> secondPageTweets = tweetDao.findByTagsTextOrderByCreateDateDesc(tag, new PageRequest(1, 2));
+        assertThat(firstPageTweets, contains(tweetOne, tweetTwo));
+        assertThat(secondPageTweets, contains(tweetThree));
     }
 
 }

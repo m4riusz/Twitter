@@ -1,21 +1,23 @@
 package com.twitter.builders;
 
+import com.twitter.Builder;
 import com.twitter.model.Tag;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
  * Created by mariusz on 21.07.16.
  */
-public final class TagBuilder {
-    private String text;
-    private long id;
-    private Date createDate;
+public final class TagBuilder implements Builder<Tag> {
+    private String text = "";
+    private long id = 0;
+    private Date createDate = Calendar.getInstance().getTime();
 
     private TagBuilder() {
     }
 
-    public static TagBuilder aTag() {
+    public static TagBuilder tag() {
         return new TagBuilder();
     }
 
