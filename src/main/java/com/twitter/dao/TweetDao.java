@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.twitter.dao.Query.GET_COMMENTS_FROM_TWEET_BY_ID;
 import static com.twitter.dao.Query.SELECT_MOST_POPULAR_TWEETS_BY_TIME;
 
 /**
@@ -18,9 +17,6 @@ import static com.twitter.dao.Query.SELECT_MOST_POPULAR_TWEETS_BY_TIME;
 public interface TweetDao extends JpaRepository<Tweet, Long> {
 
     public List<Tweet> findByOwnerId(long userId, Pageable pageable);
-
-    @Query(GET_COMMENTS_FROM_TWEET_BY_ID)
-    public List<Tweet> findCommentsById(long tweetId, Pageable pageable);
 
     @Query(value = SELECT_MOST_POPULAR_TWEETS_BY_TIME)
     public List<Tweet> findMostPopularByVotes(int hours, Pageable pageable);
