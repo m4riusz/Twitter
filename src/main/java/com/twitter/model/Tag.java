@@ -11,7 +11,6 @@ import javax.validation.constraints.NotNull;
 public class Tag extends AbstractEntity {
 
     @NotNull
-    @Column(unique = true)
     private String text;
 
     public Tag() {
