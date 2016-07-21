@@ -9,24 +9,33 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by mariusz on 19.07.16.
+ * Created by mariusz on 21.07.16.
  */
 public final class TweetBuilder implements Builder<Tweet> {
     private boolean banned = false;
     private String content = "content";
     private User owner;
     private List<Tag> tags = new ArrayList<>();
-    private List<Tweet> comments = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
     private List<UserVote> votes = new ArrayList<>();
     private List<Report> reports = new ArrayList<>();
     private long id = 0;
     private Date createDate = Calendar.getInstance().getTime();
-
     private TweetBuilder() {
     }
 
     public static TweetBuilder tweet() {
-        return new TweetBuilder();
+         return new TweetBuilder();
+    }
+
+    public TweetBuilder withTags(List<Tag> tags) {
+        this.tags = tags;
+        return this;
+    }
+
+    public TweetBuilder withComments(List<Comment> comments) {
+        this.comments = comments;
+        return this;
     }
 
     public TweetBuilder withBanned(boolean banned) {
@@ -41,16 +50,6 @@ public final class TweetBuilder implements Builder<Tweet> {
 
     public TweetBuilder withOwner(User owner) {
         this.owner = owner;
-        return this;
-    }
-
-    public TweetBuilder withTags(List<Tag> tags) {
-        this.tags = tags;
-        return this;
-    }
-
-    public TweetBuilder withComments(List<Tweet> comments) {
-        this.comments = comments;
         return this;
     }
 
@@ -76,11 +75,11 @@ public final class TweetBuilder implements Builder<Tweet> {
 
     public Tweet build() {
         Tweet tweet = new Tweet();
+        tweet.setTags(tags);
+        tweet.setComments(comments);
         tweet.setBanned(banned);
         tweet.setContent(content);
         tweet.setOwner(owner);
-        tweet.setTags(tags);
-        tweet.setComments(comments);
         tweet.setVotes(votes);
         tweet.setReports(reports);
         tweet.setId(id);
