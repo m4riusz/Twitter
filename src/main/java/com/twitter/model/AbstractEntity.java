@@ -22,6 +22,9 @@ public abstract class AbstractEntity implements Serializable {
     @CreatedDate
     private Date createDate;
 
+    @Version
+    private int version;
+
     public AbstractEntity() {
         this.createDate = Calendar.getInstance().getTime();
     }
@@ -40,6 +43,14 @@ public abstract class AbstractEntity implements Serializable {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 
     @Override
