@@ -1,9 +1,6 @@
 package com.twitter.dao;
 
-import com.twitter.model.Tweet;
-import com.twitter.model.User;
-import com.twitter.model.UserVote;
-import com.twitter.model.Vote;
+import com.twitter.model.*;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,9 +37,6 @@ public class TweetDaoTest {
 
     @Autowired
     private UserDao userDao;
-
-    @Autowired
-    private CommentDao commentDao;
 
     @Test
     public void findAllTweetsByOwnerId_noTweets() {
@@ -151,65 +145,81 @@ public class TweetDaoTest {
     }
 
     @Test
-    public void findByTagsTextOrderByCreateDateDesc_noTags() {
+    public void findByTagsInOrderByCreateDateDesc_noTags() {
         User user = a(user());
         userDao.save(aListWith(user));
-        Tweet tweet = a(tweet().withOwner(user));
+        Tweet tweet = a(tweet().withOwner(user).withTags(emptyList()));
         tweetDao.save(aListWith(tweet));
-        List<Tweet> tweetsWithTag = tweetDao.findByTagsTextOrderByCreateDateDesc("", new PageRequest(0, 10));
+        List<Tweet> tweetsWithTag = tweetDao.findDistinctByTagsInOrderByCreateDateDesc(emptyList(), new PageRequest(0, 10));
         assertThat(tweetsWithTag, is(emptyList()));
     }
 
     @Test
-    public void findByTagsTextOrderByCreateDateDesc_oneTag() {
-        String tag = "tag";
+    public void findByTagsInOrderByCreateDateDesc_oneTag() {
+        Tag tag = a(tag().withText("tag"));
         User user = a(user());
         userDao.save(aListWith(user));
-        Tweet tweet = a(tweet().withOwner(user).withTags(aListWith(a(tag().withText(tag)))));
+        Tweet tweet = a(tweet().withOwner(user).withTags(aListWith(tag)));
         tweetDao.save(aListWith(tweet));
-        List<Tweet> tweetsWithTag = tweetDao.findByTagsTextOrderByCreateDateDesc(tag, new PageRequest(0, 10));
+        List<Tweet> tweetsWithTag = tweetDao.findDistinctByTagsInOrderByCreateDateDesc(aListWith(tag), new PageRequest(0, 10));
         assertThat(tweetsWithTag, hasItem(tweet));
     }
 
 
     @Test
-    public void findByTagsTextOrderByCreateDateDesc_someTags() {
-        String tagOne = "tag1";
-        String tagTwo = "tag2";
-
+    public void findByTagsInOrderByCreateDateDesc_oneTweetWithSomeTagsFindUsingAllTags() {
+        Tag tagOne = a(tag().withText("tag1"));
+        Tag tagTwo = a(tag().withText("tag2"));
         User user = a(user());
         userDao.save(aListWith(user));
-        Tweet tweet = a(tweet().withOwner(user).withTags(aListWith(a(tag().withText(tagOne)), a(tag().withText(tagTwo)))));
+        Tweet tweet = a(tweet().withOwner(user).withTags(aListWith(tagOne, tagTwo)));
         tweetDao.save(aListWith(tweet));
-        List<Tweet> tweetsWithTag = tweetDao.findByTagsTextOrderByCreateDateDesc(tagOne, new PageRequest(0, 10));
+        List<Tweet> tweetsWithTag = tweetDao.findDistinctByTagsInOrderByCreateDateDesc(aListWith(tagOne, tagTwo), new PageRequest(0, 10));
         assertThat(tweetsWithTag, hasItem(tweet));
+        assertThat(tweetsWithTag, hasSize(1));
     }
 
     @Test
-    public void findByTagsTextOrderByCreateDateDesc_oneTagAndManyTweets() {
-        String tag = "tag";
+    public void findByTagsInOrderByCreateDateDesc_oneTagAndManyTweets() {
+        Tag tag = a(tag().withText("tag1"));
         User user = a(user());
         userDao.save(aListWith(user));
-        Tweet tweetOne = a(tweet().withOwner(user).withTags(aListWith(a(tag().withText(tag)))));
-        Tweet tweetTwo = a(tweet().withOwner(user).withTags(aListWith(a(tag().withText(tag)))));
+        Tweet tweetOne = a(tweet().withOwner(user).withTags(aListWith(tag)));
+        Tweet tweetTwo = a(tweet().withOwner(user).withTags(aListWith(tag)));
         tweetDao.save(aListWith(tweetOne, tweetTwo));
-        List<Tweet> tweetsWithTag = tweetDao.findByTagsTextOrderByCreateDateDesc(tag, new PageRequest(0, 10));
+        List<Tweet> tweetsWithTag = tweetDao.findDistinctByTagsInOrderByCreateDateDesc(aListWith(tag), new PageRequest(0, 10));
         assertThat(tweetsWithTag, hasItems(tweetOne, tweetTwo));
     }
 
     @Test
-    public void findByTagsTextOrderByCreateDateDesc_tweetOrderedByNewest() {
-        String tag = "tag";
+    public void findByTagsInOrderByCreateDateDesc_tweetOrderedByNewest() {
+        Tag tag = a(tag().withText("tag"));
         User user = a(user());
         userDao.save(aListWith(user));
-        Tweet tweetOne = a(tweet().withCreateDate(DateTime.now().minusDays(1).toDate()).withOwner(user).withTags(aListWith(a(tag().withText(tag)))));
-        Tweet tweetTwo = a(tweet().withCreateDate(DateTime.now().minusDays(2).toDate()).withOwner(user).withTags(aListWith(a(tag().withText(tag)))));
-        Tweet tweetThree = a(tweet().withCreateDate(DateTime.now().minusDays(3).toDate()).withOwner(user).withTags(aListWith(a(tag().withText(tag)))));
+        Tweet tweetOne = a(tweet().withCreateDate(DateTime.now().minusDays(1).toDate()).withOwner(user).withTags(aListWith(tag)));
+        Tweet tweetTwo = a(tweet().withCreateDate(DateTime.now().minusDays(2).toDate()).withOwner(user).withTags(aListWith(tag)));
+        Tweet tweetThree = a(tweet().withCreateDate(DateTime.now().minusDays(3).toDate()).withOwner(user).withTags(aListWith(tag)));
         tweetDao.save(aListWith(tweetOne, tweetTwo, tweetThree));
-        List<Tweet> firstPageTweets = tweetDao.findByTagsTextOrderByCreateDateDesc(tag, new PageRequest(0, 2));
-        List<Tweet> secondPageTweets = tweetDao.findByTagsTextOrderByCreateDateDesc(tag, new PageRequest(1, 2));
+        List<Tweet> firstPageTweets = tweetDao.findDistinctByTagsInOrderByCreateDateDesc(aListWith(tag), new PageRequest(0, 2));
+        List<Tweet> secondPageTweets = tweetDao.findDistinctByTagsInOrderByCreateDateDesc(aListWith(tag), new PageRequest(1, 2));
         assertThat(firstPageTweets, contains(tweetOne, tweetTwo));
         assertThat(secondPageTweets, contains(tweetThree));
+    }
+
+    @Test
+    public void findByTagsInOrderByCreateDateDesc_manyTweetsWithDifferentTagsFindAllByTags() {
+        User user = a(user());
+        userDao.save(aListWith(user));
+        Tag tagOne = a(tag().withText("tag1"));
+        Tag tagTwo = a(tag().withText("tag2"));
+        Tag tagThree = a(tag().withText("tag3"));
+        Tweet tweetOne = a(tweet().withOwner(user).withTags(aListWith(tagOne)));
+        Tweet tweetTwo = a(tweet().withOwner(user).withTags(aListWith(tagTwo)));
+        Tweet tweetThree = a(tweet().withOwner(user).withTags(aListWith(tagThree)));
+        tweetDao.save(aListWith(tweetOne, tweetTwo, tweetThree));
+        List<Tweet> tweetsWithTags = tweetDao.findDistinctByTagsInOrderByCreateDateDesc(aListWith(tagOne, tagTwo, tagThree), new PageRequest(0, 10));
+        assertThat(tweetsWithTags, hasItems(tweetOne, tweetTwo, tweetThree));
+        assertThat(tweetsWithTags, hasSize(3));
     }
 
 }
