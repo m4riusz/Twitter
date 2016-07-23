@@ -40,8 +40,8 @@ public class UserDaoTest {
 
     @Test
     public void findFollowersByUserId_someFollowers() {
-        User followerOne = a(user().withUsername("followerOne"));
-        User followerTwo = a(user().withUsername("followerTwo"));
+        User followerOne = a(user());
+        User followerTwo = a(user());
         User user = a(user().withFollowers(aListWith(followerOne, followerTwo)));
         userDao.save(aListWith(followerOne, followerTwo, user));
         List<User> userFollowers = userDao.findFollowersByUserId(user.getId(), new PageRequest(0, 10));
@@ -50,11 +50,11 @@ public class UserDaoTest {
 
     @Test
     public void findFollowersByUserId_someFollowersAndSomeUsers() {
-        User followerOne1 = a(user().withUsername("followerOne1"));
-        User followerOne2 = a(user().withUsername("followerOne2"));
-        User followerTwo = a(user().withUsername("followerTwo"));
-        User userOne = a(user().withUsername("user1").withFollowers(aListWith(followerOne1, followerOne2)));
-        User userTwo = a(user().withUsername("user2").withFollowers(aListWith(followerTwo)));
+        User followerOne1 = a(user());
+        User followerOne2 = a(user());
+        User followerTwo = a(user());
+        User userOne = a(user().withFollowers(aListWith(followerOne1, followerOne2)));
+        User userTwo = a(user().withFollowers(aListWith(followerTwo)));
         userDao.save(aListWith(followerOne1, followerOne2, followerTwo, userOne, userTwo));
         List<User> userOneFollowers = userDao.findFollowersByUserId(userOne.getId(), new PageRequest(0, 10));
         List<User> userTwoFollowers = userDao.findFollowersByUserId(userTwo.getId(), new PageRequest(0, 10));
@@ -73,9 +73,9 @@ public class UserDaoTest {
 
     @Test
     public void findFollowersCountByUserId_someFollowers() {
-        User follower1 = a(user().withUsername("follower1"));
-        User follower2 = a(user().withUsername("follower2"));
-        User user = a(user().withUsername("User1").withFollowers(aListWith(follower1, follower2)));
+        User follower1 = a(user());
+        User follower2 = a(user());
+        User user = a(user().withFollowers(aListWith(follower1, follower2)));
         userDao.save(aListWith(follower1, follower2, user));
         long followersCount = userDao.findFollowersCountByUserId(user.getId());
         assertThat(followersCount, is(equalTo(2L)));
@@ -84,12 +84,12 @@ public class UserDaoTest {
 
     @Test
     public void findFollowersCountByUserId_someFollowersAndUsers() {
-        User follower1 = a(user().withUsername("follower1"));
-        User follower2 = a(user().withUsername("follower2"));
-        User follower3 = a(user().withUsername("follower3"));
-        User userOne = a(user().withUsername("User1").withFollowers(aListWith(follower1, follower2)));
-        User userTwo = a(user().withUsername("User2").withFollowers(aListWith(follower3)));
-        User userThree = a(user().withUsername("User3").withFollowers(emptyList()));
+        User follower1 = a(user());
+        User follower2 = a(user());
+        User follower3 = a(user());
+        User userOne = a(user().withFollowers(aListWith(follower1, follower2)));
+        User userTwo = a(user().withFollowers(aListWith(follower3)));
+        User userThree = a(user().withFollowers(emptyList()));
         userDao.save(aListWith(follower1, follower2, follower3, userOne, userTwo, userThree));
         long userOneFollowersCount = userDao.findFollowersCountByUserId(userOne.getId());
         long userTwoFollowersCount = userDao.findFollowersCountByUserId(userTwo.getId());
@@ -110,8 +110,8 @@ public class UserDaoTest {
     @Test
     public void findFollowingByUserId_someFollowings() {
         User user = a(user());
-        User following1 = a(user().withUsername("following1").withFollowers(aListWith(user)));
-        User following2 = a(user().withUsername("following2").withFollowers(aListWith(user)));
+        User following1 = a(user().withFollowers(aListWith(user)));
+        User following2 = a(user().withFollowers(aListWith(user)));
         userDao.save(aListWith(user, following1, following2));
         List<User> followingUsers = userDao.findFollowingByUserId(user.getId(), new PageRequest(0, 10));
         assertThat(followingUsers, hasItems(following1, following2));
@@ -119,11 +119,11 @@ public class UserDaoTest {
 
     @Test
     public void findFollowingByUserId_someFollowingsAndUsers() {
-        User userOne = a(user().withUsername("user1"));
-        User userTwo = a(user().withUsername("user2"));
-        User following1 = a(user().withUsername("following1").withFollowers(aListWith(userOne)));
-        User following2 = a(user().withUsername("following2").withFollowers(aListWith(userOne)));
-        User following3 = a(user().withUsername("following3").withFollowers(aListWith(userTwo)));
+        User userOne = a(user());
+        User userTwo = a(user());
+        User following1 = a(user().withFollowers(aListWith(userOne)));
+        User following2 = a(user().withFollowers(aListWith(userOne)));
+        User following3 = a(user().withFollowers(aListWith(userTwo)));
         userDao.save(aListWith(userOne, userTwo, following1, following2, following3));
         List<User> userOneFollowings = userDao.findFollowingByUserId(userOne.getId(), new PageRequest(0, 10));
         List<User> userTwoFollowings = userDao.findFollowingByUserId(userTwo.getId(), new PageRequest(0, 10));
@@ -142,9 +142,9 @@ public class UserDaoTest {
 
     @Test
     public void findFollowingCountByUserId_someFollowers() {
-        User user = a(user().withUsername("User1"));
-        User followingOne = a(user().withUsername("following1").withFollowers(aListWith(user)));
-        User followingTwo = a(user().withUsername("following2").withFollowers(aListWith(user)));
+        User user = a(user());
+        User followingOne = a(user().withFollowers(aListWith(user)));
+        User followingTwo = a(user().withFollowers(aListWith(user)));
         userDao.save(aListWith(user, followingOne, followingTwo));
         long followingCount = userDao.findFollowingCountByUserId(user.getId());
         assertThat(followingCount, is(equalTo(2L)));
@@ -153,11 +153,11 @@ public class UserDaoTest {
 
     @Test
     public void findFollowingCountByUserId_someFollowersAndUsers() {
-        User userOne = a(user().withUsername("User1"));
-        User userTwo = a(user().withUsername("User2"));
-        User following1 = a(user().withUsername("following1").withFollowers(aListWith(userOne)));
-        User following2 = a(user().withUsername("following2").withFollowers(aListWith(userOne)));
-        User following3 = a(user().withUsername("following3").withFollowers(aListWith(userOne, userTwo)));
+        User userOne = a(user());
+        User userTwo = a(user());
+        User following1 = a(user().withFollowers(aListWith(userOne)));
+        User following2 = a(user().withFollowers(aListWith(userOne)));
+        User following3 = a(user().withFollowers(aListWith(userOne, userTwo)));
         userDao.save(aListWith(userOne, userTwo, following1, following2, following3));
         long userOneFollowingCount = userDao.findFollowingCountByUserId(userOne.getId());
         long userTwoFollowingCount = userDao.findFollowingCountByUserId(userTwo.getId());

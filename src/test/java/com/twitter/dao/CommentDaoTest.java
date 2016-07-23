@@ -46,7 +46,6 @@ public class CommentDaoTest {
     public void findCommentsByTweetId_noComments() {
         User user = a(user());
         userDao.save(user);
-
         Tweet tweet = a(tweet().withOwner(user));
         tweetDao.save(tweet);
         List<Comment> commentsFromTweet = commentDao.findCommentsById(tweet.getId(), new PageRequest(0, 10));
@@ -55,8 +54,8 @@ public class CommentDaoTest {
 
     @Test
     public void findCommentsByTweetId_someComments() {
-        User user = a(user().withUsername("Owner"));
-        User commentator = a(user().withUsername("Commentator"));
+        User user = a(user());
+        User commentator = a(user());
         userDao.save(aListWith(user, commentator));
 
         Tweet tweet = a(tweet().withOwner(user));
@@ -69,12 +68,12 @@ public class CommentDaoTest {
 
     @Test
     public void findCommentsByTweetId_someCommentsAndCommentators() {
-        User userOne = a(user().withUsername("Owner1"));
-        User userTwo = a(user().withUsername("Owner2"));
-        User commentator1 = a(user().withUsername("Commentator1"));
-        User commentator2 = a(user().withUsername("Commentator2"));
-        User commentator3 = a(user().withUsername("Commentator3"));
-        User commentator4 = a(user().withUsername("Commentator4"));
+        User userOne = a(user());
+        User userTwo = a(user());
+        User commentator1 = a(user());
+        User commentator2 = a(user());
+        User commentator3 = a(user());
+        User commentator4 = a(user());
         userDao.save(aListWith(userOne, userTwo, commentator1, commentator2, commentator3, commentator4));
 
         Tweet tweetFromUserOne = a(tweet().withOwner(userOne));

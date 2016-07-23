@@ -59,9 +59,9 @@ public class TweetDaoTest {
 
     @Test
     public void findAllTweetsByOwnerId_someTweetsAndSomeUsers() {
-        User userOne = a(user().withUsername("User1"));
-        User userTwo = a(user().withUsername("User2"));
-        User userThree = a(user().withUsername("User3"));
+        User userOne = a(user());
+        User userTwo = a(user());
+        User userThree = a(user());
 
         userDao.save(aListWith(userOne, userTwo, userThree));
         Tweet tweet1 = a(tweet().withOwner(userOne));
@@ -116,21 +116,21 @@ public class TweetDaoTest {
     @Test
     public void findMostPopularByVotes_unpopularAndPopularTweets() {
         User user = a(user());
-        User user1 = a(user().withUsername("voter1"));
-        User user2 = a(user().withUsername("voter2"));
-        User user3 = a(user().withUsername("voter3"));
+        User user1 = a(user());
+        User user2 = a(user());
+        User user3 = a(user());
 
         userDao.save(aListWith(user, user1, user2, user3));
         Tweet tweetOne = a(tweet().withOwner(user));
         Tweet tweetTwo = a(tweet().withOwner(user));
         Tweet tweetThree = a(tweet().withOwner(user));
 
-        UserVote voteTweetOneUserOne = a(userVote().withUser(user1).withVote(Vote.UP).withTweet(tweetOne));
-        UserVote voteTweetOneUserTwo = a(userVote().withUser(user2).withVote(Vote.UP).withTweet(tweetOne));
-        UserVote voteTweetTwoUserOne = a(userVote().withUser(user1).withVote(Vote.UP).withTweet(tweetTwo));
-        UserVote voteTweetTwoUserTwo = a(userVote().withUser(user2).withVote(Vote.UP).withTweet(tweetTwo));
-        UserVote voteTweetTwoUserThree = a(userVote().withUser(user3).withVote(Vote.UP).withTweet(tweetTwo));
-        UserVote voteTweetThreeUserOne = a(userVote().withUser(user1).withVote(Vote.UP).withTweet(tweetThree));
+        UserVote voteTweetOneUserOne = a(userVote().withUser(user1).withVote(Vote.UP).withAbstractPost(tweetOne));
+        UserVote voteTweetOneUserTwo = a(userVote().withUser(user2).withVote(Vote.UP).withAbstractPost(tweetOne));
+        UserVote voteTweetTwoUserOne = a(userVote().withUser(user1).withVote(Vote.UP).withAbstractPost(tweetTwo));
+        UserVote voteTweetTwoUserTwo = a(userVote().withUser(user2).withVote(Vote.UP).withAbstractPost(tweetTwo));
+        UserVote voteTweetTwoUserThree = a(userVote().withUser(user3).withVote(Vote.UP).withAbstractPost(tweetTwo));
+        UserVote voteTweetThreeUserOne = a(userVote().withUser(user1).withVote(Vote.UP).withAbstractPost(tweetThree));
 
         tweetOne.setVotes(aListWith(voteTweetOneUserOne, voteTweetOneUserTwo));
         tweetTwo.setVotes(aListWith(voteTweetTwoUserOne, voteTweetTwoUserTwo, voteTweetTwoUserThree));
