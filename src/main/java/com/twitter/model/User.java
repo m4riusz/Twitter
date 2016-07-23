@@ -4,10 +4,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by mariusz on 11.07.16.
@@ -31,8 +28,14 @@ public class User extends AbstractEntity implements UserDetails {
     @NotNull
     private boolean banned;
     @NotNull
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Actions actions;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
+    private List<Report> reports;
+    @NotNull
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Tweet> tweets;
+    @NotNull
+    @ManyToMany(cascade = CascadeType.ALL)
+    private List<Tag> favouriteTags;
     @NotNull
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(joinColumns = @JoinColumn(name = "userId"),
@@ -43,7 +46,9 @@ public class User extends AbstractEntity implements UserDetails {
         super();
         this.banned = false;
         this.role = Role.USER;
-        this.actions = new Actions();
+        this.reports = new ArrayList<>();
+        this.tweets = new ArrayList<>();
+        this.favouriteTags = new ArrayList<>();
         this.followers = new ArrayList<>();
         this.avatar = new Avatar("undef", new byte[100]); // FIXME: 14.07.16 fix
     }
@@ -95,12 +100,28 @@ public class User extends AbstractEntity implements UserDetails {
         this.banned = banned;
     }
 
-    public Actions getActions() {
-        return actions;
+    public List<Report> getReports() {
+        return reports;
     }
 
-    public void setActions(Actions actions) {
-        this.actions = actions;
+    public void setReports(List<Report> reports) {
+        this.reports = reports;
+    }
+
+    public List<Tweet> getTweets() {
+        return tweets;
+    }
+
+    public void setTweets(List<Tweet> tweets) {
+        this.tweets = tweets;
+    }
+
+    public List<Tag> getFavouriteTags() {
+        return favouriteTags;
+    }
+
+    public void setFavouriteTags(List<Tag> favouriteTags) {
+        this.favouriteTags = favouriteTags;
     }
 
     public List<User> getFollowers() {
@@ -138,7 +159,7 @@ public class User extends AbstractEntity implements UserDetails {
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return password.getPasswordExpireDate().isAfterNow();
+        return password.getPasswordExpireDate().after(Calendar.getInstance().getTime());
     }
 
     @Override

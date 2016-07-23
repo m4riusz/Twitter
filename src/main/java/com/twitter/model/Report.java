@@ -2,7 +2,9 @@ package com.twitter.model;
 
 import com.sun.istack.internal.Nullable;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -14,7 +16,7 @@ public class Report extends AbstractEntity{
     private ReportStatus status;
     @NotNull
     private ReportCategory category;
-    @Nullable
+    @NotNull
     private String message;
     @NotNull
     @ManyToOne
@@ -22,18 +24,22 @@ public class Report extends AbstractEntity{
     @Nullable
     @OneToOne
     private User judge;
+    @NotNull
+    @ManyToOne
+    private AbstractPost abstractPost;
 
     public Report() {
         super();
         this.status = ReportStatus.WAITING_FOR_REALIZATION;
     }
 
-    public Report(ReportCategory category, String message, User user, User judge) {
+    public Report(ReportCategory category, String message, User user, User judge, AbstractPost abstractPost) {
         this();
         this.category = category;
         this.message = message;
         this.user = user;
         this.judge = judge;
+        this.abstractPost = abstractPost;
     }
 
     public ReportStatus getStatus() {
@@ -74,5 +80,13 @@ public class Report extends AbstractEntity{
 
     public void setJudge(User judge) {
         this.judge = judge;
+    }
+
+    public AbstractPost getAbstractPost() {
+        return abstractPost;
+    }
+
+    public void setAbstractPost(AbstractPost abstractPost) {
+        this.abstractPost = abstractPost;
     }
 }

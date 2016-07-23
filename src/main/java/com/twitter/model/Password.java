@@ -1,9 +1,9 @@
 package com.twitter.model;
 
-import org.joda.time.DateTime;
-
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by mariusz on 14.07.16.
@@ -13,11 +13,11 @@ public class Password extends AbstractEntity {
     @NotNull
     private String password;
     @NotNull
-    private DateTime passwordExpireDate;
+    private Date passwordExpireDate;
 
     public Password() {
         super();
-        this.passwordExpireDate = DateTime.now();
+        this.passwordExpireDate = Calendar.getInstance().getTime();
     }
 
     public Password(String password) {
@@ -33,11 +33,11 @@ public class Password extends AbstractEntity {
         this.password = password;
     }
 
-    public DateTime getPasswordExpireDate() {
+    public Date getPasswordExpireDate() {
         return passwordExpireDate;
     }
 
-    public void setPasswordExpireDate(DateTime passwordExpireDate) {
+    public void setPasswordExpireDate(Date passwordExpireDate) {
         this.passwordExpireDate = passwordExpireDate;
     }
 }

@@ -19,10 +19,10 @@ public abstract class AbstractPost extends AbstractEntity {
     @ManyToOne
     private User owner;
     @NotNull
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "abstractPost")
     private List<UserVote> votes;
     @NotNull
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "abstractPost")
     private List<Report> reports;
 
     public AbstractPost() {
