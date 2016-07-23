@@ -13,23 +13,40 @@ import java.util.List;
  * Created by mariusz on 15.07.16.
  */
 public final class UserBuilder implements Builder<User> {
-    private long id = 0;
+    private static long counter = 0L;
+    private long id;
     private Avatar avatar = new Avatar("avatar.jpg", new byte[10]);
-    private String username = "User_" + id;
+    private String username = "User_" + counter;
     private Password password = new Password("password");
     private Role role = Role.USER;
     private Gender gender = Gender.UNDEFINED;
     private boolean banned = false;
-    private Actions actions = new Actions();
+    private List<Report> reports = new ArrayList<>();
+    private List<Tweet> tweets = new ArrayList<>();
+    private List<Tag> favouriteTags = new ArrayList<>();
     private List<User> followers = new ArrayList<>();
     private Date createDate = Calendar.getInstance().getTime();
 
-    private UserBuilder() {
-    }
-
     public static UserBuilder user() {
+        counter++;
         return new UserBuilder();
     }
+
+    public UserBuilder withReports(List<Report> reports) {
+        this.reports = reports;
+        return this;
+    }
+
+    public UserBuilder withTweets(List<Tweet> tweets) {
+        this.tweets = tweets;
+        return this;
+    }
+
+    public UserBuilder withFavouriteTags(List<Tag> tags) {
+        this.favouriteTags = tags;
+        return this;
+    }
+
 
     public UserBuilder withAvatar(Avatar avatar) {
         this.avatar = avatar;
@@ -61,11 +78,6 @@ public final class UserBuilder implements Builder<User> {
         return this;
     }
 
-    public UserBuilder withActions(Actions actions) {
-        this.actions = actions;
-        return this;
-    }
-
     public UserBuilder withFollowers(List<User> followers) {
         this.followers = followers;
         return this;
@@ -89,7 +101,9 @@ public final class UserBuilder implements Builder<User> {
         user.setRole(role);
         user.setGender(gender);
         user.setBanned(banned);
-        user.setActions(actions);
+        user.setTweets(tweets);
+        user.setFavouriteTags(favouriteTags);
+        user.setReports(reports);
         user.setFollowers(followers);
         user.setId(id);
         user.setCreateDate(createDate);

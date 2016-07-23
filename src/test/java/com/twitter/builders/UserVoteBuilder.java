@@ -1,7 +1,7 @@
 package com.twitter.builders;
 
 import com.twitter.Builder;
-import com.twitter.model.Tweet;
+import com.twitter.model.AbstractPost;
 import com.twitter.model.User;
 import com.twitter.model.UserVote;
 import com.twitter.model.Vote;
@@ -15,12 +15,9 @@ import java.util.Date;
 public final class UserVoteBuilder implements Builder<UserVote> {
     private Vote vote = Vote.UP;
     private User user;
-    private long id = 0;
-    private Tweet tweet;
+    private long id;
+    private AbstractPost abstractPost;
     private Date createDate = Calendar.getInstance().getTime();
-
-    private UserVoteBuilder() {
-    }
 
     public static UserVoteBuilder userVote() {
         return new UserVoteBuilder();
@@ -46,8 +43,8 @@ public final class UserVoteBuilder implements Builder<UserVote> {
         return this;
     }
 
-    public UserVoteBuilder withTweet(Tweet tweet) {
-        this.tweet = tweet;
+    public UserVoteBuilder withAbstractPost(AbstractPost abstractPost) {
+        this.abstractPost = abstractPost;
         return this;
     }
 
@@ -57,7 +54,7 @@ public final class UserVoteBuilder implements Builder<UserVote> {
         userVote.setUser(user);
         userVote.setId(id);
         userVote.setCreateDate(createDate);
-        userVote.setTweet(tweet);
+        userVote.setAbstractPost(abstractPost);
         return userVote;
     }
 }

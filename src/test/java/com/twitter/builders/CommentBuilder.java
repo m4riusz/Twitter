@@ -18,7 +18,7 @@ public final class CommentBuilder implements Builder<Comment> {
     private User owner;
     private List<UserVote> votes = new ArrayList<>();
     private List<Report> reports = new ArrayList<>();
-    private long id = 0;
+    private long id;
     private Date createDate = Calendar.getInstance().getTime();
 
 

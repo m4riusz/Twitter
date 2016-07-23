@@ -1,29 +1,31 @@
 package com.twitter.builders;
 
+import com.twitter.Builder;
 import com.twitter.model.Report;
 import com.twitter.model.ReportCategory;
 import com.twitter.model.ReportStatus;
 import com.twitter.model.User;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
  * Created by mariusz on 23.07.16.
  */
-public final class ReportBuilder {
-    private ReportStatus status;
-    private ReportCategory category;
-    private String message;
+public final class ReportBuilder implements Builder<Report> {
+    private ReportStatus status = ReportStatus.WAITING_FOR_REALIZATION;
+    private ReportCategory category = ReportCategory.OTHER;
+    private String message = "report content";
     private User user;
     private User judge;
     private long id;
-    private Date createDate;
+    private Date createDate = Calendar.getInstance().getTime();
     private int version;
 
     private ReportBuilder() {
     }
 
-    public static ReportBuilder aReport() {
+    public static ReportBuilder report() {
         return new ReportBuilder();
     }
 

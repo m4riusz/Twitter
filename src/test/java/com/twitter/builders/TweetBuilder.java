@@ -19,10 +19,8 @@ public final class TweetBuilder implements Builder<Tweet> {
     private List<Comment> comments = new ArrayList<>();
     private List<UserVote> votes = new ArrayList<>();
     private List<Report> reports = new ArrayList<>();
-    private long id = 0;
+    private long id;
     private Date createDate = Calendar.getInstance().getTime();
-    private TweetBuilder() {
-    }
 
     public static TweetBuilder tweet() {
          return new TweetBuilder();

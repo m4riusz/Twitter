@@ -11,11 +11,8 @@ import java.util.Date;
  */
 public final class TagBuilder implements Builder<Tag> {
     private String text = "";
-    private long id = 0;
+    private long id;
     private Date createDate = Calendar.getInstance().getTime();
-
-    private TagBuilder() {
-    }
 
     public static TagBuilder tag() {
         return new TagBuilder();
