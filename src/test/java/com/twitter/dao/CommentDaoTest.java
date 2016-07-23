@@ -48,7 +48,7 @@ public class CommentDaoTest {
         userDao.save(user);
         Tweet tweet = a(tweet().withOwner(user));
         tweetDao.save(tweet);
-        List<Comment> commentsFromTweet = commentDao.findCommentsById(tweet.getId(), new PageRequest(0, 10));
+        List<Comment> commentsFromTweet = commentDao.findByTweetId(tweet.getId(), new PageRequest(0, 10));
         assertThat(commentsFromTweet, is(emptyList()));
     }
 
@@ -62,7 +62,7 @@ public class CommentDaoTest {
         Comment comment = a(comment().withTweet(tweet).withOwner(commentator));
         commentDao.save(aListWith(comment));
         tweetDao.save(aListWith(tweet));
-        List<Comment> commentsFromTweet = commentDao.findCommentsById(tweet.getId(), new PageRequest(0, 10));
+        List<Comment> commentsFromTweet = commentDao.findByTweetId(tweet.getId(), new PageRequest(0, 10));
         assertThat(commentsFromTweet, hasItem(comment));
     }
 
@@ -86,8 +86,8 @@ public class CommentDaoTest {
         commentDao.save(aListWith(comment1, comment2, comment3, comment4, ownerComment));
         tweetDao.save(aListWith(tweetFromUserOne, tweetFromUserTwo));
 
-        List<Comment> commentsFromTweetOne = commentDao.findCommentsById(tweetFromUserOne.getId(), new PageRequest(0, 10));
-        List<Comment> commentsFromTweetTwo = commentDao.findCommentsById(tweetFromUserTwo.getId(), new PageRequest(0, 10));
+        List<Comment> commentsFromTweetOne = commentDao.findByTweetId(tweetFromUserOne.getId(), new PageRequest(0, 10));
+        List<Comment> commentsFromTweetTwo = commentDao.findByTweetId(tweetFromUserTwo.getId(), new PageRequest(0, 10));
         assertThat(commentsFromTweetOne, hasItems(comment1, comment2, comment3, ownerComment));
         assertThat(commentsFromTweetTwo, hasItem(comment4));
     }

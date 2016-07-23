@@ -16,7 +16,6 @@ import static com.twitter.dao.Query.GET_COMMENTS_FROM_TWEET_BY_ID;
 @Repository
 public interface CommentDao extends JpaRepository<Comment, Long> {
 
-    @Query(GET_COMMENTS_FROM_TWEET_BY_ID)
-    public List<Comment> findCommentsById(long tweetId, Pageable pageable);
+    public List<Comment> findByTweetId(long tweetId, Pageable pageable);
 
 }
