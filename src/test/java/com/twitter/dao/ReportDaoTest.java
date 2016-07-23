@@ -2,7 +2,6 @@ package com.twitter.dao;
 
 import com.twitter.model.*;
 import org.joda.time.DateTime;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,4 +158,109 @@ public class ReportDaoTest {
         assertThat(reportListPageTwo, contains(reportThree));
     }
 
+    @Test
+    public void findByStatusAndCategoryOrderByCreateDateAsc_oneReportWithGoodStatusAndGoodCategory() {
+        User accusedUser = a(user());
+        userDao.save(aListWith(accusedUser));
+        Report report = a(report().withUser(accusedUser)
+                .withStatus(ReportStatus.WAITING_FOR_REALIZATION)
+                .withCategory(ReportCategory.HATE_SPEECH));
+        Tweet tweet = a(tweet().withOwner(accusedUser).withReports(aListWith(report)));
+        report.setAbstractPost(tweet);
+        tweetDao.save(aListWith(tweet));
+
+        List<Report> reportList = reportDao.findByStatusAndCategoryOrderByCreateDateAsc(
+                ReportStatus.WAITING_FOR_REALIZATION,
+                ReportCategory.HATE_SPEECH,
+                new PageRequest(0, 10));
+        assertThat(reportList, hasItem(report));
+    }
+
+    @Test
+    public void findByStatusAndCategoryOrderByCreateDateAsc_oneReportWithGoodStatusAndBadCategory() {
+        User accusedUser = a(user());
+        userDao.save(aListWith(accusedUser));
+        Report report = a(report().withUser(accusedUser)
+                .withStatus(ReportStatus.WAITING_FOR_REALIZATION)
+                .withCategory(ReportCategory.SPAM_OR_FLOOD));
+        Tweet tweet = a(tweet().withOwner(accusedUser).withReports(aListWith(report)));
+        report.setAbstractPost(tweet);
+        tweetDao.save(aListWith(tweet));
+
+        List<Report> reportList = reportDao.findByStatusAndCategoryOrderByCreateDateAsc(
+                ReportStatus.WAITING_FOR_REALIZATION,
+                ReportCategory.HATE_SPEECH,
+                new PageRequest(0, 10));
+        assertThat(reportList, not(hasItem(report)));
+    }
+
+    @Test
+    public void findByStatusAndCategoryOrderByCreateDateAsc_oneReportWithBadStatusAndGoodCategory() {
+        User accusedUser = a(user());
+        userDao.save(aListWith(accusedUser));
+        Report report = a(report().withUser(accusedUser)
+                .withStatus(ReportStatus.INNOCENT)
+                .withCategory(ReportCategory.SPAM_OR_FLOOD));
+        Tweet tweet = a(tweet().withOwner(accusedUser).withReports(aListWith(report)));
+        report.setAbstractPost(tweet);
+        tweetDao.save(aListWith(tweet));
+
+        List<Report> reportList = reportDao.findByStatusAndCategoryOrderByCreateDateAsc(
+                ReportStatus.GUILTY,
+                ReportCategory.SPAM_OR_FLOOD,
+                new PageRequest(0, 10));
+        assertThat(reportList, not(hasItem(report)));
+    }
+
+    @Test
+    public void findByStatusAndCategoryOrderByCreateDateAsc_oneReportWithBadStatusAndBadCategory() {
+        User accusedUser = a(user());
+        userDao.save(aListWith(accusedUser));
+        Report report = a(report().withUser(accusedUser)
+                .withStatus(ReportStatus.INNOCENT)
+                .withCategory(ReportCategory.SPAM_OR_FLOOD));
+        Tweet tweet = a(tweet().withOwner(accusedUser).withReports(aListWith(report)));
+        report.setAbstractPost(tweet);
+        tweetDao.save(aListWith(tweet));
+
+        List<Report> reportList = reportDao.findByStatusAndCategoryOrderByCreateDateAsc(
+                ReportStatus.GUILTY,
+                ReportCategory.ADVERTISEMENT,
+                new PageRequest(0, 10));
+        assertThat(reportList, not(hasItem(report)));
+    }
+
+    @Test
+    public void findByStatusAndCategoryOrderByCreateDateAsc_pagingAndOrderTest() {
+        User accusedUserOne = a(user());
+        User reportUserOne = a(user());
+        User reportUserTwo = a(user());
+        User reportUserThree = a(user());
+        userDao.save(aListWith(accusedUserOne, reportUserOne, reportUserTwo, reportUserThree));
+        Date oldestDate = DateTime.now().minusDays(1).toDate();
+        Date normalDate = DateTime.now().toDate();
+        Date youngestDate = DateTime.now().plusDays(1).toDate();
+        Report reportOne = a(report().withUser(accusedUserOne).withCreateDate(oldestDate)
+                .withCategory(ReportCategory.ADVERTISEMENT)
+                .withStatus(ReportStatus.WAITING_FOR_REALIZATION));
+        Report reportTwo = a(report().withUser(reportUserTwo).withCreateDate(normalDate)
+                .withCategory(ReportCategory.ADVERTISEMENT)
+                .withStatus(ReportStatus.WAITING_FOR_REALIZATION));
+        Report reportThree = a(report().withUser(reportUserThree).withCreateDate(youngestDate)
+                .withCategory(ReportCategory.ADVERTISEMENT)
+                .withStatus(ReportStatus.WAITING_FOR_REALIZATION));
+        Tweet tweet = a(tweet().withOwner(accusedUserOne).withReports(aListWith(reportOne, reportTwo, reportThree)));
+        reportOne.setAbstractPost(tweet);
+        reportTwo.setAbstractPost(tweet);
+        reportThree.setAbstractPost(tweet);
+        tweetDao.save(aListWith(tweet));
+        List<Report> reportListPageOne = reportDao.findByStatusAndCategoryOrderByCreateDateAsc(
+                ReportStatus.WAITING_FOR_REALIZATION,
+                ReportCategory.ADVERTISEMENT, new PageRequest(0, 2));
+        List<Report> reportListPageTwo = reportDao.findByStatusAndCategoryOrderByCreateDateAsc(
+                ReportStatus.WAITING_FOR_REALIZATION,
+                ReportCategory.ADVERTISEMENT, new PageRequest(1, 2));
+        assertThat(reportListPageOne, contains(reportOne, reportTwo));
+        assertThat(reportListPageTwo, contains(reportThree));
+    }
 }
