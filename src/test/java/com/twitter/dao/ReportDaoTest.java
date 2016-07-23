@@ -1,9 +1,6 @@
 package com.twitter.dao;
 
-import com.twitter.model.Report;
-import com.twitter.model.ReportStatus;
-import com.twitter.model.Tweet;
-import com.twitter.model.User;
+import com.twitter.model.*;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,12 +40,8 @@ public class ReportDaoTest {
     @Autowired
     private ReportDao reportDao;
 
-    @Before
-    public void setUp() {
-    }
-
     @Test
-    public void findByStatusOrderByCreateDateAsc_noReports() {
+    public void findAllReports_noReports() {
         User accusedUser = a(user());
         userDao.save(aListWith(accusedUser));
         Tweet tweet = a(tweet().withOwner(accusedUser));
@@ -106,6 +99,62 @@ public class ReportDaoTest {
         tweetDao.save(aListWith(tweet));
         List<Report> reportListPageOne = reportDao.findByStatusOrderByCreateDateAsc(ReportStatus.WAITING_FOR_REALIZATION, new PageRequest(0, 2));
         List<Report> reportListPageTwo = reportDao.findByStatusOrderByCreateDateAsc(ReportStatus.WAITING_FOR_REALIZATION, new PageRequest(1, 2));
+        assertThat(reportListPageOne, contains(reportOne, reportTwo));
+        assertThat(reportListPageTwo, contains(reportThree));
+    }
+
+    @Test
+    public void findByCategoryOrderByCreateDateAsc_oneReport() {
+        User owner = a(user());
+        User reportUser = a(user());
+        userDao.save(aListWith(owner, reportUser));
+        Report report = a(report().withUser(reportUser).withCategory(ReportCategory.HATE_SPEECH));
+        Tweet tweet = a(tweet().withOwner(owner).withReports(aListWith(report)));
+        report.setAbstractPost(tweet);
+        tweetDao.save(tweet);
+        List<Report> reportList = reportDao.findByCategoryOrderByCreateDateAsc(ReportCategory.HATE_SPEECH, new PageRequest(0, 10));
+        assertThat(reportList, hasItem(report));
+        assertThat(reportList, hasSize(1));
+    }
+
+    @Test
+    public void findByCategoryOrderByCreateDateAsc_someReportsWithDifferentCategories() {
+        User owner = a(user());
+        User reportUser = a(user());
+        userDao.save(aListWith(owner, reportUser));
+        Report reportOne = a(report().withUser(reportUser).withCategory(ReportCategory.HATE_SPEECH));
+        Report reportTwo = a(report().withUser(reportUser).withCategory(ReportCategory.ADVERTISEMENT));
+        Report reportThree = a(report().withUser(reportUser).withCategory(ReportCategory.OTHER));
+        Tweet tweet = a(tweet().withOwner(owner).withReports(aListWith(reportOne, reportTwo, reportThree)));
+        reportOne.setAbstractPost(tweet);
+        reportTwo.setAbstractPost(tweet);
+        reportThree.setAbstractPost(tweet);
+        tweetDao.save(tweet);
+        List<Report> reportList = reportDao.findByCategoryOrderByCreateDateAsc(ReportCategory.OTHER, new PageRequest(0, 10));
+        assertThat(reportList, hasItem(reportThree));
+        assertThat(reportList, hasSize(1));
+    }
+
+    @Test
+    public void findByCategoryOrderByCreateDateAsc_pagingAndOrderTest() {
+        User accusedUserOne = a(user());
+        User reportUserOne = a(user());
+        User reportUserTwo = a(user());
+        User reportUserThree = a(user());
+        userDao.save(aListWith(accusedUserOne, reportUserOne, reportUserTwo, reportUserThree));
+        Date oldestDate = DateTime.now().minusDays(1).toDate();
+        Date normalDate = DateTime.now().toDate();
+        Date youngestDate = DateTime.now().plusDays(1).toDate();
+        Report reportOne = a(report().withUser(accusedUserOne).withCreateDate(oldestDate).withCategory(ReportCategory.ADVERTISEMENT));
+        Report reportTwo = a(report().withUser(reportUserTwo).withCreateDate(normalDate).withCategory(ReportCategory.ADVERTISEMENT));
+        Report reportThree = a(report().withUser(reportUserThree).withCreateDate(youngestDate).withCategory(ReportCategory.ADVERTISEMENT));
+        Tweet tweet = a(tweet().withOwner(accusedUserOne).withReports(aListWith(reportOne, reportTwo, reportThree)));
+        reportOne.setAbstractPost(tweet);
+        reportTwo.setAbstractPost(tweet);
+        reportThree.setAbstractPost(tweet);
+        tweetDao.save(aListWith(tweet));
+        List<Report> reportListPageOne = reportDao.findByCategoryOrderByCreateDateAsc(ReportCategory.ADVERTISEMENT, new PageRequest(0, 2));
+        List<Report> reportListPageTwo = reportDao.findByCategoryOrderByCreateDateAsc(ReportCategory.ADVERTISEMENT, new PageRequest(1, 2));
         assertThat(reportListPageOne, contains(reportOne, reportTwo));
         assertThat(reportListPageTwo, contains(reportThree));
     }
