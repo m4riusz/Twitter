@@ -9,16 +9,15 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 
 import static com.twitter.Util.a;
 import static com.twitter.builders.UserBuilder.user;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
@@ -27,15 +26,14 @@ import static org.mockito.Mockito.when;
  * Created by mariusz on 14.07.16.
  */
 @SpringBootTest
-@RunWith(value = SpringJUnit4ClassRunner.class)
+@RunWith(value = MockitoJUnitRunner.class)
 public class UserServiceTest {
 
     @Mock
     private UserDao userDao;
 
-    @Autowired
     @InjectMocks
-    private UserService userService;
+    private UserService userService = new UserServiceImpl(userDao);
 
     @Before
     public void initMocks() {
@@ -44,10 +42,9 @@ public class UserServiceTest {
 
     @Test
     public void getUserByIdTest_userExists() {
-        long existingUserId = 1L;
-        User user = a(user().withId(existingUserId));
-        when(userDao.findOne(existingUserId)).thenReturn(user);
-        User userById = userService.getUserById(existingUserId);
+        User user = a(user());
+        when(userDao.findOne(anyLong())).thenReturn(user);
+        User userById = userService.getUserById(1L);
 
         assertThat(userById, is(user));
     }
@@ -62,15 +59,16 @@ public class UserServiceTest {
     public void getUserByUsername_userExists() {
         String username = "Mariusz";
         User user = a(user().withUsername(username));
-        when(userDao.findByUsername(username)).thenReturn(user);
-        User userById = userService.loadUserByUsername(username);
-        assertThat(userById, is(user));
+        when(userDao.findByUsername(anyString())).thenReturn(user);
+        User userByUsername = userService.loadUserByUsername(username);
+        assertThat(userByUsername, is(user));
     }
 
     @Test(expected = UsernameNotFoundException.class)
     public void getUserByUsername_userDoesNotExists() {
         when(userDao.findByUsername(anyString())).thenReturn(null);
-        userService.loadUserByUsername("Username");
+        User user = userService.loadUserByUsername("Username");
+        assertThat(user, is(nullValue()));
     }
 
 }
