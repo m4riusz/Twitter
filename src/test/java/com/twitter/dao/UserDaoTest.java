@@ -165,4 +165,19 @@ public class UserDaoTest {
         assertThat(userTwoFollowingCount, is(equalTo(1L)));
     }
 
+    @Test
+    public void findByUsername_userDoesNotExists() {
+        User user = userDao.findByUsername("As");
+        assertThat(user, is(nullValue()));
+    }
+
+    @Test
+    public void findByUsername_userExists() {
+        String username = "4chan";
+        User user = a(user().withUsername(username));
+        userDao.save(aListWith(user));
+        User userFromDatabase = userDao.findByUsername(username);
+        assertThat(userFromDatabase, is(user));
+    }
+
 }
