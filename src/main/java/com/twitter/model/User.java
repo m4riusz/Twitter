@@ -29,27 +29,26 @@ public class User extends AbstractEntity implements UserDetails {
     private boolean banned;
     @NotNull
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
-    private List<Report> reports;
+    private List<Report> reports = new ArrayList<>();
     @NotNull
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Tweet> tweets;
+    private List<Tweet> tweets = new ArrayList<>();
     @NotNull
     @ManyToMany(cascade = CascadeType.ALL)
-    private List<Tag> favouriteTags;
+    private List<Tag> favouriteTags = new ArrayList<>();
     @NotNull
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(joinColumns = @JoinColumn(name = "userId"),
             inverseJoinColumns = @JoinColumn(name = "followerId"))
-    private List<User> followers;
+    private List<User> followers = new ArrayList<>();
+    @NotNull
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Tweet> favouriteTweets = new ArrayList<>();
 
     public User() {
         super();
         this.banned = false;
         this.role = Role.USER;
-        this.reports = new ArrayList<>();
-        this.tweets = new ArrayList<>();
-        this.favouriteTags = new ArrayList<>();
-        this.followers = new ArrayList<>();
         this.avatar = new Avatar("undef", new byte[100]); // FIXME: 14.07.16 fix
     }
 
@@ -130,6 +129,14 @@ public class User extends AbstractEntity implements UserDetails {
 
     public void setFollowers(List<User> followers) {
         this.followers = followers;
+    }
+
+    public List<Tweet> getFavouriteTweets() {
+        return favouriteTweets;
+    }
+
+    public void setFavouriteTweets(List<Tweet> favouriteTweets) {
+        this.favouriteTweets = favouriteTweets;
     }
 
     @Override

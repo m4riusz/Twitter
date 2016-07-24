@@ -18,7 +18,7 @@ public class Tweet extends AbstractPost {
     @ManyToMany(cascade = CascadeType.ALL)
     private List<Tag> tags = new ArrayList<>();
     @NotNull
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "tweet")
     private List<Comment> comments = new ArrayList<>();
 
     public Tweet(String content, User owner) {
