@@ -11,4 +11,6 @@ public final class Query {
 
     public static final String SELECT_MOST_POPULAR_TWEETS_BY_TIME = "SELECT tweet FROM Tweet tweet WHERE ((day(current_timestamp) * 24 + hour(current_timestamp)) - (day(tweet.createDate) * 24 + hour(tweet.createDate))) < ?1 ORDER BY tweet.votes.size DESC";
 
+    public static final String SELECT_MOST_POPULAR_COMMENTS_FROM_TWEET = "SELECT comment FROM Comment comment WHERE comment.tweet.id = ?1 ORDER BY comment.votes.size DESC";
+
 }

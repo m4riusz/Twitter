@@ -110,7 +110,21 @@ public class TweetDaoTest {
 
     @Test
     public void findMostPopularByVotes_someOldAndNewTweets(){
+        User user = a(user());
 
+        userDao.save(aListWith(user));
+        Date tooOldDate = DateTime.now().minusDays(10).toDate();
+        Date currentDate = DateTime.now().toDate();
+        Tweet tweetOne = a(tweet().withOwner(user).withCreateDate(tooOldDate));
+        Tweet tweetTwo = a(tweet().withOwner(user).withCreateDate(currentDate));
+        Tweet tweetThree = a(tweet().withOwner(user).withCreateDate(currentDate));
+
+        tweetDao.save(aListWith(tweetOne, tweetTwo, tweetThree));
+
+        List<Tweet> mostPopularTweets = tweetDao.findMostPopularByVotes(10, new PageRequest(0, 10));
+
+        assertThat(mostPopularTweets, contains(tweetTwo, tweetThree));
+        assertThat(mostPopularTweets, not(hasItem(tweetOne)));
     }
 
     @Test
@@ -140,8 +154,8 @@ public class TweetDaoTest {
         List<Tweet> mostPopularOnFirstPage = tweetDao.findMostPopularByVotes(24, new PageRequest(0, 2));
         List<Tweet> mostPopularSecondPage = tweetDao.findMostPopularByVotes(24, new PageRequest(1, 2));
 
-        assertThat(mostPopularOnFirstPage, hasItems(tweetOne, tweetTwo));
-        assertThat(mostPopularSecondPage, hasItem(tweetThree));
+        assertThat(mostPopularOnFirstPage, contains(tweetTwo, tweetOne));
+        assertThat(mostPopularSecondPage, contains(tweetThree));
     }
 
     @Test
