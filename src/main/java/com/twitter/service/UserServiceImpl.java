@@ -1,10 +1,12 @@
 package com.twitter.service;
 
 import com.twitter.dao.UserDao;
+import com.twitter.exception.UserAlreadyExistsException;
 import com.twitter.exception.UserFollowException;
 import com.twitter.exception.UserNotFoundException;
 import com.twitter.exception.UserUnfollowException;
 import com.twitter.model.Password;
+import com.twitter.model.Result;
 import com.twitter.model.Role;
 import com.twitter.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,116 +39,130 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserById(long userId) {
-        return getUser(userId);
+    public Result<User> getUserById(long userId) {
+        User userByID = userDao.findOne(userId);
+        if (userByID == null) {
+            throw new UserNotFoundException(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        }
+        return new Result<>(true, userByID);
     }
 
     @Override
-    public void create(User user) {
+    public Result<Boolean> create(User user) {
+        if (userDao.findByUsername(user.getUsername()) != null) {
+            throw new UserAlreadyExistsException(MessageUtil.USER_ALREADY_EXISTS_ERROR_MSG);
+        }
         userDao.save(user);
+        return new Result<>(true, Boolean.TRUE);
     }
 
     @Override
-    public void follow(User user, long usedToFollowId) {
+    public Result<Boolean> follow(User user, long usedToFollowId) {
         User userToFollow = getUser(usedToFollowId);
         if (user.getId() == usedToFollowId) {
-            throw new UserFollowException();
+            throw new UserFollowException(MessageUtil.FOLLOW_YOURSELF_ERROR_MSG);
         } else if (userToFollow.getFollowers().contains(user)) {
-            throw new UserFollowException();
+            throw new UserFollowException(MessageUtil.FOLLOW_ALREADY_FOLLOWED_ERROR_MSG);
         }
         userToFollow.getFollowers().add(user);
+        return new Result<>(true, Boolean.TRUE);
     }
 
     @Override
-    public void unfollow(User user, long userToUnfollowId) {
+    public Result<Boolean> unfollow(User user, long userToUnfollowId) {
         User userToUnfollow = getUser(userToUnfollowId);
         if (user.getId() == userToUnfollow.getId()) {
-            throw new UserUnfollowException();
+            throw new UserUnfollowException(MessageUtil.UNFOLLOW_YOURSELF_ERROR_MSG);
         } else if (!userToUnfollow.getFollowers().contains(user)) {
-            throw new UserUnfollowException();
+            throw new UserUnfollowException(MessageUtil.UNFOLLOW_UNFOLLOWED_ERROR_MSG);
         }
         userToUnfollow.getFollowers().remove(user);
+        return new Result<>(true, Boolean.TRUE);
     }
 
     @Override
-    public void banUser(long userToBanId) {
+    public Result<Boolean> banUser(long userToBanId) {
         User userToBan = getUser(userToBanId);
         userToBan.setBanned(true);
+        return new Result<>(true, Boolean.TRUE);
     }
 
     @Override
-    public void unbanUser(long userToUnbanId) {
+    public Result<Boolean> unbanUser(long userToUnbanId) {
         User userToUnban = getUser(userToUnbanId);
         userToUnban.setBanned(false);
+        return new Result<>(true, Boolean.TRUE);
     }
 
     @Override
-    public void changeUserRole(long userToChangeId, Role role) {
+    public Result<Boolean> changeUserRole(long userToChangeId, Role role) {
         User userToChange = getUser(userToChangeId);
         userToChange.setRole(role);
+        return new Result<>(true, Boolean.TRUE);
     }
 
     @Override
-    public void deleteUserById(long userId) {
+    public Result<Boolean> deleteUserById(long userId) {
         if (userDao.exists(userId)) {
             userDao.delete(userId);
-            return;
+            return new Result<>(true, Boolean.TRUE);
         }
-        throw new UserNotFoundException();
+        throw new UserNotFoundException(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
 
     @Override
-    public void changeUserPasswordById(long userId, String password) {
+    public Result<Boolean> changeUserPasswordById(long userId, String password) {
         User userToChange = getUser(userId);
         userToChange.setPassword(new Password(password));
+        return new Result<>(true, Boolean.TRUE);
     }
 
     @Override
-    public long getAllUsersCount() {
-        return userDao.count();
+    public Result<Long> getAllUsersCount() {
+        return new Result<>(true, userDao.count());
     }
 
     @Override
-    public List<User> getAllUsers(Pageable pageable) {
-        return userDao.findAll(pageable).getContent();
+    public Result<List<User>> getAllUsers(Pageable pageable) {
+        return new Result<>(true, userDao.findAll(pageable).getContent());
     }
 
     @Override
-    public long getUserFollowersCountById(long userId) {
+    public Result<Long> getUserFollowersCountById(long userId) {
         if (userDao.exists(userId)) {
-            return userDao.findFollowersCountByUserId(userId);
+            return new Result<>(true, userDao.findFollowersCountByUserId(userId));
+        }
+        throw new UserNotFoundException(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+    }
+
+    @Override
+    public Result<List<User>> getUserFollowersById(long userId, Pageable pageable) {
+        if (userDao.exists(userId)) {
+            return new Result<>(true, userDao.findFollowersByUserId(userId, pageable));
         }
         throw new UserNotFoundException();
     }
 
     @Override
-    public List<User> getUserFollowersById(long userId, Pageable pageable) {
+    public Result<Long> getUserFollowingCountById(long userId) {
         if (userDao.exists(userId)) {
-            return userDao.findFollowersByUserId(userId, pageable);
+            return new Result<>(true, userDao.findFollowingCountByUserId(userId));
         }
-        throw new UserNotFoundException();
+        throw new UserNotFoundException(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
 
     @Override
-    public long getUserFollowingCountById(long userId) {
+    public Result<List<User>> getUserFollowingsById(long userId, Pageable pageable) {
         if (userDao.exists(userId)) {
-            return userDao.findFollowingCountByUserId(userId);
+            return new Result<>(true, userDao.findFollowingByUserId(userId, pageable));
         }
-        throw new UserNotFoundException();
-    }
-
-    @Override
-    public List<User> getUserFollowingsById(long userId, Pageable pageable) {
-        if (userDao.exists(userId)) {
-            return userDao.findFollowingByUserId(userId, pageable);
-        }
-        throw new UserNotFoundException();
+        throw new UserNotFoundException(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
 
     private User getUser(long userId) {
         User userToChange = userDao.findOne(userId);
         if (userToChange == null) {
-            throw new UserNotFoundException();
+            throw new UserNotFoundException(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
         }
         return userToChange;
     }

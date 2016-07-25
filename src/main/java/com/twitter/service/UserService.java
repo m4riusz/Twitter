@@ -1,10 +1,12 @@
 package com.twitter.service;
 
+import com.twitter.model.Result;
 import com.twitter.model.Role;
 import com.twitter.model.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -17,41 +19,41 @@ import java.util.List;
 @Service
 public interface UserService extends UserDetailsService {
 
-    public User loadUserByUsername(String username) throws UsernameNotFoundException;
+    User loadUserByUsername(String username) throws UsernameNotFoundException;
 
-    public User getUserById(long userId);
+    Result<User> getUserById(long userId);
 
-    public void create(User user);
+    Result<Boolean> create(User user);
 
-    public void follow(User user, long usedToFollowId);
+    Result<Boolean> follow(User user, long usedToFollowId);
 
-    public void unfollow(User user, long userToUnfollowId);
-
-    @PreAuthorize("hasAnyRole('ADMIN','MODERATOR')")
-    public void banUser(long userToBanId);
+    Result<Boolean> unfollow(User user, long userToUnfollowId);
 
     @PreAuthorize("hasAnyRole('ADMIN','MODERATOR')")
-    public void unbanUser(long userToUnbanId);
+    Result<Boolean> banUser(long userToBanId);
+
+    @PreAuthorize("hasAnyRole('ADMIN','MODERATOR')")
+    Result<Boolean> unbanUser(long userToUnbanId);
 
     @PreAuthorize("hasRole('ADMIN')")
-    public void changeUserRole(long userToChangeId, Role role);
+    Result<Boolean> changeUserRole(long userToChangeId, Role role);
 
     @PreAuthorize("hasAnyRole('ADMIN','MODERATOR')")
-    public void deleteUserById(long userId);
+    Result<Boolean> deleteUserById(long userId);
 
     @PreAuthorize("#userToChangeId == principal.id")
-    public void changeUserPasswordById(@Param("userToChangeId") long userId, String password);
+    Result<Boolean> changeUserPasswordById(@Param("userToChangeId") long userId, String password);
 
-    public long getAllUsersCount();
+    Result<Long> getAllUsersCount();
 
-    public List<User> getAllUsers(Pageable pageable);
+    Result<List<User>> getAllUsers(Pageable pageable);
 
-    public long getUserFollowersCountById(long userId);
+    Result<Long> getUserFollowersCountById(long userId);
 
-    public List<User> getUserFollowersById(long userId, Pageable pageable);
+    Result<List<User>> getUserFollowersById(long userId, Pageable pageable);
 
-    public long getUserFollowingCountById(long userId);
+    Result<Long> getUserFollowingCountById(long userId);
 
-    public List<User> getUserFollowingsById(long userId, Pageable pageable);
+    Result<List<User>> getUserFollowingsById(long userId, Pageable pageable);
 
 }

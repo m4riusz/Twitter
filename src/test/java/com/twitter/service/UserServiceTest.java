@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by mariusz on 14.07.16.
  */
+
 @SpringBootTest
 @RunWith(value = MockitoJUnitRunner.class)
 public class UserServiceTest {
@@ -44,7 +45,7 @@ public class UserServiceTest {
     public void getUserByIdTest_userExists() {
         User user = a(user());
         when(userDao.findOne(anyLong())).thenReturn(user);
-        User userById = userService.getUserById(1L);
+        User userById = userService.getUserById(1L).getValue();
 
         assertThat(userById, is(user));
     }
