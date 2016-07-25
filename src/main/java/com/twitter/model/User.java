@@ -1,5 +1,7 @@
 package com.twitter.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
@@ -14,35 +16,50 @@ import java.util.*;
 public class User extends AbstractEntity implements UserDetails {
     @NotNull
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Avatar avatar;
     @NotNull
     @Column(unique = true)
+    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
+    @Length(
+            min = 3, max = 10,
+            message = "Username length should be between {min} and {max}!"
+    )
     private String username;
     @NotNull
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Password password;
     @NotNull
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Role role;
     @NotNull
+    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Gender gender;
     @NotNull
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private boolean banned;
     @NotNull
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<Report> reports = new ArrayList<>();
     @NotNull
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<Tweet> tweets = new ArrayList<>();
     @NotNull
     @ManyToMany(cascade = CascadeType.ALL)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<Tag> favouriteTags = new ArrayList<>();
     @NotNull
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(joinColumns = @JoinColumn(name = "userId"),
             inverseJoinColumns = @JoinColumn(name = "followerId"))
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<User> followers = new ArrayList<>();
     @NotNull
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<Tweet> favouriteTweets = new ArrayList<>();
 
     public User() {

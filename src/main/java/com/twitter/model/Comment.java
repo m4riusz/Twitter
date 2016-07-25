@@ -1,5 +1,7 @@
 package com.twitter.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
@@ -11,6 +13,7 @@ import javax.validation.constraints.NotNull;
 public class Comment extends AbstractPost {
     @NotNull
     @ManyToOne
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Tweet tweet;
 
     public Comment() {

@@ -1,6 +1,8 @@
 package com.twitter.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.istack.internal.Nullable;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -13,10 +15,17 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class Report extends AbstractEntity{
     @NotNull
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private ReportStatus status;
     @NotNull
+    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private ReportCategory category;
     @NotNull
+    @Length(
+            min = 1, max = 100,
+            message = "Report length should be between {min} and {max}!"
+    )
+    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private String message;
     @NotNull
     @ManyToOne

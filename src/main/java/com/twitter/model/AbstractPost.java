@@ -1,5 +1,8 @@
 package com.twitter.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -12,17 +15,26 @@ import java.util.List;
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class AbstractPost extends AbstractEntity {
     @NotNull
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private boolean banned;
     @NotNull
+    @Length(
+            min = 1, max = 100,
+            message = "Post length should be between {min} and {max}!"
+    )
+    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private String content;
     @NotNull
     @ManyToOne
+    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private User owner;
     @NotNull
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "abstractPost")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<UserVote> votes;
     @NotNull
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "abstractPost")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<Report> reports;
 
     public AbstractPost() {
