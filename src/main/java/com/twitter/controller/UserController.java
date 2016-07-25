@@ -1,6 +1,7 @@
 package com.twitter.controller;
 
 import com.twitter.model.Password;
+import com.twitter.model.Result;
 import com.twitter.model.User;
 import com.twitter.route.Route;
 import com.twitter.service.UserService;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -27,12 +29,12 @@ public class UserController {
 
     @ResponseStatus(value = HttpStatus.CREATED)
     @RequestMapping(value = Route.REST_USER, method = RequestMethod.POST)
-    public void createUser(@RequestBody User user) {
-        userService.create(user);
+    public Result<Boolean> createUser(@Valid @RequestBody User user) {
+        return userService.create(user);
     }
 
     @RequestMapping(value = Route.REST_USER_ID, method = RequestMethod.GET)
-    public User getUserById(@PathVariable long userId) {
+    public Result<User> getUserById(@PathVariable long userId) {
         return userService.getUserById(userId);
     }
 
@@ -48,7 +50,7 @@ public class UserController {
     }
 
     @RequestMapping(value = Route.REST_USER_GET_ALL, method = RequestMethod.GET)
-    public List<User> getAllUsers(@PathVariable int page, @PathVariable int size) {
+    public Result<List<User>> getAllUsers(@PathVariable int page, @PathVariable int size) {
         return userService.getAllUsers(new PageRequest(page, size));
     }
 }
