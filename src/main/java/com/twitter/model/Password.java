@@ -1,10 +1,10 @@
 package com.twitter.model;
 
 import org.hibernate.validator.constraints.Length;
+import org.joda.time.DateTime;
 
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
-import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -23,7 +23,7 @@ public class Password extends AbstractEntity {
 
     public Password() {
         super();
-        this.passwordExpireDate = Calendar.getInstance().getTime();
+        this.passwordExpireDate = DateTime.now().plusYears(1).toDate();
     }
 
     public Password(String password) {
