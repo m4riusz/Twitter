@@ -28,6 +28,7 @@ public final class TokenAuthenticationFilter extends GenericFilterBean {
     private static final String HEADER_USERNAME = "username";
     private static final String HEADER_PASSWORD = "password";
     private static final String REQUEST_ATTR_DO_NOT_CONTINUE = "MyAuthenticationFilter-doNotContinue";
+    private static final String POST = "POST";
 
     @Autowired
     private AuthenticationService authenticationService;
@@ -40,7 +41,8 @@ public final class TokenAuthenticationFilter extends GenericFilterBean {
 
         boolean authenticated = checkToken(httpRequest, httpResponse);
 
-        if (canRequestProcessingContinue(httpRequest) && httpRequest.getMethod().equals("POST")) {
+        System.out.println(httpRequest.getRequestURI());
+        if (canRequestProcessingContinue(httpRequest) && isLoginOrLogoutRequest(httpRequest)) {
             if (authenticated) {
                 checkLogout(httpRequest);
             }
@@ -50,6 +52,10 @@ public final class TokenAuthenticationFilter extends GenericFilterBean {
         if (canRequestProcessingContinue(httpRequest)) {
             chain.doFilter(request, response);
         }
+    }
+
+    private boolean isLoginOrLogoutRequest(HttpServletRequest httpRequest) {
+        return httpRequest.getMethod().equals(POST) && (httpRequest.getRequestURI().equals(Route.LOGIN_URL) || httpRequest.getRequestURI().equals(Route.LOGOUT_URL));
     }
 
     private void checkLogin(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException {
