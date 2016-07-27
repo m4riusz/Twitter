@@ -57,9 +57,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Result<Boolean> follow(User user, long usedToFollowId) {
-        User userToFollow = getUser(usedToFollowId);
-        if (user.getId() == usedToFollowId) {
+    public Result<Boolean> follow(User user, long userToFollowId) {
+        User userToFollow = getUser(userToFollowId);
+        if (user.getId() == userToFollowId) {
             throw new UserFollowException(MessageUtil.FOLLOW_YOURSELF_ERROR_MSG);
         } else if (userToFollow.getFollowers().contains(user)) {
             throw new UserFollowException(MessageUtil.FOLLOW_ALREADY_FOLLOWED_ERROR_MSG);

@@ -41,7 +41,6 @@ public final class TokenAuthenticationFilter extends GenericFilterBean {
 
         boolean authenticated = checkToken(httpRequest, httpResponse);
 
-        System.out.println(httpRequest.getRequestURI());
         if (canRequestProcessingContinue(httpRequest) && isLoginOrLogoutRequest(httpRequest)) {
             if (authenticated) {
                 checkLogout(httpRequest);

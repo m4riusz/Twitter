@@ -30,7 +30,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         try {
             authentication = authenticationManager.authenticate(authentication);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
             if (authentication.getPrincipal() != null) {
                 UserDetails userContext = (UserDetails) authentication.getPrincipal();
                 TokenInfo newToken = tokenManager.createNewToken(userContext);
