@@ -1,5 +1,6 @@
 package com.twitter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import java.util.List;
 public class Util {
 
     public static <T> List<T> aListWith(T... ts) {
-        return Arrays.asList(ts);
+        return new ArrayList<>(Arrays.asList(ts));
     }
 
     public static <T> T a(Builder<T> builder) {

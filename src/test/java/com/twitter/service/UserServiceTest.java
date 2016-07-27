@@ -4,6 +4,7 @@ import com.twitter.dao.UserDao;
 import com.twitter.exception.UserAlreadyExistsException;
 import com.twitter.exception.UserFollowException;
 import com.twitter.exception.UserNotFoundException;
+import com.twitter.exception.UserUnfollowException;
 import com.twitter.model.Result;
 import com.twitter.model.User;
 import org.junit.Before;
@@ -125,5 +126,37 @@ public class UserServiceTest {
         userService.follow(user, 1L);
     }
 
-    
+    @Test
+    public void unfollow_userFollowsOtherUser() {
+        User user = a(user().withId(2L));
+        User userToUnfollow = a(user().withId(1L).withFollowers(aListWith(user)));
+        when(userDao.findOne(anyLong())).thenReturn(userToUnfollow);
+        Result<Boolean> unfollowResult = userService.unfollow(user, userToUnfollow.getId());
+        assertThat(userToUnfollow.getFollowers(), not(hasItem(user)));
+        assertThat(unfollowResult.isSuccess(), is(true));
+        assertThat(unfollowResult.getValue(), is(true));
+    }
+
+    @Test(expected = UserUnfollowException.class)
+    public void unfollow_userUnfollowsHimself() {
+        User user = a(user());
+        when(userDao.findOne(anyLong())).thenReturn(user);
+        userService.unfollow(user, user.getId());
+    }
+
+    @Test(expected = UserUnfollowException.class)
+    public void unfollow_userNotFollowed() {
+        User user = a(user().withId(1L));
+        User userToUnfollow = a(user().withId(2L));
+        when(userDao.findOne(anyLong())).thenReturn(userToUnfollow);
+        userService.unfollow(user, userToUnfollow.getId());
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void unfollow_userToUnfollowDoesNotExists() {
+        User user = a(user());
+        when(userDao.findOne(anyLong())).thenReturn(null);
+        userService.unfollow(user, 1L);
+    }
+
 }
