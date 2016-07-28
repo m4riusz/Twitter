@@ -13,7 +13,11 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -22,9 +26,12 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.test.context.web.ServletTestExecutionListener;
 
+import java.util.List;
+
 import static com.twitter.Util.a;
 import static com.twitter.Util.aListWith;
 import static com.twitter.builders.UserBuilder.user;
+import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertTrue;
@@ -37,11 +44,7 @@ import static org.mockito.Mockito.when;
  */
 
 @SpringBootTest
-@RunWith(value = SpringJUnit4ClassRunner.class)
-@TestExecutionListeners(listeners = {ServletTestExecutionListener.class,
-        DependencyInjectionTestExecutionListener.class,
-        DirtiesContextTestExecutionListener.class,
-        TransactionalTestExecutionListener.class})
+@RunWith(value = MockitoJUnitRunner.class)
 public class UserServiceTest {
 
     @Mock
@@ -169,13 +172,148 @@ public class UserServiceTest {
     }
 
     @Test(expected = UserNotFoundException.class)
-    public void deleteUserById_userWithUserRole() {
+    public void deleteUserById_userDoesNotExist() {
         long userId = 1L;
-        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userDao.exists(anyLong())).thenReturn(false);
         userService.deleteUserById(userId);
-        when(userDao.findOne(anyLong())).thenReturn(null);
-        userService.getUserById(userId);
     }
 
+    @Test
+    public void deleteUserById_userExists() {
+        long userId = 1L;
+        when(userDao.exists(anyLong())).thenReturn(true);
+        Result<Boolean> removeUser = userService.deleteUserById(userId);
+        assertThat(removeUser.isSuccess(), is(true));
+    }
+
+    @Test
+    public void getAllUsersCount_noUsers() {
+        when(userDao.count()).thenReturn(0L);
+        Result<Long> allUsersCount = userService.getAllUsersCount();
+        assertThat(allUsersCount.isSuccess(), is(true));
+        assertThat(allUsersCount.getValue(), is(equalTo(0L)));
+    }
+
+    @Test
+    public void getAllUsersCount_someUsers() {
+        when(userDao.count()).thenReturn(5L);
+        Result<Long> allUsersCount = userService.getAllUsersCount();
+        assertThat(allUsersCount.isSuccess(), is(true));
+        assertThat(allUsersCount.getValue(), is(equalTo(5L)));
+    }
+
+    @Test
+    public void getAllUsers_someUsers() {
+        User userOne = a(user());
+        User userTwo = a(user());
+        when(userDao.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(aListWith(userOne, userTwo)));
+        Result<List<User>> allUsers = userService.getAllUsers(new PageRequest(0, 10));
+        assertThat(allUsers.isSuccess(), is(true));
+        assertThat(allUsers.getValue(), hasItems(userOne, userTwo));
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void getUserFollowersCountById_userDoesNotExists() {
+        when(userDao.exists(1L)).thenReturn(false);
+        userService.getUserFollowersCountById(1L);
+    }
+
+    @Test
+    public void getUserFollowersCountById_userExistsNoFollowers() {
+        long userId = 1L;
+        when(userDao.exists(userId)).thenReturn(true);
+        when(userDao.findFollowersCountByUserId(userId)).thenReturn(0L);
+        Result<Long> userFollowersCountById = userService.getUserFollowersCountById(userId);
+        assertThat(userFollowersCountById.isSuccess(), is(true));
+        assertThat(userFollowersCountById.getValue(), is(equalTo(0L)));
+    }
+
+    @Test
+    public void getUserFollowersCountById_userExistsSomeFollowers() {
+        long userId = 1L;
+        when(userDao.exists(userId)).thenReturn(true);
+        when(userDao.findFollowersCountByUserId(anyLong())).thenReturn(2L);
+        Result<Long> userFollowersById = userService.getUserFollowersCountById(userId);
+        assertThat(userFollowersById.isSuccess(), is(true));
+        assertThat(userFollowersById.getValue(), is(equalTo(2L)));
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void getUserFollowersById_userDoesNotExists() {
+        when(userDao.exists(anyLong())).thenReturn(false);
+        userService.getUserFollowersById(1L, new PageRequest(0, 10));
+    }
+
+    @Test
+    public void getUserFollowersById_noFollowers() {
+        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userDao.findFollowersByUserId(anyLong(), any(Pageable.class))).thenReturn(emptyList());
+        Result<List<User>> userFollowersById = userService.getUserFollowersById(1L, new PageRequest(0, 10));
+        assertThat(userFollowersById.isSuccess(), is(true));
+        assertThat(userFollowersById.getValue(), is(emptyList()));
+    }
+
+    @Test
+    public void getUserFollowersById_someUsers() {
+        when(userDao.exists(anyLong())).thenReturn(true);
+        User userOne = a(user());
+        User userTwo = a(user());
+        when(userDao.findFollowersByUserId(anyLong(), any(Pageable.class))).thenReturn(aListWith(userOne, userTwo));
+        Result<List<User>> userFollowersById = userService.getUserFollowersById(1L, new PageRequest(0, 10));
+        assertThat(userFollowersById.isSuccess(), is(true));
+        assertThat(userFollowersById.getValue(), hasItems(userOne, userTwo));
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void getUserFollowingCountById_userDoesNotExists() {
+        when(userDao.exists(1L)).thenReturn(false);
+        userService.getUserFollowingCountById(1L);
+    }
+
+    @Test
+    public void getUserFollowingCountById_userExistsNoFollowers() {
+        long userId = 1L;
+        when(userDao.exists(userId)).thenReturn(true);
+        when(userDao.findFollowingCountByUserId(userId)).thenReturn(0L);
+        Result<Long> userFollowingCountById = userService.getUserFollowingCountById(userId);
+        assertThat(userFollowingCountById.isSuccess(), is(true));
+        assertThat(userFollowingCountById.getValue(), is(equalTo(0L)));
+    }
+
+    @Test
+    public void getUserFollowingCountById_userExistsSomeFollowers() {
+        long userId = 1L;
+        when(userDao.exists(userId)).thenReturn(true);
+        when(userDao.findFollowingCountByUserId(anyLong())).thenReturn(2L);
+        Result<Long> userFollowersById = userService.getUserFollowingCountById(userId);
+        assertThat(userFollowersById.isSuccess(), is(true));
+        assertThat(userFollowersById.getValue(), is(equalTo(2L)));
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void getUserFollowingsById_userDoesNotExists() {
+        when(userDao.exists(anyLong())).thenReturn(false);
+        userService.getUserFollowingsById(1L, new PageRequest(0, 10));
+    }
+
+    @Test
+    public void getUserFollowingsById_noFollowers() {
+        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userDao.findFollowingByUserId(anyLong(), any(Pageable.class))).thenReturn(emptyList());
+        Result<List<User>> userFollowingsById = userService.getUserFollowingsById(1L, new PageRequest(0, 10));
+        assertThat(userFollowingsById.isSuccess(), is(true));
+        assertThat(userFollowingsById.getValue(), is(emptyList()));
+    }
+
+    @Test
+    public void getUserFollowingsById_someUsers() {
+        User userOne = a(user());
+        User userTwo = a(user());
+        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userDao.findFollowingByUserId(anyLong(), any(Pageable.class))).thenReturn(aListWith(userOne, userTwo));
+        Result<List<User>> userFollowingsById = userService.getUserFollowingsById(1L, new PageRequest(0, 10));
+        assertThat(userFollowingsById.isSuccess(), is(true));
+        assertThat(userFollowingsById.getValue(), hasItems(userOne, userTwo));
+    }
 
 }
