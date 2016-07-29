@@ -236,4 +236,64 @@ public class TweetDaoTest {
         assertThat(tweetsWithTags, hasSize(3));
     }
 
+    @Test
+    public void findTweetsFromFollowingUsers_noFollowingUsers() {
+        User user = a(user());
+        userDao.save(user);
+        List<Tweet> tweetsFromFollowingUsers = tweetDao.findTweetsFromFollowingUsers(user.getId(), new PageRequest(0, 10));
+        assertThat(tweetsFromFollowingUsers, is(emptyList()));
+    }
+
+    @Test
+    public void findTweetsFromFollowingUsers_oneFollowingAndSomeTweets() {
+        User user = a(user());
+        User followingOne = a(user().withFollowers(aListWith(user)));
+        userDao.save(aListWith(user, followingOne));
+
+        Tweet tweetOne = a(tweet().withOwner(followingOne));
+        Tweet tweetTwo = a(tweet().withOwner(followingOne));
+        tweetDao.save(aListWith(tweetOne, tweetTwo));
+
+        List<Tweet> tweetsFromFollowingUsers = tweetDao.findTweetsFromFollowingUsers(user.getId(), new PageRequest(0, 10));
+        assertThat(tweetsFromFollowingUsers, hasItems(tweetOne, tweetTwo));
+    }
+
+    @Test
+    public void findTweetsFromFollowingUsers_someFollowingAndSomeTweets() {
+        User user = a(user());
+        User followingOne = a(user().withFollowers(aListWith(user)));
+        User followingTwo = a(user().withFollowers(aListWith(user)));
+        userDao.save(aListWith(user, followingOne, followingTwo));
+
+        Tweet tweetOne = a(tweet().withOwner(followingOne));
+        Tweet tweetTwo = a(tweet().withOwner(followingOne));
+        Tweet tweetThree = a(tweet().withOwner(followingTwo));
+        tweetDao.save(aListWith(tweetOne, tweetTwo, tweetThree));
+
+        List<Tweet> tweetsFromFollowingUsers = tweetDao.findTweetsFromFollowingUsers(user.getId(), new PageRequest(0, 10));
+        assertThat(tweetsFromFollowingUsers, hasItems(tweetOne, tweetTwo, tweetThree));
+    }
+
+    @Test
+    public void findTweetsFromFollowingUsers_orderTest() {
+        User user = a(user());
+        User followingOne = a(user().withFollowers(aListWith(user)));
+        userDao.save(aListWith(user, followingOne));
+        Date oldestDate = DateTime.now().minusDays(4).toDate();
+        Date oldDate = DateTime.now().minusDays(3).toDate();
+        Date date = DateTime.now().minusDays(2).toDate();
+        Date youngestDate = DateTime.now().toDate();
+        Tweet tweetOne = a(tweet().withCreateDate(oldestDate).withOwner(followingOne));
+        Tweet tweetTwo = a(tweet().withCreateDate(oldDate).withOwner(followingOne));
+        Tweet tweetThree = a(tweet().withCreateDate(date).withOwner(followingOne));
+        Tweet tweetFour = a(tweet().withCreateDate(youngestDate).withOwner(followingOne));
+        tweetDao.save(aListWith(tweetOne, tweetTwo, tweetThree, tweetFour));
+
+        List<Tweet> tweetsFromFollowingUsersPageOne = tweetDao.findTweetsFromFollowingUsers(user.getId(), new PageRequest(0, 2));
+        List<Tweet> tweetsFromFollowingUsersPageTwo = tweetDao.findTweetsFromFollowingUsers(user.getId(), new PageRequest(1, 2));
+        assertThat(tweetsFromFollowingUsersPageOne, contains(tweetFour, tweetThree));
+        assertThat(tweetsFromFollowingUsersPageTwo, contains(tweetTwo, tweetOne));
+    }
+
+
 }
