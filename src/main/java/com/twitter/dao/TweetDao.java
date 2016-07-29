@@ -24,5 +24,6 @@ public interface TweetDao extends JpaRepository<Tweet, Long> {
 
     public List<Tweet> findDistinctByTagsInOrderByCreateDateDesc(List<Tag> tagList, Pageable pageable);
 
+    public List<Tweet> findTweetsFromFollowingUsers(long userId, Pageable pageable);
 }
 
