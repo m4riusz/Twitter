@@ -10,4 +10,5 @@ public final class MessageUtil {
 
     public static final String TWEET_DOES_NOT_EXISTS_BY_ID_ERROR_MSG = "Tweet with this id does not exist!";
     public static final String USER_OR_TWEET_IS_NULL_MSG = "User or tweet is undefined!";
+    public static final String HOURS_CANT_BE_LESS_OR_EQUAL_0_ERROR_MSG = "Hours cant be less or equal 0!";
 }

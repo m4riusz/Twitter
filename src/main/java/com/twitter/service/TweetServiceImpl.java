@@ -4,6 +4,7 @@ import com.twitter.dao.TweetDao;
 import com.twitter.dao.UserDao;
 import com.twitter.exception.TweetCreateException;
 import com.twitter.exception.TweetNotFoundException;
+import com.twitter.exception.TwitterGetException;
 import com.twitter.exception.UserNotFoundException;
 import com.twitter.model.Result;
 import com.twitter.model.Tag;
@@ -12,6 +13,8 @@ import com.twitter.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
@@ -19,6 +22,8 @@ import java.util.List;
  * Created by mariusz on 29.07.16.
  */
 @Service
+@Transactional
+@Validated
 public class TweetServiceImpl implements TweetService {
 
     private final TweetDao tweetDao;
@@ -80,6 +85,9 @@ public class TweetServiceImpl implements TweetService {
 
     @Override
     public Result<List<Tweet>> getMostVotedTweets(int hours, Pageable pageable) {
+        if (hours <= 0){
+            throw new TwitterGetException(MessageUtil.HOURS_CANT_BE_LESS_OR_EQUAL_0_ERROR_MSG);
+        }
         return new Result<>(true, tweetDao.findMostPopularByVotes(hours, pageable));
     }
 
