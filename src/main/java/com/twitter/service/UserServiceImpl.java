@@ -11,11 +11,15 @@ import com.twitter.model.Role;
 import com.twitter.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by mariusz on 14.07.16.
@@ -25,10 +29,12 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private UserDao userDao;
+    private JavaMailSender javaMailSender;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao) {
+    public UserServiceImpl(UserDao userDao, JavaMailSender javaMailSender) {
         this.userDao = userDao;
+        this.javaMailSender = javaMailSender;
     }
 
     @Override
@@ -52,8 +58,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public Result<Boolean> create(User user) {
         if (userDao.findByUsername(user.getUsername()) != null) {
-            throw new UserAlreadyExistsException(MessageUtil.USER_ALREADY_EXISTS_ERROR_MSG);
+            throw new UserAlreadyExistsException(MessageUtil.USER_ALREADY_EXISTS_USERNAME_ERROR_MSG);
+        } else if (userDao.findByEmail(user.getEmail()) != null) {
+            throw new UserAlreadyExistsException(MessageUtil.USER_ALREADY_EXISTS_EMAIL_ERROR_MSG);
         }
+        String verifyKey = UUID.randomUUID().toString();
+        sendEmail(user.getEmail(),
+                MessageUtil.EMAIL_FROM,
+                MessageUtil.EMAIL_SUBJECT,
+                MessageUtil.EMAIL_CONTENT + "\n" + MessageUtil.EMAIL_VERIFY_LINK + verifyKey
+        );
+        user.getAccountStatus().setVerifyKey(verifyKey);
         userDao.save(user);
         return new Result<>(true, Boolean.TRUE);
     }
@@ -83,16 +98,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Result<Boolean> banUser(long userToBanId) {
+    public Result<Boolean> banUser(long userToBanId, Date date) {
         User userToBan = getUser(userToBanId);
-        userToBan.setBanned(true);
+        userToBan.getAccountStatus().setBannedUntil(date);
         return new Result<>(true, Boolean.TRUE);
     }
 
     @Override
     public Result<Boolean> unbanUser(long userToUnbanId) {
         User userToUnban = getUser(userToUnbanId);
-        userToUnban.setBanned(false);
+        userToUnban.getAccountStatus().setBannedUntil(null);
         return new Result<>(true, Boolean.TRUE);
     }
 
@@ -161,11 +176,33 @@ public class UserServiceImpl implements UserService {
         throw new UserNotFoundException(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
 
+    @Override
+    public Result<String> activateAccount(String verifyKey) {
+        User user = userDao.findOneByAccountStatusVerifyKey(verifyKey);
+        if (user != null && !user.getAccountStatus().isEnable()) {
+            user.getAccountStatus().setEnable(true);
+            return new Result<>(true, MessageUtil.ACCOUNT_HAS_BEEN_ENABLED);
+        } else if (user != null && user.getAccountStatus().isEnable()) {
+            return new Result<>(false, MessageUtil.ACCOUNT_HAS_BEEN_ALREADY_ENABLED);
+        } else {
+            return new Result<>(false, MessageUtil.INVALID_VERIFY_KEY);
+        }
+    }
+
     private User getUser(long userId) {
         User userToChange = userDao.findOne(userId);
         if (userToChange == null) {
             throw new UserNotFoundException(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
         }
         return userToChange;
+    }
+
+    private void sendEmail(String to, String from, String subject, String content) {
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(to);
+        mailMessage.setFrom(from);
+        mailMessage.setSubject(subject);
+        mailMessage.setText(content);
+        javaMailSender.send(mailMessage);
     }
 }

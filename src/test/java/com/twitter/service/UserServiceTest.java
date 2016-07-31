@@ -15,6 +15,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
@@ -43,11 +44,14 @@ public class UserServiceTest {
     @Mock
     private UserDao userDao;
 
+    @Mock
+    private JavaMailSender javaMailSender;
+
     private UserService userService;
 
     @Before
     public void setUp() {
-        userService = new UserServiceImpl(userDao);
+        userService = new UserServiceImpl(userDao, javaMailSender);
     }
 
     @Test

@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,13 +19,11 @@ import java.util.List;
 @Service
 public interface UserService extends UserDetailsService {
 
-    @PreAuthorize(SecurityUtil.AUTHENTICATED)
     User loadUserByUsername(String username) throws UsernameNotFoundException;
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     Result<User> getUserById(long userId);
 
-    @PreAuthorize(SecurityUtil.AUTHENTICATED)
     Result<Boolean> create(User user);
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
@@ -34,7 +33,7 @@ public interface UserService extends UserDetailsService {
     Result<Boolean> unfollow(User user, long userToUnfollowId);
 
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
-    Result<Boolean> banUser(long userToBanId);
+    Result<Boolean> banUser(long userToBanId, Date date);
 
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
     Result<Boolean> unbanUser(long userToUnbanId);
@@ -65,5 +64,7 @@ public interface UserService extends UserDetailsService {
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     Result<List<User>> getUserFollowingsById(long userId, Pageable pageable);
+
+    Result<String> activateAccount(String verifyKey);
 
 }
