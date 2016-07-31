@@ -17,10 +17,11 @@ public final class UserBuilder implements Builder<User> {
     private long id;
     private Avatar avatar = new Avatar("avatar.jpg", new byte[10]);
     private String username = "User_" + counter;
+    private String email = username + "@email.com";
     private Password password = new Password("password");
     private Role role = Role.USER;
     private Gender gender = Gender.UNDEFINED;
-    private boolean banned = false;
+    private AccountStatus accountStatus = new AccountStatus(true, username + "_verifyKey");
     private List<Report> reports = new ArrayList<>();
     private List<Tweet> tweets = new ArrayList<>();
     private List<Tag> favouriteTags = new ArrayList<>();
@@ -58,6 +59,11 @@ public final class UserBuilder implements Builder<User> {
         return this;
     }
 
+    public UserBuilder withEmail(String email) {
+        this.email = email;
+        return this;
+    }
+
     public UserBuilder withPassword(Password password) {
         this.password = password;
         return this;
@@ -73,8 +79,8 @@ public final class UserBuilder implements Builder<User> {
         return this;
     }
 
-    public UserBuilder withBanned(boolean banned) {
-        this.banned = banned;
+    public UserBuilder withAccountStatus(AccountStatus accountStatus) {
+        this.accountStatus = accountStatus;
         return this;
     }
 
@@ -100,7 +106,8 @@ public final class UserBuilder implements Builder<User> {
         user.setPassword(password);
         user.setRole(role);
         user.setGender(gender);
-        user.setBanned(banned);
+        user.setEmail(email);
+        user.setAccountStatus(accountStatus);
         user.setTweets(tweets);
         user.setFavouriteTags(favouriteTags);
         user.setReports(reports);

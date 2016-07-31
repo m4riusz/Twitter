@@ -26,6 +26,10 @@ public class User extends AbstractEntity implements UserDetails {
             message = "Username length should be between {min} and {max}!"
     )
     private String username;
+    @NotNull(message = "Email is required!")
+    @Column(unique = true)
+    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
+    private String email;
     @NotNull
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -37,8 +41,9 @@ public class User extends AbstractEntity implements UserDetails {
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Gender gender;
     @NotNull
+    @OneToOne(cascade = CascadeType.ALL)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private boolean banned;
+    private AccountStatus accountStatus;
     @NotNull
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -64,13 +69,14 @@ public class User extends AbstractEntity implements UserDetails {
 
     public User() {
         super();
-        this.banned = false;
+        this.accountStatus = new AccountStatus();
         this.role = Role.USER;
         this.avatar = new Avatar("undef", new byte[100]); // FIXME: 14.07.16 fix
     }
 
-    public User(String username, String password, Gender gender) {
+    public User(String email, String username, String password, Gender gender) {
         this();
+        this.email = email;
         this.username = username;
         this.password = new Password(password);
         this.gender = gender;
@@ -106,14 +112,6 @@ public class User extends AbstractEntity implements UserDetails {
 
     public void setGender(Gender gender) {
         this.gender = gender;
-    }
-
-    public boolean isBanned() {
-        return banned;
-    }
-
-    public void setBanned(boolean banned) {
-        this.banned = banned;
     }
 
     public List<Report> getReports() {
@@ -156,6 +154,22 @@ public class User extends AbstractEntity implements UserDetails {
         this.favouriteTweets = favouriteTweets;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public AccountStatus getAccountStatus() {
+        return accountStatus;
+    }
+
+    public void setAccountStatus(AccountStatus accountStatus) {
+        this.accountStatus = accountStatus;
+    }
+
     @Override
     public Collection<Role> getAuthorities() {
         return Arrays.asList(role);
@@ -178,7 +192,7 @@ public class User extends AbstractEntity implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return !banned;
+        return !(accountStatus.getBannedUntil() != null);
     }
 
     @Override
@@ -188,7 +202,7 @@ public class User extends AbstractEntity implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return accountStatus.isEnable();
     }
 
     @Override
