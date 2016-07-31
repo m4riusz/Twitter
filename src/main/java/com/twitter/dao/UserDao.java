@@ -29,4 +29,8 @@ public interface UserDao extends JpaRepository<User, Long> {
     public long findFollowingCountByUserId(long userId);
 
     public User findByUsername(String username);
+
+    public User findByEmail(String email);
+
+    public User findOneByAccountStatusVerifyKey(String verifyKey);
 }
