@@ -17,7 +17,6 @@ import java.util.List;
  * Created by mariusz on 18.07.16.
  */
 @RestController
-@RequestMapping(Route.API)
 public class UserController {
 
     private UserService userService;
@@ -28,28 +27,33 @@ public class UserController {
     }
 
     @ResponseStatus(value = HttpStatus.CREATED)
-    @RequestMapping(value = Route.REST_USER, method = RequestMethod.POST)
+    @RequestMapping(value = Route.REGISTER_USER, method = RequestMethod.POST)
     public Result<Boolean> createUser(@Valid @RequestBody User user) {
         return userService.create(user);
     }
 
-    @RequestMapping(value = Route.REST_USER_ID, method = RequestMethod.GET)
+    @RequestMapping(value = Route.VERIFY_USER_URL, method = RequestMethod.GET)
+    public Result<String> verifyUser(@PathVariable String verifyKey) {
+        return userService.activateAccount(verifyKey);
+    }
+
+    @RequestMapping(value = Route.USER_BY_ID, method = RequestMethod.GET)
     public Result<User> getUserById(@PathVariable long userId) {
         return userService.getUserById(userId);
     }
 
-    @RequestMapping(value = Route.REST_USER_ID, method = RequestMethod.PUT)
+    @RequestMapping(value = Route.USER_BY_ID, method = RequestMethod.PUT)
     public void updateUserById(@PathVariable long userId, @RequestBody Password password) {
         userService.changeUserPasswordById(userId, password.getPassword());
     }
 
     @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(value = Route.REST_USER_ID, method = RequestMethod.DELETE)
+    @RequestMapping(value = Route.USER_BY_ID, method = RequestMethod.DELETE)
     public void deleteUser(@PathVariable long userId) {
         userService.deleteUserById(userId);
     }
 
-    @RequestMapping(value = Route.REST_USER_GET_ALL, method = RequestMethod.GET)
+    @RequestMapping(value = Route.USER_GET_ALL, method = RequestMethod.GET)
     public Result<List<User>> getAllUsers(@PathVariable int page, @PathVariable int size) {
         return userService.getAllUsers(new PageRequest(page, size));
     }

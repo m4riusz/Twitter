@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @RunWith(MockitoJUnitRunner.class)
-public class UserServiceTest {
+public class  UserServiceTest {
 
     @Mock
     private UserDao userDao;

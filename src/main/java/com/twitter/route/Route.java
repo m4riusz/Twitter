@@ -6,12 +6,19 @@ package com.twitter.route;
 public final class Route {
 
     public static final String API = "/api";
-    public static final String REST_USER = "/user";
-    public static final String REST_USER_ID = "/user/{userId}";
-    public static final String REST_USER_GET_ALL = "/user/{page}/{size}";
+    public static final String USER = "/user";
+    public static final String VERIFY = "/verify";
+    public static final String ALL = "/**";
 
 
+    public static final String USER_BY_ID = API + USER + "/{userId}";
+    public static final String USER_GET_ALL = API + USER + "/{page}/{size}";
     public static final String LOGIN_URL = API + "/login";
-    public static final String REGISTER_USER = API + REST_USER;
+    public static final String REGISTER_USER = API + USER;
     public static final String LOGOUT_URL = API + "/logout";
+    public static final String VERIFY_USER_URL = API + USER + VERIFY + "/{verifyKey}";
+    public static final String VERIFY_USER_URL_REGEX = API + USER + VERIFY + ALL;
+    public static final String ALL_REQUESTS_REGEX = API + ALL;
+
+
 }
