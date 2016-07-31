@@ -23,7 +23,6 @@ import java.util.List;
  */
 @Service
 @Transactional
-@Validated
 public class TweetServiceImpl implements TweetService {
 
     private final TweetDao tweetDao;
