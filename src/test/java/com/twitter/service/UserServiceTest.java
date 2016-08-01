@@ -234,7 +234,6 @@ public class  UserServiceTest {
 
     @Test
     public void getUserFollowersCountById_userExistsSomeFollowers() {
-
         when(userDao.exists(TestUtil.ID_ONE)).thenReturn(true);
         when(userDao.findFollowersCountByUserId(TestUtil.ID_ONE)).thenReturn(2L);
         Result<Long> userFollowersById = userService.getUserFollowersCountById(TestUtil.ID_ONE);
@@ -285,7 +284,6 @@ public class  UserServiceTest {
 
     @Test
     public void getUserFollowingCountById_userExistsSomeFollowers() {
-
         when(userDao.exists(anyLong())).thenReturn(true);
         when(userDao.findFollowingCountByUserId(anyLong())).thenReturn(2L);
         Result<Long> userFollowersById = userService.getUserFollowingCountById(TestUtil.ID_ONE);
@@ -341,6 +339,7 @@ public class  UserServiceTest {
         User user = a(user().withAccountStatus(new AccountStatus(false, "someKey")));
         when(userDao.findOneByAccountStatusVerifyKey(anyString())).thenReturn(user);
         Result<String> activateResult = userService.activateAccount("someKey");
+        assertThat(user.isEnabled(), is(Boolean.TRUE));
         assertThat(activateResult, hasFinishedSuccessfully());
         assertThat(activateResult, hasValueOf(MessageUtil.ACCOUNT_HAS_BEEN_ENABLED));
     }
