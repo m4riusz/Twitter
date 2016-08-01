@@ -1,10 +1,7 @@
 package com.twitter.builders;
 
 import com.twitter.Builder;
-import com.twitter.model.Report;
-import com.twitter.model.ReportCategory;
-import com.twitter.model.ReportStatus;
-import com.twitter.model.User;
+import com.twitter.model.*;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -20,6 +17,7 @@ public final class ReportBuilder implements Builder<Report> {
     private User judge;
     private long id;
     private Date createDate = Calendar.getInstance().getTime();
+    private AbstractPost abstractPost;
     private int version;
 
     private ReportBuilder() {
@@ -36,6 +34,11 @@ public final class ReportBuilder implements Builder<Report> {
 
     public ReportBuilder withCategory(ReportCategory category) {
         this.category = category;
+        return this;
+    }
+
+    public ReportBuilder withAbstractPost(AbstractPost abstractPost) {
+        this.abstractPost = abstractPost;
         return this;
     }
 
@@ -73,6 +76,7 @@ public final class ReportBuilder implements Builder<Report> {
         Report report = new Report();
         report.setStatus(status);
         report.setCategory(category);
+        report.setAbstractPost(abstractPost);
         report.setMessage(message);
         report.setUser(user);
         report.setJudge(judge);

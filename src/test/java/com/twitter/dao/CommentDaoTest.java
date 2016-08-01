@@ -3,16 +3,14 @@ package com.twitter.dao;
 import com.twitter.model.Comment;
 import com.twitter.model.Tweet;
 import com.twitter.model.User;
-import org.joda.time.DateTime;
+import com.twitter.service.TestUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Date;
 import java.util.List;
 
 import static com.twitter.Util.a;
@@ -50,13 +48,19 @@ public class CommentDaoTest {
         userDao.save(user);
         Tweet tweet = a(tweet().withOwner(user));
         tweetDao.save(tweet);
-        List<Comment> commentsFromTweet = commentDao.findByTweetId(tweet.getId(), new PageRequest(0, 10));
+        List<Comment> commentsFromTweet = commentDao.findByTweetId(
+                tweet.getId(),
+                TestUtil.ALL_IN_ONE_PAGE
+        );
         assertThat(commentsFromTweet, is(emptyList()));
     }
 
     @Test
     public void findByTweetId_tweetIdNotFound() {
-        List<Comment> commentsFromNotExistingTweet = commentDao.findByTweetId(111L, new PageRequest(0, 10));
+        List<Comment> commentsFromNotExistingTweet = commentDao.findByTweetId(
+                TestUtil.ID_ONE,
+                TestUtil.ALL_IN_ONE_PAGE
+        );
         assertThat(commentsFromNotExistingTweet, is(emptyList()));
     }
 
@@ -65,12 +69,17 @@ public class CommentDaoTest {
         User user = a(user());
         User commentator = a(user());
         userDao.save(aListWith(user, commentator));
-
         Tweet tweet = a(tweet().withOwner(user));
         tweetDao.save(aListWith(tweet));
-        Comment comment = a(comment().withTweet(tweet).withOwner(commentator));
+        Comment comment = a(comment()
+                .withTweet(tweet)
+                .withOwner(commentator)
+        );
         commentDao.save(aListWith(comment));
-        List<Comment> commentsFromTweet = commentDao.findByTweetId(tweet.getId(), new PageRequest(0, 10));
+        List<Comment> commentsFromTweet = commentDao.findByTweetId(
+                tweet.getId(),
+                TestUtil.ALL_IN_ONE_PAGE
+        );
         assertThat(commentsFromTweet, hasItem(comment));
     }
 
@@ -83,19 +92,39 @@ public class CommentDaoTest {
         User commentator3 = a(user());
         User commentator4 = a(user());
         userDao.save(aListWith(userOne, userTwo, commentator1, commentator2, commentator3, commentator4));
-
         Tweet tweetFromUserOne = a(tweet().withOwner(userOne));
         Tweet tweetFromUserTwo = a(tweet().withOwner(userTwo));
         tweetDao.save(aListWith(tweetFromUserOne, tweetFromUserTwo));
-        Comment comment1 = a(comment().withOwner(commentator1).withTweet(tweetFromUserOne));
-        Comment comment2 = a(comment().withOwner(commentator2).withTweet(tweetFromUserOne));
-        Comment comment3 = a(comment().withOwner(commentator3).withTweet(tweetFromUserOne));
-        Comment comment4 = a(comment().withOwner(commentator4).withTweet(tweetFromUserTwo));
-        Comment ownerComment = a(comment().withOwner(userOne).withTweet(tweetFromUserOne));
+        Comment comment1 = a(comment()
+                .withOwner(commentator1)
+                .withTweet(tweetFromUserOne)
+        );
+        Comment comment2 = a(comment()
+                .withOwner(commentator2)
+                .withTweet(tweetFromUserOne)
+        );
+        Comment comment3 = a(comment()
+                .withOwner(commentator3)
+                .withTweet(tweetFromUserOne)
+        );
+        Comment comment4 = a(comment()
+                .withOwner(commentator4)
+                .withTweet(tweetFromUserTwo)
+        );
+        Comment ownerComment = a(comment()
+                .withOwner(userOne)
+                .withTweet(tweetFromUserOne)
+        );
         commentDao.save(aListWith(comment1, comment2, comment3, comment4, ownerComment));
 
-        List<Comment> commentsFromTweetOne = commentDao.findByTweetId(tweetFromUserOne.getId(), new PageRequest(0, 10));
-        List<Comment> commentsFromTweetTwo = commentDao.findByTweetId(tweetFromUserTwo.getId(), new PageRequest(0, 10));
+        List<Comment> commentsFromTweetOne = commentDao.findByTweetId(
+                tweetFromUserOne.getId(),
+                TestUtil.ALL_IN_ONE_PAGE
+        );
+        List<Comment> commentsFromTweetTwo = commentDao.findByTweetId(
+                tweetFromUserTwo.getId(),
+                TestUtil.ALL_IN_ONE_PAGE
+        );
         assertThat(commentsFromTweetOne, hasItems(comment1, comment2, comment3, ownerComment));
         assertThat(commentsFromTweetTwo, hasItem(comment4));
     }
@@ -106,24 +135,33 @@ public class CommentDaoTest {
         User userOne = a(user());
         User commentator = a(user());
         userDao.save(aListWith(userOne, commentator));
-
         Tweet tweetFromUserOne = a(tweet().withOwner(userOne));
         tweetDao.save(aListWith(tweetFromUserOne));
-        Comment comment1 = a(comment().withOwner(commentator).withTweet(tweetFromUserOne)
-                .withVotes(aListWith(
-                        a(userVote().withAbstractPost(tweetFromUserOne).withUser(commentator)),
-                        a(userVote().withAbstractPost(tweetFromUserOne).withUser(commentator)),
-                        a(userVote().withAbstractPost(tweetFromUserOne).withUser(commentator))
-                )));
-        Comment comment2 = a(comment().withOwner(commentator).withTweet(tweetFromUserOne)
-                .withVotes(aListWith(
-                        a(userVote().withAbstractPost(tweetFromUserOne).withUser(commentator))
-                )));
-        Comment comment3 = a(comment().withOwner(commentator).withTweet(tweetFromUserOne)
-                .withVotes(emptyList()));
 
+        Comment comment1 = a(comment()
+                .withOwner(commentator)
+                .withTweet(tweetFromUserOne)
+                .withVotes(aListWith(
+                        a(userVote().withAbstractPost(tweetFromUserOne).withUser(commentator)),
+                        a(userVote().withAbstractPost(tweetFromUserOne).withUser(commentator)),
+                        a(userVote().withAbstractPost(tweetFromUserOne).withUser(commentator))
+                )));
+        Comment comment2 = a(comment()
+                .withOwner(commentator)
+                .withTweet(tweetFromUserOne)
+                .withVotes(aListWith(
+                        a(userVote().withAbstractPost(tweetFromUserOne).withUser(commentator))
+                )));
+        Comment comment3 = a(comment()
+                .withOwner(commentator)
+                .withTweet(tweetFromUserOne)
+                .withVotes(emptyList()));
         commentDao.save(aListWith(comment1, comment2, comment3));
-        List<Comment> commentsFromTweetOne = commentDao.findByTweetIdOrderByVotes(tweetFromUserOne.getId(), new PageRequest(0, 10));
+
+        List<Comment> commentsFromTweetOne = commentDao.findByTweetIdOrderByVotes(
+                tweetFromUserOne.getId(),
+                TestUtil.ALL_IN_ONE_PAGE
+        );
         assertThat(commentsFromTweetOne, contains(comment1, comment2, comment3));
     }
 
@@ -135,19 +173,27 @@ public class CommentDaoTest {
         Tweet tweet = a(tweet().withOwner(user));
         tweetDao.save(aListWith(tweet));
 
-        Date youngestDate = DateTime.now().minusDays(1).toDate();
-        Date olderDate = DateTime.now().minusDays(2).toDate();
-        Date oldestDate = DateTime.now().minusDays(3).toDate();
-
-        Comment youngestComment = a(comment().withOwner(commentator).withTweet(tweet)
-                .withCreateDate(youngestDate));
-        Comment olderComment = a(comment().withOwner(commentator).withTweet(tweet)
-                .withCreateDate(olderDate));
-        Comment oldestComment = a(comment().withOwner(commentator).withTweet(tweet)
-                .withCreateDate(oldestDate));
+        Comment youngestComment = a(comment()
+                .withOwner(commentator)
+                .withTweet(tweet)
+                .withCreateDate(TestUtil.DATE_2003)
+        );
+        Comment olderComment = a(comment()
+                .withOwner(commentator)
+                .withTweet(tweet)
+                .withCreateDate(TestUtil.DATE_2002)
+        );
+        Comment oldestComment = a(comment()
+                .withOwner(commentator)
+                .withTweet(tweet)
+                .withCreateDate(TestUtil.DATE_2001)
+        );
         commentDao.save(aListWith(youngestComment, olderComment, oldestComment));
 
-        List<Comment> commentList = commentDao.findByTweetIdOrderByCreateDateAsc(tweet.getId(), new PageRequest(0, 10));
+        List<Comment> commentList = commentDao.findByTweetIdOrderByCreateDateAsc(
+                tweet.getId(),
+                TestUtil.ALL_IN_ONE_PAGE
+        );
         assertThat(commentList, contains(oldestComment, olderComment, youngestComment));
     }
 
@@ -159,19 +205,27 @@ public class CommentDaoTest {
         Tweet tweet = a(tweet().withOwner(user));
         tweetDao.save(aListWith(tweet));
 
-        Date youngestDate = DateTime.now().minusDays(1).toDate();
-        Date olderDate = DateTime.now().minusDays(2).toDate();
-        Date oldestDate = DateTime.now().minusDays(3).toDate();
-
-        Comment youngestComment = a(comment().withOwner(commentator).withTweet(tweet)
-                .withCreateDate(youngestDate));
-        Comment olderComment = a(comment().withOwner(commentator).withTweet(tweet)
-                .withCreateDate(olderDate));
-        Comment oldestComment = a(comment().withOwner(commentator).withTweet(tweet)
-                .withCreateDate(oldestDate));
+        Comment youngestComment = a(comment()
+                .withOwner(commentator)
+                .withTweet(tweet)
+                .withCreateDate(TestUtil.DATE_2003)
+        );
+        Comment olderComment = a(comment()
+                .withOwner(commentator)
+                .withTweet(tweet)
+                .withCreateDate(TestUtil.DATE_2002)
+        );
+        Comment oldestComment = a(comment()
+                .withOwner(commentator)
+                .withTweet(tweet)
+                .withCreateDate(TestUtil.DATE_2001)
+        );
         commentDao.save(aListWith(youngestComment, olderComment, oldestComment));
 
-        List<Comment> commentList = commentDao.findByTweetIdOrderByCreateDateDesc(tweet.getId(), new PageRequest(0, 10));
+        List<Comment> commentList = commentDao.findByTweetIdOrderByCreateDateDesc(
+                tweet.getId(),
+                TestUtil.ALL_IN_ONE_PAGE
+        );
         assertThat(commentList, contains(youngestComment, olderComment, oldestComment));
     }
 
