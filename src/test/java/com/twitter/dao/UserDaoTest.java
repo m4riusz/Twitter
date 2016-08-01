@@ -1,5 +1,6 @@
 package com.twitter.dao;
 
+import com.twitter.model.AccountStatus;
 import com.twitter.model.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -179,5 +180,37 @@ public class UserDaoTest {
         User userFromDatabase = userDao.findByUsername(username);
         assertThat(userFromDatabase, is(user));
     }
+
+    @Test
+    public void findByEmail_emailDoesNotExist() {
+        User userByEmail = userDao.findByEmail("some@email.com");
+        assertThat(userByEmail, is(nullValue()));
+    }
+
+    @Test
+    public void findByEmail_emailExist() {
+        String email = "some@email.com";
+        User user = a(user().withEmail(email));
+        userDao.save(user);
+        User userByEmail = userDao.findByEmail(email);
+        assertThat(userByEmail, is(user));
+        assertThat(userByEmail.getEmail(), is(email));
+    }
+
+    @Test
+    public void findOneByAccountStatusVerifyKey_keyDoesNotExist() {
+        User user = userDao.findOneByAccountStatusVerifyKey("afsaf");
+        assertThat(user, is(nullValue()));
+    }
+
+    @Test
+    public void findOneByAccountStatusVerifyKey_keyDoesExist() {
+        AccountStatus accountStatus = new AccountStatus(false, "someKey");
+        User userOne = a(user().withAccountStatus(accountStatus));
+        userDao.save(userOne);
+        User user = userDao.findOneByAccountStatusVerifyKey("someKey");
+        assertThat(user, is(userOne));
+    }
+
 
 }
