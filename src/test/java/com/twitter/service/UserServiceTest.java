@@ -5,6 +5,7 @@ import com.twitter.exception.UserAlreadyExistsException;
 import com.twitter.exception.UserFollowException;
 import com.twitter.exception.UserNotFoundException;
 import com.twitter.exception.UserUnfollowException;
+import com.twitter.model.AccountStatus;
 import com.twitter.model.Result;
 import com.twitter.model.User;
 import org.junit.Before;
@@ -15,6 +16,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -23,6 +25,7 @@ import java.util.List;
 import static com.twitter.Util.a;
 import static com.twitter.Util.aListWith;
 import static com.twitter.builders.UserBuilder.user;
+import static com.twitter.matchers.ResultIsFailureMatcher.hasFailed;
 import static com.twitter.matchers.ResultIsSuccessMatcher.hasFinishedSuccessfully;
 import static com.twitter.matchers.ResultValueMatcher.hasValueOf;
 import static com.twitter.matchers.UserFollowerMatcher.hasFollowers;
@@ -30,8 +33,9 @@ import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by mariusz on 14.07.16.
@@ -92,11 +96,18 @@ public class  UserServiceTest {
         Result<Boolean> createResult = userService.create(user);
         assertThat(createResult, hasFinishedSuccessfully());
         assertThat(createResult, hasValueOf(Boolean.TRUE));
+        verify(javaMailSender, times(1)).send(any(SimpleMailMessage.class));
     }
 
     @Test(expected = UserAlreadyExistsException.class)
-    public void create_userAlreadyExists() {
+    public void create_usernameAlreadyExist() {
         when(userDao.findByUsername(anyString())).thenReturn(a(user()));
+        userService.create(a(user()));
+    }
+
+    @Test(expected = UserAlreadyExistsException.class)
+    public void create_emailAlreadyExist() {
+        when(userDao.findByEmail(anyString())).thenReturn(a(user()));
         userService.create(a(user()));
     }
 
@@ -306,6 +317,32 @@ public class  UserServiceTest {
         Result<List<User>> userFollowingsById = userService.getUserFollowingsById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
         assertThat(userFollowingsById, hasFinishedSuccessfully());
         assertThat(userFollowingsById, hasValueOf(aListWith(userOne, userTwo)));
+    }
+
+    @Test
+    public void activateAccount_verifyKeyNotFound() {
+        when(userDao.findOneByAccountStatusVerifyKey(anyString())).thenReturn(null);
+        Result<String> activateResult = userService.activateAccount("someKey");
+        assertThat(activateResult, hasFailed());
+        assertThat(activateResult, hasValueOf(MessageUtil.INVALID_VERIFY_KEY));
+    }
+
+    @Test
+    public void activateAccount_accountAlreadyActivated() {
+        User user = a(user().withAccountStatus(new AccountStatus(true, "someKey")));
+        when(userDao.findOneByAccountStatusVerifyKey(anyString())).thenReturn(user);
+        Result<String> activateResult = userService.activateAccount("someKey");
+        assertThat(activateResult, hasFailed());
+        assertThat(activateResult, hasValueOf(MessageUtil.ACCOUNT_HAS_BEEN_ALREADY_ENABLED));
+    }
+
+    @Test
+    public void activateAccount_accountNotActivated() {
+        User user = a(user().withAccountStatus(new AccountStatus(false, "someKey")));
+        when(userDao.findOneByAccountStatusVerifyKey(anyString())).thenReturn(user);
+        Result<String> activateResult = userService.activateAccount("someKey");
+        assertThat(activateResult, hasFinishedSuccessfully());
+        assertThat(activateResult, hasValueOf(MessageUtil.ACCOUNT_HAS_BEEN_ENABLED));
     }
 
 }
