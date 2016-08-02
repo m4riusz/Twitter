@@ -18,12 +18,12 @@ public class ResultIsFailureMatcher extends TypeSafeMatcher<Result> {
 
     @Override
     protected void describeMismatchSafely(Result item, Description mismatchDescription) {
-        mismatchDescription.appendText("a result was ").appendValue(Boolean.TRUE);
+        mismatchDescription.appendText("a result was ").appendValue(true);
     }
 
     @Override
     public void describeTo(Description description) {
-        description.appendText("a result ").appendValue(Boolean.FALSE);
+        description.appendText("a result ").appendValue(false);
     }
 
     public static ResultIsFailureMatcher hasFailed() {

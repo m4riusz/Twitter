@@ -31,6 +31,6 @@ public class ResultValueMatcher<T> extends TypeSafeMatcher<Result<T>> {
     }
 
     public static <T> ResultValueMatcher<T> hasValueOf(T value) {
-        return new ResultValueMatcher(value);
+        return new ResultValueMatcher<>(value);
     }
 }

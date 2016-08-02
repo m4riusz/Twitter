@@ -17,12 +17,12 @@ public class ResultIsSuccessMatcher extends TypeSafeMatcher<Result> {
 
     @Override
     protected void describeMismatchSafely(Result item, Description mismatchDescription) {
-        mismatchDescription.appendText("a result was ").appendValue(Boolean.FALSE);
+        mismatchDescription.appendText("a result was ").appendValue(false);
     }
 
     @Override
     public void describeTo(Description description) {
-        description.appendText("a result ").appendValue(Boolean.TRUE);
+        description.appendText("a result ").appendValue(true);
     }
 
     public static ResultIsSuccessMatcher hasFinishedSuccessfully() {
