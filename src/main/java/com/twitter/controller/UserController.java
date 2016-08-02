@@ -33,7 +33,7 @@ public class UserController {
     }
 
     @RequestMapping(value = Route.VERIFY_USER_URL, method = RequestMethod.GET)
-    public Result<String> verifyUser(@PathVariable String verifyKey) {
+    public Result<Boolean> verifyUser(@PathVariable String verifyKey) {
         return userService.activateAccount(verifyKey);
     }
 

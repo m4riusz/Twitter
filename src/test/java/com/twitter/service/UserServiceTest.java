@@ -488,35 +488,5 @@ public class  UserServiceTest {
         assertThat(userResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 }
-/*
-package com.twitter.service;
 
-        import com.twitter.model.Comment;
-        import com.twitter.model.Result;
-        import org.springframework.data.domain.Pageable;
-        import org.springframework.stereotype.Service;
-
-        import java.util.List;
-
-*/
-/**
- * Created by mariusz on 02.08.16.
- *//*
-
-@Service
-public interface CommentService {
-
-    Result<Boolean> createComment(Comment comment);
-
-    Result<Comment> getCommentById(long tweetId);
-
-    Result<List<Comment>> getTweetCommentsById(long tweetId, Pageable pageable);
-
-    Result<List<Comment>> getLatestCommentsById(long tweetId, Pageable pageable);
-
-    Result<List<Comment>> getOldestCommentsById(long tweetId, Pageable pageable);
-
-    Result<List<Comment>> getMostVotedComments(long tweetId, Pageable pageable);
-}
-*/
 
