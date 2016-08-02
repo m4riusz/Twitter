@@ -6,6 +6,7 @@ import com.twitter.model.Result;
 import com.twitter.model.Tag;
 import com.twitter.model.Tweet;
 import com.twitter.model.User;
+import com.twitter.util.TagExtractor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,11 +46,14 @@ public class TweetServiceTest {
     @Mock
     private TweetDao tweetDao;
 
+    @Mock
+    private TagExtractor tagExtractor;
+
     private TweetService tweetService;
 
     @Before
     public void setUp() {
-        tweetService = new TweetServiceImpl(tweetDao, userDao);
+        tweetService = new TweetServiceImpl(tweetDao, userDao, tagExtractor);
     }
 
     public void getTweetById_tweetDoesNotExist() {

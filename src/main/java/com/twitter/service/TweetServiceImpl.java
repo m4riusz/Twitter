@@ -6,6 +6,7 @@ import com.twitter.model.Result;
 import com.twitter.model.Tag;
 import com.twitter.model.Tweet;
 import com.twitter.model.User;
+import com.twitter.util.TagExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,11 +26,13 @@ public class TweetServiceImpl implements TweetService {
 
     private final TweetDao tweetDao;
     private final UserDao userDao;
+    private final TagExtractor tagExtractor;
 
     @Autowired
-    public TweetServiceImpl(TweetDao tweetDao, UserDao userDao) {
+    public TweetServiceImpl(TweetDao tweetDao, UserDao userDao, TagExtractor tagExtractor) {
         this.tweetDao = tweetDao;
         this.userDao = userDao;
+        this.tagExtractor = tagExtractor;
     }
 
     @Override
@@ -46,6 +49,8 @@ public class TweetServiceImpl implements TweetService {
             return ResultFailure(MessageUtil.USER_OR_TWEET_IS_NULL_MSG);
         }
         tweet.setOwner(user);
+        List<Tag> tagList = tagExtractor.extract(tweet.getContent());
+        tweet.setTags(tagList);
         try {
             tweetDao.save(tweet);
             return ResultSuccess(true);
