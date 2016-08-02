@@ -24,7 +24,9 @@ public final class MessageUtil {
     public static final String EMAIL_CONTENT = "Thank you for registration. Please click ling below to activate account!";
     public static final String EMAIL_FROM = "some@email.com";
     public static final String EMAIL_VERIFY_LINK = "http://localhost:8080/api/user/verify/";
-    public static final String REPORT_DATE_NOT_SET_ERROR_MSG = "Report date is not set!";
+    public static final String REPORT_DATE_NOT_SET_ERROR_MSG = "Date is not set!";
     public static final String REPORT_DATE_IS_INVALID_ERROR_MSG = "Date until banned is invalid!";
     public static final String DELETE_ABSTRACT_POST_CONTENT = "[Content has been deleted by administration]";
+
+    public static final String RESULT_SUCCESS_MESSAGE = "Ok";
 }

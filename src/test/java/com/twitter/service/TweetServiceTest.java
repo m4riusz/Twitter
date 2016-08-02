@@ -2,10 +2,6 @@ package com.twitter.service;
 
 import com.twitter.dao.TweetDao;
 import com.twitter.dao.UserDao;
-import com.twitter.exception.TweetCreateException;
-import com.twitter.exception.TweetNotFoundException;
-import com.twitter.exception.TwitterGetException;
-import com.twitter.exception.UserNotFoundException;
 import com.twitter.model.Result;
 import com.twitter.model.Tag;
 import com.twitter.model.Tweet;
@@ -27,7 +23,9 @@ import static com.twitter.Util.aListWith;
 import static com.twitter.builders.TagBuilder.tag;
 import static com.twitter.builders.TweetBuilder.tweet;
 import static com.twitter.builders.UserBuilder.user;
+import static com.twitter.matchers.ResultIsFailureMatcher.hasFailed;
 import static com.twitter.matchers.ResultIsSuccessMatcher.hasFinishedSuccessfully;
+import static com.twitter.matchers.ResultMessageMatcher.hasMessageOf;
 import static com.twitter.matchers.ResultValueMatcher.hasValueOf;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -54,10 +52,12 @@ public class TweetServiceTest {
         tweetService = new TweetServiceImpl(tweetDao, userDao);
     }
 
-    @Test(expected = TweetNotFoundException.class)
     public void getTweetById_tweetDoesNotExist() {
         when(tweetDao.exists(anyLong())).thenReturn(false);
-        tweetService.getTweetById(1L);
+        Result<Tweet> tweetResult = tweetService.getTweetById(1L);
+        assertThat(tweetResult, hasFailed());
+        assertThat(tweetResult, hasValueOf(null));
+        assertThat(tweetResult, hasMessageOf(MessageUtil.TWEET_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
     }
 
     @Test
@@ -68,16 +68,22 @@ public class TweetServiceTest {
         Result<Tweet> tweetById = tweetService.getTweetById(TestUtil.ID_ONE);
         assertThat(tweetById, hasFinishedSuccessfully());
         assertThat(tweetById, hasValueOf(tweet));
+        assertThat(tweetById, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
-    @Test(expected = TweetCreateException.class)
+
     public void createTweet_userIsNull() {
-        tweetService.createTweet(null, a(tweet()));
+        Result<Boolean> tweetResult = tweetService.createTweet(null, a(tweet()));
+        assertThat(tweetResult, hasFailed());
+        assertThat(tweetResult, hasValueOf(null));
+        assertThat(tweetResult, hasMessageOf(MessageUtil.USER_OR_TWEET_IS_NULL_MSG));
     }
 
-    @Test(expected = TweetCreateException.class)
     public void createTweet_tweetIsNull() {
-        tweetService.createTweet(a(user()), null);
+        Result<Boolean> tweetResult = tweetService.createTweet(a(user()), null);
+        assertThat(tweetResult, hasFailed());
+        assertThat(tweetResult, hasValueOf(null));
+        assertThat(tweetResult, hasMessageOf(MessageUtil.USER_OR_TWEET_IS_NULL_MSG));
     }
 
     @Test
@@ -85,13 +91,19 @@ public class TweetServiceTest {
         User user = a(user());
         Tweet tweet = a(tweet());
         when(tweetDao.save(tweet)).thenReturn(tweet);
-        tweetService.createTweet(user, tweet);
+        Result<Boolean> tweetResult = tweetService.createTweet(user, tweet);
+        assertThat(tweetResult, hasFinishedSuccessfully());
+        assertThat(tweetResult, hasValueOf(true));
+        assertThat(tweetResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
-    @Test(expected = TweetNotFoundException.class)
+
     public void deleteTweetById_tweetDoesNotExist() {
         when(tweetDao.exists(anyLong())).thenReturn(false);
-        tweetService.deleteTweetById(TestUtil.ID_ONE);
+        Result<Boolean> tweetResult = tweetService.deleteTweetById(TestUtil.ID_ONE);
+        assertThat(tweetResult, hasFailed());
+        assertThat(tweetResult, hasValueOf(null));
+        assertThat(tweetResult, hasMessageOf(MessageUtil.TWEET_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
     }
 
     @Test
@@ -99,7 +111,8 @@ public class TweetServiceTest {
         when(tweetDao.exists(anyLong())).thenReturn(true);
         Result<Boolean> deleteTweetById = tweetService.deleteTweetById(1L);
         assertThat(deleteTweetById, hasFinishedSuccessfully());
-        assertThat(deleteTweetById, hasValueOf(Boolean.TRUE));
+        assertThat(deleteTweetById, hasValueOf(true));
+        assertThat(deleteTweetById, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
     @Test
@@ -108,6 +121,7 @@ public class TweetServiceTest {
         Result<List<Tweet>> allTweetsResult = tweetService.getAllTweets(TestUtil.ALL_IN_ONE_PAGE);
         assertThat(allTweetsResult, hasFinishedSuccessfully());
         assertThat(allTweetsResult, hasValueOf(emptyList()));
+        assertThat(allTweetsResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
     @Test
@@ -118,6 +132,7 @@ public class TweetServiceTest {
         Result<List<Tweet>> allTweetsResult = tweetService.getAllTweets(TestUtil.ALL_IN_ONE_PAGE);
         assertThat(allTweetsResult, hasFinishedSuccessfully());
         assertThat(allTweetsResult, hasValueOf(aListWith(tweetOne, tweetTwo)));
+        assertThat(allTweetsResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
     @Test
@@ -133,60 +148,71 @@ public class TweetServiceTest {
         Result<List<Tweet>> allTweetsPageTwo = tweetService.getAllTweets(pageTwoRequest);
         assertThat(allTweetsPageOne, hasFinishedSuccessfully());
         assertThat(allTweetsPageOne, hasValueOf(aListWith(tweetOne, tweetTwo)));
+        assertThat(allTweetsPageOne, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
         assertThat(allTweetsPageTwo, hasFinishedSuccessfully());
         assertThat(allTweetsPageTwo, hasValueOf(aListWith(tweetThree)));
+        assertThat(allTweetsPageTwo, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
-    @Test(expected = UserNotFoundException.class)
+
     public void getTweetsFromFollowingUsers_userDoesNotExist() {
-        when(userDao.exists(anyLong())).thenReturn(Boolean.FALSE);
-        tweetService.getTweetsFromFollowingUsers(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
+        when(userDao.exists(anyLong())).thenReturn(false);
+        Result<List<Tweet>> tweetsResult = tweetService.getTweetsFromFollowingUsers(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(tweetsResult, hasFailed());
+        assertThat(tweetsResult, hasValueOf(null));
+        assertThat(tweetsResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
     }
 
     @Test
     public void getTweetsFromFollowingUsers_noTweetsFromFollowingUsers() {
-        when(userDao.exists(anyLong())).thenReturn(Boolean.TRUE);
+        when(userDao.exists(anyLong())).thenReturn(true);
         when(tweetDao.findTweetsFromFollowingUsers(anyLong(), any(Pageable.class))).thenReturn(emptyList());
         Result<List<Tweet>> tweetsFromFollowingUsers = tweetService.getTweetsFromFollowingUsers(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
         assertThat(tweetsFromFollowingUsers, hasFinishedSuccessfully());
         assertThat(tweetsFromFollowingUsers, hasValueOf(emptyList()));
+        assertThat(tweetsFromFollowingUsers, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
     @Test
     public void getTweetsFromFollowingUsers_someTweetsFromFollowingUsers() {
-        when(userDao.exists(anyLong())).thenReturn(Boolean.TRUE);
+        when(userDao.exists(anyLong())).thenReturn(true);
         Tweet tweetOne = a(tweet());
         Tweet tweetTwo = a(tweet());
         when(tweetDao.findTweetsFromFollowingUsers(anyLong(), any(Pageable.class))).thenReturn(aListWith(tweetOne, tweetTwo));
         Result<List<Tweet>> tweetsFromFollowingUsers = tweetService.getTweetsFromFollowingUsers(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
         assertThat(tweetsFromFollowingUsers, hasFinishedSuccessfully());
         assertThat(tweetsFromFollowingUsers, hasValueOf(aListWith(tweetOne, tweetTwo)));
+        assertThat(tweetsFromFollowingUsers, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
-    @Test(expected = UserNotFoundException.class)
     public void getTweetsFromUser_userDoesNotExist() {
-        when(userDao.exists(anyLong())).thenReturn(Boolean.FALSE);
-        tweetService.getTweetsFromUser(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
+        when(userDao.exists(anyLong())).thenReturn(false);
+        Result<List<Tweet>> tweetResult = tweetService.getTweetsFromUser(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(tweetResult, hasFailed());
+        assertThat(tweetResult, hasValueOf(null));
+        assertThat(tweetResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
     }
 
     @Test
     public void getTweetsFromUser_noTweets() {
-        when(userDao.exists(anyLong())).thenReturn(Boolean.TRUE);
+        when(userDao.exists(anyLong())).thenReturn(true);
         when(tweetDao.findByOwnerId(anyLong(), any(Pageable.class))).thenReturn(emptyList());
         Result<List<Tweet>> tweetsFromUserResult = tweetService.getTweetsFromUser(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
         assertThat(tweetsFromUserResult, hasFinishedSuccessfully());
         assertThat(tweetsFromUserResult, hasValueOf(emptyList()));
+        assertThat(tweetsFromUserResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
     @Test
     public void getTweetsFromUser_someTweets() {
         Tweet tweetOne = a(tweet());
         Tweet tweetTwo = a(tweet());
-        when(userDao.exists(anyLong())).thenReturn(Boolean.TRUE);
+        when(userDao.exists(anyLong())).thenReturn(true);
         when(tweetDao.findByOwnerId(anyLong(), any(Pageable.class))).thenReturn(aListWith(tweetOne, tweetTwo));
         Result<List<Tweet>> tweetsFromUserResult = tweetService.getTweetsFromUser(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
         assertThat(tweetsFromUserResult, hasFinishedSuccessfully());
         assertThat(tweetsFromUserResult, hasValueOf(aListWith(tweetOne, tweetTwo)));
+        assertThat(tweetsFromUserResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
     @Test
@@ -196,25 +222,32 @@ public class TweetServiceTest {
         Tweet tweetThree = a(tweet());
         Pageable pageOneRequest = new PageRequest(0, 2);
         Pageable pageTwoRequest = new PageRequest(1, 2);
-        when(userDao.exists(anyLong())).thenReturn(Boolean.TRUE);
+        when(userDao.exists(anyLong())).thenReturn(true);
         when(tweetDao.findByOwnerId(TestUtil.ID_ONE, pageOneRequest)).thenReturn(aListWith(tweetOne, tweetTwo));
         when(tweetDao.findByOwnerId(TestUtil.ID_ONE, pageTwoRequest)).thenReturn(aListWith(tweetThree));
         Result<List<Tweet>> allTweetsPageOne = tweetService.getTweetsFromUser(TestUtil.ID_ONE, pageOneRequest);
         Result<List<Tweet>> allTweetsPageTwo = tweetService.getTweetsFromUser(TestUtil.ID_ONE, pageTwoRequest);
         assertThat(allTweetsPageOne, hasFinishedSuccessfully());
         assertThat(allTweetsPageOne, hasValueOf(aListWith(tweetOne, tweetTwo)));
+        assertThat(allTweetsPageOne, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
         assertThat(allTweetsPageTwo, hasFinishedSuccessfully());
         assertThat(allTweetsPageTwo, hasValueOf(aListWith(tweetThree)));
+        assertThat(allTweetsPageTwo, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
-    @Test(expected = TwitterGetException.class)
+
     public void getMostVotedTweets_hoursSmallerThanZero() {
-        tweetService.getMostVotedTweets(-1, TestUtil.ALL_IN_ONE_PAGE);
+        Result<List<Tweet>> tweetResult = tweetService.getMostVotedTweets(-1, TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(tweetResult, hasFailed());
+        assertThat(tweetResult, hasValueOf(null));
+        assertThat(tweetResult, hasMessageOf(MessageUtil.HOURS_CANT_BE_LESS_OR_EQUAL_0_ERROR_MSG));
     }
 
-    @Test(expected = TwitterGetException.class)
     public void getMostVotedTweets_hoursEqualsZero() {
-        tweetService.getMostVotedTweets(0, TestUtil.ALL_IN_ONE_PAGE);
+        Result<List<Tweet>> tweetResult = tweetService.getMostVotedTweets(0, TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(tweetResult, hasFailed());
+        assertThat(tweetResult, hasValueOf(null));
+        assertThat(tweetResult, hasMessageOf(MessageUtil.HOURS_CANT_BE_LESS_OR_EQUAL_0_ERROR_MSG));
     }
 
     @Test
@@ -225,6 +258,7 @@ public class TweetServiceTest {
         Result<List<Tweet>> mostVotedTweetsResult = tweetService.getMostVotedTweets(10, TestUtil.ALL_IN_ONE_PAGE);
         assertThat(mostVotedTweetsResult, hasFinishedSuccessfully());
         assertThat(mostVotedTweetsResult, hasValueOf(aListWith(tweetOne, tweetTwo)));
+        assertThat(mostVotedTweetsResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
     @Test
@@ -235,15 +269,17 @@ public class TweetServiceTest {
         Tweet tweetThree = a(tweet());
         Pageable pageOneRequest = new PageRequest(0, 2);
         Pageable pageTwoRequest = new PageRequest(1, 2);
-        when(userDao.exists(anyLong())).thenReturn(Boolean.TRUE);
+        when(userDao.exists(anyLong())).thenReturn(true);
         when(tweetDao.findMostPopularByVotes(hours, pageOneRequest)).thenReturn(aListWith(tweetOne, tweetTwo));
         when(tweetDao.findMostPopularByVotes(hours, pageTwoRequest)).thenReturn(aListWith(tweetThree));
         Result<List<Tweet>> mostVotedTweetsPageOneResult = tweetService.getMostVotedTweets(hours, pageOneRequest);
         Result<List<Tweet>> mostVotedTweetsPageTwoResult = tweetService.getMostVotedTweets(hours, pageTwoRequest);
         assertThat(mostVotedTweetsPageOneResult, hasFinishedSuccessfully());
         assertThat(mostVotedTweetsPageOneResult, hasValueOf(aListWith(tweetOne, tweetTwo)));
+        assertThat(mostVotedTweetsPageOneResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
         assertThat(mostVotedTweetsPageTwoResult, hasFinishedSuccessfully());
         assertThat(mostVotedTweetsPageTwoResult, hasValueOf(aListWith(tweetThree)));
+        assertThat(mostVotedTweetsPageTwoResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
     @Test
@@ -252,6 +288,7 @@ public class TweetServiceTest {
         Result<List<Tweet>> tweetsByTagsOrderedByNewestResult = tweetService.getTweetsByTagsOrderedByNewest(emptyList(), TestUtil.ALL_IN_ONE_PAGE);
         assertThat(tweetsByTagsOrderedByNewestResult, hasFinishedSuccessfully());
         assertThat(tweetsByTagsOrderedByNewestResult, hasValueOf(emptyList()));
+        assertThat(tweetsByTagsOrderedByNewestResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
     @Test
@@ -264,6 +301,7 @@ public class TweetServiceTest {
         Result<List<Tweet>> tweetsByTagsOrderedByNewestResult = tweetService.getTweetsByTagsOrderedByNewest(aListWith(tag), TestUtil.ALL_IN_ONE_PAGE);
         assertThat(tweetsByTagsOrderedByNewestResult, hasFinishedSuccessfully());
         assertThat(tweetsByTagsOrderedByNewestResult, hasValueOf(aListWith(tweetOne, tweetTwo)));
+        assertThat(tweetsByTagsOrderedByNewestResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
     @Test
@@ -277,6 +315,7 @@ public class TweetServiceTest {
         Result<List<Tweet>> tweetsByTagsOrderedByNewestResult = tweetService.getTweetsByTagsOrderedByNewest(aListWith(tagOne, tagTwo), TestUtil.ALL_IN_ONE_PAGE);
         assertThat(tweetsByTagsOrderedByNewestResult, hasFinishedSuccessfully());
         assertThat(tweetsByTagsOrderedByNewestResult, hasValueOf(aListWith(tweetOne, tweetTwo)));
+        assertThat(tweetsByTagsOrderedByNewestResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
     @Test
@@ -297,7 +336,9 @@ public class TweetServiceTest {
         Result<List<Tweet>> tweetsByTagsOrderedByNewestPageTwoResult = tweetService.getTweetsByTagsOrderedByNewest(aListWith(tagOne), pageTwoRequest);
         assertThat(tweetsByTagsOrderedByNewestPageOneResult, hasFinishedSuccessfully());
         assertThat(tweetsByTagsOrderedByNewestPageOneResult, hasValueOf(aListWith(tweetOne, tweetTwo)));
+        assertThat(tweetsByTagsOrderedByNewestPageOneResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
         assertThat(tweetsByTagsOrderedByNewestPageTwoResult, hasFinishedSuccessfully());
         assertThat(tweetsByTagsOrderedByNewestPageTwoResult, hasValueOf(aListWith(tweetThree)));
+        assertThat(tweetsByTagsOrderedByNewestPageTwoResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 }

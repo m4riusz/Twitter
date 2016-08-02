@@ -1,10 +1,6 @@
 package com.twitter.service;
 
 import com.twitter.dao.UserDao;
-import com.twitter.exception.UserAlreadyExistsException;
-import com.twitter.exception.UserFollowException;
-import com.twitter.exception.UserNotFoundException;
-import com.twitter.exception.UserUnfollowException;
 import com.twitter.model.Password;
 import com.twitter.model.Result;
 import com.twitter.model.Role;
@@ -17,9 +13,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import static com.twitter.model.Result.ResultFailure;
+import static com.twitter.model.Result.ResultSuccess;
 
 /**
  * Created by mariusz on 14.07.16.
@@ -50,17 +50,17 @@ public class UserServiceImpl implements UserService {
     public Result<User> getUserById(long userId) {
         User userByID = userDao.findOne(userId);
         if (userByID == null) {
-            throw new UserNotFoundException(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+            return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
         }
-        return new Result<>(true, userByID);
+        return ResultSuccess(userByID);
     }
 
     @Override
     public Result<Boolean> create(User user) {
         if (userDao.findByUsername(user.getUsername()) != null) {
-            throw new UserAlreadyExistsException(MessageUtil.USER_ALREADY_EXISTS_USERNAME_ERROR_MSG);
+            return ResultFailure(MessageUtil.USER_ALREADY_EXISTS_USERNAME_ERROR_MSG);
         } else if (userDao.findByEmail(user.getEmail()) != null) {
-            throw new UserAlreadyExistsException(MessageUtil.USER_ALREADY_EXISTS_EMAIL_ERROR_MSG);
+            return ResultFailure(MessageUtil.USER_ALREADY_EXISTS_EMAIL_ERROR_MSG);
         }
         String verifyKey = UUID.randomUUID().toString();
         sendEmail(user.getEmail(),
@@ -70,131 +70,142 @@ public class UserServiceImpl implements UserService {
         );
         user.getAccountStatus().setVerifyKey(verifyKey);
         userDao.save(user);
-        return new Result<>(true, Boolean.TRUE);
+        return ResultSuccess(true);
     }
 
     @Override
     public Result<Boolean> follow(User user, long userToFollowId) {
-        User userToFollow = getUser(userToFollowId);
-        if (user.getId() == userToFollowId) {
-            throw new UserFollowException(MessageUtil.FOLLOW_YOURSELF_ERROR_MSG);
+        User userToFollow = userDao.findOne(userToFollowId);
+        if (userToFollow == null) {
+            return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        } else if (user.getId() == userToFollowId) {
+            return ResultFailure(MessageUtil.FOLLOW_YOURSELF_ERROR_MSG);
         } else if (userToFollow.getFollowers().contains(user)) {
-            throw new UserFollowException(MessageUtil.FOLLOW_ALREADY_FOLLOWED_ERROR_MSG);
+            return ResultFailure(MessageUtil.FOLLOW_ALREADY_FOLLOWED_ERROR_MSG);
         }
         userToFollow.getFollowers().add(user);
-        return new Result<>(true, Boolean.TRUE);
+        return ResultSuccess(true);
     }
 
     @Override
     public Result<Boolean> unfollow(User user, long userToUnfollowId) {
-        User userToUnfollow = getUser(userToUnfollowId);
-        if (user.getId() == userToUnfollow.getId()) {
-            throw new UserUnfollowException(MessageUtil.UNFOLLOW_YOURSELF_ERROR_MSG);
+        User userToUnfollow = userDao.findOne(userToUnfollowId);
+        if (userToUnfollow == null) {
+            return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        } else if (user.getId() == userToUnfollow.getId()) {
+            return ResultFailure(MessageUtil.UNFOLLOW_YOURSELF_ERROR_MSG);
         } else if (!userToUnfollow.getFollowers().contains(user)) {
-            throw new UserUnfollowException(MessageUtil.UNFOLLOW_UNFOLLOWED_ERROR_MSG);
+            return ResultFailure(MessageUtil.UNFOLLOW_UNFOLLOWED_ERROR_MSG);
         }
         userToUnfollow.getFollowers().remove(user);
-        return new Result<>(true, Boolean.TRUE);
+        return ResultSuccess(true);
     }
 
     @Override
     public Result<Boolean> banUser(long userToBanId, Date date) {
-        User userToBan = getUser(userToBanId);
+        User userToBan = userDao.findOne(userToBanId);
+        if (userToBan == null) {
+            return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        } else if (date == null) {
+            return ResultFailure(MessageUtil.REPORT_DATE_NOT_SET_ERROR_MSG);
+        } else if (isBanDateBeforeNow(date)) {
+            return ResultFailure(MessageUtil.REPORT_DATE_IS_INVALID_ERROR_MSG);
+        }
         userToBan.getAccountStatus().setBannedUntil(date);
-        return new Result<>(true, Boolean.TRUE);
+        return ResultSuccess(true);
     }
 
     @Override
     public Result<Boolean> unbanUser(long userToUnbanId) {
-        User userToUnban = getUser(userToUnbanId);
+        User userToUnban = userDao.findOne(userToUnbanId);
+        if (userToUnban == null) {
+            return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        }
         userToUnban.getAccountStatus().setBannedUntil(null);
-        return new Result<>(true, Boolean.TRUE);
+        return ResultSuccess(true);
     }
 
     @Override
     public Result<Boolean> changeUserRole(long userToChangeId, Role role) {
-        User userToChange = getUser(userToChangeId);
+        User userToChange = userDao.findOne(userToChangeId);
+        if (userToChange == null) {
+            return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        }
         userToChange.setRole(role);
-        return new Result<>(true, Boolean.TRUE);
+        return ResultSuccess(true);
     }
 
     @Override
     public Result<Boolean> deleteUserById(long userId) {
         if (userDao.exists(userId)) {
             userDao.delete(userId);
-            return new Result<>(true, Boolean.TRUE);
+            return ResultSuccess(true);
         }
-        throw new UserNotFoundException(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
 
     @Override
     public Result<Boolean> changeUserPasswordById(long userId, String password) {
-        User userToChange = getUser(userId);
+        User userToChange = userDao.findOne(userId);
+        if (userToChange == null) {
+            return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        }
         userToChange.setPassword(new Password(password));
-        return new Result<>(true, Boolean.TRUE);
+        return ResultSuccess(true);
     }
 
     @Override
     public Result<Long> getAllUsersCount() {
-        return new Result<>(true, userDao.count());
+        return ResultSuccess(userDao.count());
     }
 
     @Override
     public Result<List<User>> getAllUsers(Pageable pageable) {
-        return new Result<>(true, userDao.findAll(pageable).getContent());
+        return ResultSuccess(userDao.findAll(pageable).getContent());
     }
 
     @Override
     public Result<Long> getUserFollowersCountById(long userId) {
         if (userDao.exists(userId)) {
-            return new Result<>(true, userDao.findFollowersCountByUserId(userId));
+            return ResultSuccess(userDao.findFollowersCountByUserId(userId));
         }
-        throw new UserNotFoundException(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
 
     @Override
     public Result<List<User>> getUserFollowersById(long userId, Pageable pageable) {
         if (userDao.exists(userId)) {
-            return new Result<>(true, userDao.findFollowersByUserId(userId, pageable));
+            return ResultSuccess(userDao.findFollowersByUserId(userId, pageable));
         }
-        throw new UserNotFoundException();
+        return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
 
     @Override
     public Result<Long> getUserFollowingCountById(long userId) {
         if (userDao.exists(userId)) {
-            return new Result<>(true, userDao.findFollowingCountByUserId(userId));
+            return ResultSuccess(userDao.findFollowingCountByUserId(userId));
         }
-        throw new UserNotFoundException(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
 
     @Override
     public Result<List<User>> getUserFollowingsById(long userId, Pageable pageable) {
         if (userDao.exists(userId)) {
-            return new Result<>(true, userDao.findFollowingByUserId(userId, pageable));
+            return ResultSuccess(userDao.findFollowingByUserId(userId, pageable));
         }
-        throw new UserNotFoundException(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
 
     @Override
-    public Result<String> activateAccount(String verifyKey) {
+    public Result<Boolean> activateAccount(String verifyKey) {
         User user = userDao.findOneByAccountStatusVerifyKey(verifyKey);
         if (user != null && !user.getAccountStatus().isEnable()) {
             user.getAccountStatus().setEnable(true);
-            return new Result<>(true, MessageUtil.ACCOUNT_HAS_BEEN_ENABLED);
+            return ResultSuccess(true);
         } else if (user != null && user.getAccountStatus().isEnable()) {
-            return new Result<>(false, MessageUtil.ACCOUNT_HAS_BEEN_ALREADY_ENABLED);
-        } else {
-            return new Result<>(false, MessageUtil.INVALID_VERIFY_KEY);
+            return ResultFailure(MessageUtil.ACCOUNT_HAS_BEEN_ALREADY_ENABLED);
         }
-    }
-
-    private User getUser(long userId) {
-        User userToChange = userDao.findOne(userId);
-        if (userToChange == null) {
-            throw new UserNotFoundException(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
-        }
-        return userToChange;
+        return ResultFailure(MessageUtil.INVALID_VERIFY_KEY);
     }
 
     private void sendEmail(String to, String from, String subject, String content) {
@@ -204,5 +215,9 @@ public class UserServiceImpl implements UserService {
         mailMessage.setSubject(subject);
         mailMessage.setText(content);
         javaMailSender.send(mailMessage);
+    }
+
+    private boolean isBanDateBeforeNow(Date date) {
+        return date.before(Calendar.getInstance().getTime());
     }
 }

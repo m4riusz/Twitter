@@ -1,8 +1,6 @@
 package com.twitter.service;
 
 import com.twitter.dao.ReportDao;
-import com.twitter.exception.ReportException;
-import com.twitter.exception.ReportNotFoundException;
 import com.twitter.model.*;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -20,8 +18,11 @@ import static com.twitter.Util.aListWith;
 import static com.twitter.builders.ReportBuilder.report;
 import static com.twitter.builders.TweetBuilder.tweet;
 import static com.twitter.builders.UserBuilder.user;
+import static com.twitter.matchers.ResultIsFailureMatcher.hasFailed;
 import static com.twitter.matchers.ResultIsSuccessMatcher.hasFinishedSuccessfully;
+import static com.twitter.matchers.ResultMessageMatcher.hasMessageOf;
 import static com.twitter.matchers.ResultValueMatcher.hasValueOf;
+import static com.twitter.matchers.UserIsBanned.isBanned;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
@@ -45,10 +46,12 @@ public class ReportServiceTest {
         reportService = new ReportServiceImpl(reportDao);
     }
 
-    @Test(expected = ReportNotFoundException.class)
     public void findById_reportDoesNotExist() {
         when(reportDao.exists(anyLong())).thenReturn(false);
-        reportService.findById(TestUtil.ID_ONE);
+        Result<Report> reportResult = reportService.findById(TestUtil.ID_ONE);
+        assertThat(reportResult, hasFailed());
+        assertThat(reportResult, hasValueOf(null));
+        assertThat(reportResult, hasMessageOf(MessageUtil.REPORT_NOT_FOUND_BY_ID_ERROR_MSG));
     }
 
 
@@ -62,6 +65,7 @@ public class ReportServiceTest {
         Result<Report> reportResult = reportService.findById(TestUtil.ID_ONE);
         assertThat(reportResult, hasFinishedSuccessfully());
         assertThat(reportResult, hasValueOf(report));
+        assertThat(reportResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
     @Test
@@ -78,30 +82,38 @@ public class ReportServiceTest {
         when(reportDao.save(any(Report.class))).thenReturn(report);
         Result<Boolean> createReportResult = reportService.createReport(report);
         assertThat(createReportResult, hasFinishedSuccessfully());
-        assertThat(createReportResult, hasValueOf(Boolean.TRUE));
+        assertThat(createReportResult, hasValueOf(true));
+        assertThat(createReportResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
-    @Test(expected = ReportNotFoundException.class)
+
     public void judgeReport_reportDoesNotExist() {
         when(reportDao.exists(anyLong())).thenReturn(false);
-        reportService.judgeReport(1L, ReportStatus.GUILTY, null, null);
+        Result<Boolean> reportResult = reportService.judgeReport(1L, ReportStatus.GUILTY, null, null);
+        assertThat(reportResult, hasFailed());
+        assertThat(reportResult, hasValueOf(null));
+        assertThat(reportResult, hasMessageOf(MessageUtil.REPORT_NOT_FOUND_BY_ID_ERROR_MSG));
     }
 
-    @Test(expected = ReportException.class)
-    public void judgeReport_userIsGuiltyAndDataIsNotSer() {
+    public void judgeReport_userIsGuiltyAndDataIsNotSet() {
         Report report = a(report());
         when(reportDao.findOne(anyLong())).thenReturn(report);
         User judge = a(user());
-        reportService.judgeReport(report.getId(), ReportStatus.GUILTY, judge, null);
+        Result<Boolean> reportResult = reportService.judgeReport(report.getId(), ReportStatus.GUILTY, judge, null);
+        assertThat(reportResult, hasFailed());
+        assertThat(reportResult, hasValueOf(null));
+        assertThat(reportResult, hasMessageOf(MessageUtil.REPORT_DATE_NOT_SET_ERROR_MSG));
     }
 
-    @Test(expected = ReportException.class)
     public void judgeReport_userIsGuiltyAndDataIsInvalid() {
         Report report = a(report());
         when(reportDao.findOne(anyLong())).thenReturn(report);
         User judge = a(user());
         Date dateBeforeNow = DateTime.now().minusDays(1).toDate();
-        reportService.judgeReport(report.getId(), ReportStatus.GUILTY, judge, dateBeforeNow);
+        Result<Boolean> reportResult = reportService.judgeReport(report.getId(), ReportStatus.GUILTY, judge, dateBeforeNow);
+        assertThat(reportResult, hasFailed());
+        assertThat(reportResult, hasValueOf(null));
+        assertThat(reportResult, hasMessageOf(MessageUtil.REPORT_DATE_IS_INVALID_ERROR_MSG));
     }
 
     @Test
@@ -126,8 +138,9 @@ public class ReportServiceTest {
                 dateWhenBanExpired
         );
         assertThat(judgeReportResult, hasFinishedSuccessfully());
-        assertThat(judgeReportResult, hasValueOf(Boolean.TRUE));
-        assertThat(tweetOwner.isAccountNonLocked(), is(false));
+        assertThat(judgeReportResult, hasValueOf(true));
+        assertThat(judgeReportResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        assertThat(tweetOwner, isBanned(false));
         assertThat(tweet.getContent(), is(MessageUtil.DELETE_ABSTRACT_POST_CONTENT));
         assertThat(report.getJudge(), is(judge));
     }
@@ -159,6 +172,7 @@ public class ReportServiceTest {
         );
         assertThat(latestReportsByStatusResult, hasFinishedSuccessfully());
         assertThat(latestReportsByStatusResult, hasValueOf(reportList));
+        assertThat(latestReportsByStatusResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
     @Test
@@ -188,6 +202,7 @@ public class ReportServiceTest {
         );
         assertThat(latestReportsByStatusResult, hasFinishedSuccessfully());
         assertThat(latestReportsByStatusResult, hasValueOf(reportList));
+        assertThat(latestReportsByStatusResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
     @Test
@@ -222,6 +237,7 @@ public class ReportServiceTest {
         );
         assertThat(latestReportsByStatusResult, hasFinishedSuccessfully());
         assertThat(latestReportsByStatusResult, hasValueOf(reportList));
+        assertThat(latestReportsByStatusResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
 }

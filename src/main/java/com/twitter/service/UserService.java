@@ -65,6 +65,6 @@ public interface UserService extends UserDetailsService {
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     Result<List<User>> getUserFollowingsById(long userId, Pageable pageable);
 
-    Result<String> activateAccount(String verifyKey);
+    Result<Boolean> activateAccount(String verifyKey);
 
 }
