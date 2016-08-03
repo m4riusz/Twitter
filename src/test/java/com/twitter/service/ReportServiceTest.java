@@ -140,7 +140,7 @@ public class ReportServiceTest {
         assertThat(judgeReportResult, hasFinishedSuccessfully());
         assertThat(judgeReportResult, hasValueOf(true));
         assertThat(judgeReportResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
-        assertThat(tweetOwner, isBanned(false));
+        assertThat(tweetOwner, isBanned(true));
         assertThat(tweet.getContent(), is(MessageUtil.DELETE_ABSTRACT_POST_CONTENT));
         assertThat(report.getJudge(), is(judge));
     }

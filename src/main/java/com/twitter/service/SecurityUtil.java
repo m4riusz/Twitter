@@ -7,4 +7,6 @@ public class SecurityUtil {
     public static final String ADMIN_OR_MODERATOR = "hasAuthority('ADMIN') OR hasAuthority('MODERATOR')";
     public static final String ADMIN = "hasAuthority('ADMIN')";
     public static final String AUTHENTICATED = "isAuthenticated()";
+    public static final String PERSONAL_USAGE = "#userId == principal.id";
+    public static final String POST_PERSONAL = "#post.owner.id == principal.id";
 }

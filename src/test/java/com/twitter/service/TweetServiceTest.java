@@ -61,7 +61,7 @@ public class TweetServiceTest {
         Result<Tweet> tweetResult = tweetService.getTweetById(1L);
         assertThat(tweetResult, hasFailed());
         assertThat(tweetResult, hasValueOf(null));
-        assertThat(tweetResult, hasMessageOf(MessageUtil.TWEET_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
+        assertThat(tweetResult, hasMessageOf(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
     }
 
     @Test
@@ -75,27 +75,11 @@ public class TweetServiceTest {
         assertThat(tweetById, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
-
-    public void createTweet_userIsNull() {
-        Result<Boolean> tweetResult = tweetService.createTweet(null, a(tweet()));
-        assertThat(tweetResult, hasFailed());
-        assertThat(tweetResult, hasValueOf(null));
-        assertThat(tweetResult, hasMessageOf(MessageUtil.USER_OR_TWEET_IS_NULL_MSG));
-    }
-
-    public void createTweet_tweetIsNull() {
-        Result<Boolean> tweetResult = tweetService.createTweet(a(user()), null);
-        assertThat(tweetResult, hasFailed());
-        assertThat(tweetResult, hasValueOf(null));
-        assertThat(tweetResult, hasMessageOf(MessageUtil.USER_OR_TWEET_IS_NULL_MSG));
-    }
-
     @Test
     public void createTweet_saveTweet() {
-        User user = a(user());
         Tweet tweet = a(tweet());
         when(tweetDao.save(tweet)).thenReturn(tweet);
-        Result<Boolean> tweetResult = tweetService.createTweet(user, tweet);
+        Result<Boolean> tweetResult = tweetService.createTweet(tweet);
         assertThat(tweetResult, hasFinishedSuccessfully());
         assertThat(tweetResult, hasValueOf(true));
         assertThat(tweetResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
@@ -107,7 +91,7 @@ public class TweetServiceTest {
         Result<Boolean> tweetResult = tweetService.deleteTweetById(TestUtil.ID_ONE);
         assertThat(tweetResult, hasFailed());
         assertThat(tweetResult, hasValueOf(null));
-        assertThat(tweetResult, hasMessageOf(MessageUtil.TWEET_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
+        assertThat(tweetResult, hasMessageOf(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
     }
 
     @Test

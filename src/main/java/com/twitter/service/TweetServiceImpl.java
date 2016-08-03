@@ -5,7 +5,6 @@ import com.twitter.dao.UserDao;
 import com.twitter.model.Result;
 import com.twitter.model.Tag;
 import com.twitter.model.Tweet;
-import com.twitter.model.User;
 import com.twitter.util.TagExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -40,15 +39,11 @@ public class TweetServiceImpl implements TweetService {
         if (tweetDao.exists(tweetId)) {
             return ResultSuccess(tweetDao.findOne(tweetId));
         }
-        return ResultFailure(MessageUtil.TWEET_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
 
     @Override
-    public Result<Boolean> createTweet(User user, Tweet tweet) {
-        if (user == null || tweet == null) {
-            return ResultFailure(MessageUtil.USER_OR_TWEET_IS_NULL_MSG);
-        }
-        tweet.setOwner(user);
+    public Result<Boolean> createTweet(Tweet tweet) {
         List<Tag> tagList = tagExtractor.extract(tweet.getContent());
         tweet.setTags(tagList);
         try {
@@ -65,7 +60,7 @@ public class TweetServiceImpl implements TweetService {
             tweetDao.delete(tweetId);
             return ResultSuccess(true);
         }
-        return ResultFailure(MessageUtil.TWEET_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
 
     @Override

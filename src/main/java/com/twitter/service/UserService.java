@@ -4,7 +4,6 @@ import com.twitter.model.Result;
 import com.twitter.model.Role;
 import com.twitter.model.User;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -44,8 +43,8 @@ public interface UserService extends UserDetailsService {
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
     Result<Boolean> deleteUserById(long userId);
 
-    @PreAuthorize("#userToChangeId == principal.id") //// TODO: 27.07.16 add to security util
-    Result<Boolean> changeUserPasswordById(@Param("userToChangeId") long userId, String password);
+    @PreAuthorize(SecurityUtil.PERSONAL_USAGE)
+    Result<Boolean> changeUserPasswordById(long userId, String password);
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     Result<Long> getAllUsersCount();
