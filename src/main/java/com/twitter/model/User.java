@@ -1,5 +1,6 @@
 package com.twitter.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +21,7 @@ public class User extends AbstractEntity implements UserDetails {
     private Avatar avatar;
     @NotNull
     @Column(unique = true)
-    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Length(
             min = 3, max = 10,
             message = "Username length should be between {min} and {max}!"
@@ -42,29 +43,29 @@ public class User extends AbstractEntity implements UserDetails {
     private Gender gender;
     @NotNull
     @OneToOne(cascade = CascadeType.ALL)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     private AccountStatus accountStatus;
     @NotNull
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     private List<Report> reports = new ArrayList<>();
     @NotNull
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     private List<Tweet> tweets = new ArrayList<>();
     @NotNull
     @ManyToMany(cascade = CascadeType.ALL)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     private List<Tag> favouriteTags = new ArrayList<>();
     @NotNull
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(joinColumns = @JoinColumn(name = "userId"),
             inverseJoinColumns = @JoinColumn(name = "followerId"))
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     private List<User> followers = new ArrayList<>();
     @NotNull
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     private List<Tweet> favouriteTweets = new ArrayList<>();
 
     public User() {

@@ -1,5 +1,6 @@
 package com.twitter.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.Length;
 
@@ -34,7 +35,7 @@ public abstract class AbstractPost extends AbstractEntity {
     private List<UserVote> votes;
     @NotNull
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "abstractPost")
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     private List<Report> reports;
 
     public AbstractPost() {

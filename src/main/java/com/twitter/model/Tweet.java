@@ -1,5 +1,6 @@
 package com.twitter.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.CascadeType;
@@ -22,7 +23,7 @@ public class Tweet extends AbstractPost {
     private List<Tag> tags = new ArrayList<>();
     @NotNull
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "tweet")
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     private List<Comment> comments = new ArrayList<>();
 
     public Tweet(String content, User owner) {
