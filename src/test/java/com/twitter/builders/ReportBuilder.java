@@ -10,9 +10,10 @@ import java.util.Date;
  * Created by mariusz on 23.07.16.
  */
 public final class ReportBuilder implements Builder<Report> {
+    private static long counter = 0L;
     private ReportStatus status = ReportStatus.WAITING_FOR_REALIZATION;
     private ReportCategory category = ReportCategory.OTHER;
-    private String message = "report content";
+    private String message = "report content nr" + counter;
     private User user;
     private User judge;
     private long id;
@@ -20,10 +21,8 @@ public final class ReportBuilder implements Builder<Report> {
     private AbstractPost abstractPost;
     private int version;
 
-    private ReportBuilder() {
-    }
-
     public static ReportBuilder report() {
+        counter++;
         return new ReportBuilder();
     }
 

@@ -8,12 +8,17 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static com.twitter.Util.a;
+import static com.twitter.builders.UserBuilder.user;
+import static com.twitter.builders.UserVoteBuilder.userVote;
+
 /**
  * Created by mariusz on 21.07.16.
  */
 public final class CommentBuilder implements Builder<Comment> {
+    private static long counter = 0L;
     private boolean banned = false;
-    private String content = "comment content";
+    private String content = "comment content nr " + counter;
     private Tweet tweet;
     private User owner;
     private List<UserVote> votes = new ArrayList<>();
@@ -23,6 +28,7 @@ public final class CommentBuilder implements Builder<Comment> {
 
 
     public static CommentBuilder comment() {
+        counter++;
         return new CommentBuilder();
     }
 
@@ -63,6 +69,19 @@ public final class CommentBuilder implements Builder<Comment> {
 
     public CommentBuilder withCreateDate(Date createDate) {
         this.createDate = createDate;
+        return this;
+    }
+
+
+    public CommentBuilder withNumberOfVotesOf(long votes) {
+        List<UserVote> voteList = new ArrayList<>();
+        for (long currentVote = 0; currentVote < votes; currentVote++) {
+            voteList.add(a(userVote()
+                    .withUser(a(user()))
+                    .withVote(Vote.UP)
+            ));
+        }
+        this.votes = voteList;
         return this;
     }
 

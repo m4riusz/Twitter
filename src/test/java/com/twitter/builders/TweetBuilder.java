@@ -8,12 +8,17 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static com.twitter.Util.a;
+import static com.twitter.builders.UserBuilder.user;
+import static com.twitter.builders.UserVoteBuilder.userVote;
+
 /**
  * Created by mariusz on 21.07.16.
  */
 public final class TweetBuilder implements Builder<Tweet> {
+    private static long counter = 0L;
     private boolean banned = false;
-    private String content = "content";
+    private String content = "content nr " + counter;
     private User owner;
     private List<Tag> tags = new ArrayList<>();
     private List<Comment> comments = new ArrayList<>();
@@ -23,6 +28,7 @@ public final class TweetBuilder implements Builder<Tweet> {
     private Date createDate = Calendar.getInstance().getTime();
 
     public static TweetBuilder tweet() {
+        counter++;
          return new TweetBuilder();
     }
 
@@ -53,6 +59,18 @@ public final class TweetBuilder implements Builder<Tweet> {
 
     public TweetBuilder withVotes(List<UserVote> votes) {
         this.votes = votes;
+        return this;
+    }
+
+    public TweetBuilder withNumberOfVotesOf(long votes) {
+        List<UserVote> voteList = new ArrayList<>();
+        for (long currentVote = 0; currentVote < votes; currentVote++) {
+            voteList.add(a(userVote()
+                    .withUser(a(user()))
+                    .withVote(Vote.UP)
+            ));
+        }
+        this.votes = voteList;
         return this;
     }
 
