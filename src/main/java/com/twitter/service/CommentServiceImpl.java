@@ -75,7 +75,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Result<List<Comment>> getMostVotedComments(long tweetId, Pageable pageable) {
         if (tweetDao.exists(tweetId)) {
-            return ResultSuccess(commentDao.findByTweetId(tweetId, pageable));
+            return ResultSuccess(commentDao.findByTweetIdOrderByVotes(tweetId, pageable));
         }
         return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }

@@ -3,6 +3,7 @@ package com.twitter.dao;
 import com.twitter.model.Comment;
 import com.twitter.model.Tweet;
 import com.twitter.model.User;
+import com.twitter.model.UserVote;
 import com.twitter.service.TestUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,10 +41,13 @@ public class CommentDaoTest {
     private UserDao userDao;
 
     @Autowired
+    private UserVoteDao userVoteDao;
+
+    @Autowired
     private CommentDao commentDao;
 
     @Test
-    public void findByTweetId_TweetWithnoComments() {
+    public void findByTweetId_TweetWithNoComments() {
         User user = a(user());
         userDao.save(user);
         Tweet tweet = a(tweet().withOwner(user));
@@ -133,36 +137,51 @@ public class CommentDaoTest {
     @Test
     public void findByTweetIdOrderByVotesSize_someCommentsWithDifferentAmountOfVotes() {
         User userOne = a(user());
-        User commentator = a(user());
-        userDao.save(aListWith(userOne, commentator));
+        User commentatorOne = a(user());
+        User commentatorTwo = a(user());
+        User commentatorThree = a(user());
+        userDao.save(aListWith(userOne, commentatorOne, commentatorTwo, commentatorThree));
         Tweet tweetFromUserOne = a(tweet().withOwner(userOne));
         tweetDao.save(aListWith(tweetFromUserOne));
 
-        Comment comment1 = a(comment()
-                .withOwner(commentator)
+        Comment commentOne = a(comment()
+                .withOwner(commentatorOne)
                 .withTweet(tweetFromUserOne)
-                .withVotes(aListWith(
-                        a(userVote().withAbstractPost(tweetFromUserOne).withUser(commentator)),
-                        a(userVote().withAbstractPost(tweetFromUserOne).withUser(commentator)),
-                        a(userVote().withAbstractPost(tweetFromUserOne).withUser(commentator))
-                )));
-        Comment comment2 = a(comment()
-                .withOwner(commentator)
+        );
+        Comment commentTwo = a(comment()
+                .withOwner(commentatorTwo)
                 .withTweet(tweetFromUserOne)
-                .withVotes(aListWith(
-                        a(userVote().withAbstractPost(tweetFromUserOne).withUser(commentator))
-                )));
-        Comment comment3 = a(comment()
-                .withOwner(commentator)
+        );
+        Comment commentThree = a(comment()
+                .withOwner(commentatorThree)
                 .withTweet(tweetFromUserOne)
-                .withVotes(emptyList()));
-        commentDao.save(aListWith(comment1, comment2, comment3));
+        );
+        commentDao.save(aListWith(commentOne, commentTwo, commentThree));
+
+
+        List<UserVote> commentTwoVotes = aListWith(
+                a(userVote().withAbstractPost(commentTwo).withUser(commentatorOne)),
+                a(userVote().withAbstractPost(commentTwo).withUser(commentatorTwo)),
+                a(userVote().withAbstractPost(commentTwo).withUser(commentatorThree))
+        );
+        List<UserVote> commentOneVotes = aListWith(
+                a(userVote().withAbstractPost(commentOne).withUser(commentatorOne)),
+                a(userVote().withAbstractPost(commentOne).withUser(commentatorTwo))
+        );
+
+        List<UserVote> commentThreeVotes = aListWith(
+                a(userVote().withAbstractPost(commentThree).withUser(commentatorThree))
+        );
+
+        userVoteDao.save(commentOneVotes);
+        userVoteDao.save(commentTwoVotes);
+        userVoteDao.save(commentThreeVotes);
 
         List<Comment> commentsFromTweetOne = commentDao.findByTweetIdOrderByVotes(
                 tweetFromUserOne.getId(),
                 TestUtil.ALL_IN_ONE_PAGE
         );
-        assertThat(commentsFromTweetOne, contains(comment1, comment2, comment3));
+        assertThat(commentsFromTweetOne, contains(commentTwo, commentOne, commentThree));
     }
 
     @Test

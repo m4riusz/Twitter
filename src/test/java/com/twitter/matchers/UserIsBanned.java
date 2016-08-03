@@ -27,7 +27,7 @@ public class UserIsBanned extends TypeSafeMatcher<User> {
 
     @Override
     protected void describeMismatchSafely(User item, Description mismatchDescription) {
-        mismatchDescription.appendText("a user banned status was ").appendValue(item.isAccountNonLocked());
+        mismatchDescription.appendText("a user banned status was ").appendValue(!item.isAccountNonLocked());
     }
 
     public static UserIsBanned isBanned(boolean bannedExpected) {
