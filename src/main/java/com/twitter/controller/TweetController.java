@@ -3,6 +3,7 @@ package com.twitter.controller;
 import com.twitter.model.Result;
 import com.twitter.model.Tag;
 import com.twitter.model.Tweet;
+import com.twitter.model.UserVote;
 import com.twitter.route.Route;
 import com.twitter.service.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -65,5 +67,4 @@ public class TweetController {
     public Result<List<Tweet>> getTweetsByTags(@RequestBody Tag[] tags, @PathVariable int page, @PathVariable int size) {
         return tweetService.getTweetsByTagsOrderedByNewest(Arrays.asList(tags), new PageRequest(page, size));
     }
-
 }
