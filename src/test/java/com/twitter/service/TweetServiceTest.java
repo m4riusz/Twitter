@@ -2,6 +2,7 @@ package com.twitter.service;
 
 import com.twitter.dao.TweetDao;
 import com.twitter.dao.UserDao;
+import com.twitter.dao.UserVoteDao;
 import com.twitter.model.Result;
 import com.twitter.model.Tag;
 import com.twitter.model.Tweet;
@@ -49,11 +50,14 @@ public class TweetServiceTest {
     @Mock
     private TagExtractor tagExtractor;
 
+    @Mock
+    private UserVoteDao userVoteDao;
+
     private TweetService tweetService;
 
     @Before
     public void setUp() {
-        tweetService = new TweetServiceImpl(tweetDao, userDao, tagExtractor);
+        tweetService = new TweetServiceImpl(tweetDao, userDao, userVoteDao, tagExtractor);
     }
 
     public void getTweetById_tweetDoesNotExist() {

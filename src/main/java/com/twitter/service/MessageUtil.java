@@ -11,6 +11,7 @@ public final class MessageUtil {
     public static final String USER_ALREADY_EXISTS_EMAIL_ERROR_MSG = "User with this email already exists!";
     public static final String ACCOUNT_HAS_BEEN_ENABLED = "Account has been enabled!";
     public static final String ACCOUNT_HAS_BEEN_ALREADY_ENABLED = "Account has been already enabled!";
+    public static final String SAVE_COMMENT_ERROR = "Error when saving comment!";
 
     public static final String INVALID_VERIFY_KEY = "Invalid verify key!";
     public static final String POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG = "Post with this id does not exist!";

@@ -2,9 +2,11 @@ package com.twitter.service;
 
 import com.twitter.dao.TweetDao;
 import com.twitter.dao.UserDao;
+import com.twitter.dao.UserVoteDao;
 import com.twitter.model.Result;
 import com.twitter.model.Tag;
 import com.twitter.model.Tweet;
+import com.twitter.model.UserVote;
 import com.twitter.util.TagExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -25,12 +27,14 @@ public class TweetServiceImpl implements TweetService {
 
     private final TweetDao tweetDao;
     private final UserDao userDao;
+    private final UserVoteDao userVoteDao;
     private final TagExtractor tagExtractor;
 
     @Autowired
-    public TweetServiceImpl(TweetDao tweetDao, UserDao userDao, TagExtractor tagExtractor) {
+    public TweetServiceImpl(TweetDao tweetDao, UserDao userDao, UserVoteDao userVoteDao, TagExtractor tagExtractor) {
         this.tweetDao = tweetDao;
         this.userDao = userDao;
+        this.userVoteDao = userVoteDao;
         this.tagExtractor = tagExtractor;
     }
 
@@ -95,5 +99,16 @@ public class TweetServiceImpl implements TweetService {
     @Override
     public Result<List<Tweet>> getTweetsByTagsOrderedByNewest(List<Tag> tagList, Pageable pageable) {
         return ResultSuccess(tweetDao.findDistinctByTagsInOrderByCreateDateDesc(tagList, pageable));
+    }
+
+    @Override
+    public Result<Boolean> vote(UserVote userVote) {
+        UserVote vote = userVoteDao.findByUserAndAbstractPost(userVote.getUser(), userVote.getAbstractPost());
+        if (vote == null) {
+            userVoteDao.save(userVote);
+        } else {
+            userVote.setVote(userVote.getVote());
+        }
+        return ResultSuccess(true);
     }
 }

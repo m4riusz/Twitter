@@ -21,6 +21,7 @@ import static com.twitter.model.Result.ResultSuccess;
 @Transactional
 public class CommentServiceImpl implements CommentService {
 
+
     private CommentDao commentDao;
     private TweetDao tweetDao;
 
@@ -32,12 +33,10 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Result<Boolean> createComment(Comment comment) {
-        try {
-            commentDao.save(comment);
+        if (commentDao.save(comment) != null) {
             return ResultSuccess(true);
-        } catch (Exception e) {
-            return ResultFailure(e.getMessage());
         }
+        return ResultFailure(MessageUtil.SAVE_COMMENT_ERROR);
     }
 
     @Override

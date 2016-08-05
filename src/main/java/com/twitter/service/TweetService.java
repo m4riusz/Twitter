@@ -15,7 +15,7 @@ import java.util.List;
  */
 @Service
 @PreAuthorize(SecurityUtil.AUTHENTICATED)
-public interface TweetService {
+public interface TweetService extends AbstractPostInterface {
 
     Result<Tweet> getTweetById(long tweetId);
 
