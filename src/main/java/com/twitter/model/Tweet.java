@@ -1,7 +1,7 @@
 package com.twitter.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -15,11 +15,12 @@ import java.util.List;
  * Created by mariusz on 11.07.16.
  */
 @Entity
+@JsonTypeName("tweet")
 public class Tweet extends AbstractPost {
 
     @NotNull
     @ManyToMany(cascade = CascadeType.ALL)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     private List<Tag> tags = new ArrayList<>();
     @NotNull
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "tweet")

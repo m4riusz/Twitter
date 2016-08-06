@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 public class Comment extends AbstractPost {
     @NotNull
     @ManyToOne
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Tweet tweet;
 
     public Comment() {

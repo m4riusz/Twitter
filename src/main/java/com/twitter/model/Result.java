@@ -1,6 +1,6 @@
 package com.twitter.model;
 
-import com.twitter.service.MessageUtil;
+import com.twitter.util.MessageUtil;
 
 /**
  * Created by mariusz on 25.07.16.

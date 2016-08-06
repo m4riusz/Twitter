@@ -1,6 +1,12 @@
 package com.twitter.model;
 
-import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -11,6 +17,7 @@ import javax.validation.constraints.NotNull;
         uniqueConstraints =
         @UniqueConstraint(columnNames = {"user_id", "abstract_post_id"})
 )
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class UserVote extends AbstractEntity {
 
     @NotNull

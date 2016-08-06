@@ -1,7 +1,6 @@
 package com.twitter.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
@@ -9,11 +8,21 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
 /**
  * Created by mariusz on 21.07.16.
  */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@JsonTypeInfo(use = Id.NAME,
+        include = As.PROPERTY,
+        property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Tweet.class, name = "tweet"),
+        @JsonSubTypes.Type(value = Comment.class, name = "comment")
+})
 public abstract class AbstractPost extends AbstractEntity {
     @NotNull
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -31,7 +40,7 @@ public abstract class AbstractPost extends AbstractEntity {
     private User owner;
     @NotNull
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "abstractPost")
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     private List<UserVote> votes;
     @NotNull
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "abstractPost")
