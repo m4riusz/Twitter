@@ -2,6 +2,7 @@ package com.twitter.service;
 
 import com.twitter.dao.ReportDao;
 import com.twitter.model.*;
+import com.twitter.util.MessageUtil;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;

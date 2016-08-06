@@ -5,6 +5,7 @@ import com.twitter.model.Password;
 import com.twitter.model.Result;
 import com.twitter.model.Role;
 import com.twitter.model.User;
+import com.twitter.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.SimpleMailMessage;

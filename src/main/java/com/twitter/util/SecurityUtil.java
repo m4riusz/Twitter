@@ -1,4 +1,4 @@
-package com.twitter.service;
+package com.twitter.util;
 
 /**
  * Created by mariusz on 27.07.16.
@@ -9,4 +9,5 @@ public class SecurityUtil {
     public static final String AUTHENTICATED = "isAuthenticated()";
     public static final String PERSONAL_USAGE = "#userId == principal.id";
     public static final String POST_PERSONAL = "#post.owner.id == principal.id";
+    public static final String PERSONAL_VOTE = "#userVote.user.id == principal.id";
 }

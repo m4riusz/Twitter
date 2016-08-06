@@ -1,6 +1,7 @@
 package com.twitter.service;
 
 import com.twitter.model.*;
+import com.twitter.util.SecurityUtil;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;

@@ -7,6 +7,7 @@ import com.twitter.model.Result;
 import com.twitter.model.Tag;
 import com.twitter.model.Tweet;
 import com.twitter.model.UserVote;
+import com.twitter.util.MessageUtil;
 import com.twitter.util.TagExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -39,15 +40,15 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
-    public Result<Tweet> getTweetById(long tweetId) {
-        if (tweetDao.exists(tweetId)) {
+    public Result<Tweet> getById(long tweetId) {
+        if (doesTweetExist(tweetId)) {
             return ResultSuccess(tweetDao.findOne(tweetId));
         }
         return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
 
     @Override
-    public Result<Boolean> createTweet(Tweet tweet) {
+    public Result<Boolean> create(Tweet tweet) {
         List<Tag> tagList = tagExtractor.extract(tweet.getContent());
         tweet.setTags(tagList);
         try {
@@ -59,8 +60,8 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
-    public Result<Boolean> deleteTweetById(long tweetId) {
-        if (tweetDao.exists(tweetId)) {
+    public Result<Boolean> delete(long tweetId) {
+        if (doesTweetExist(tweetId)) {
             tweetDao.delete(tweetId);
             return ResultSuccess(true);
         }
@@ -74,15 +75,15 @@ public class TweetServiceImpl implements TweetService {
 
     @Override
     public Result<List<Tweet>> getTweetsFromFollowingUsers(long userId, Pageable pageable) {
-        if (userDao.exists(userId)) {
+        if (doesUserExist(userId)) {
             return ResultSuccess(tweetDao.findTweetsFromFollowingUsers(userId, pageable));
         }
         return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
 
     @Override
-    public Result<List<Tweet>> getTweetsFromUser(long userId, Pageable pageable) {
-        if (userDao.exists(userId)) {
+    public Result<List<Tweet>> getAllFromUserById(long userId, Pageable pageable) {
+        if (doesUserExist(userId)) {
             return ResultSuccess(tweetDao.findByOwnerId(userId, pageable));
         }
         return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
@@ -103,12 +104,53 @@ public class TweetServiceImpl implements TweetService {
 
     @Override
     public Result<Boolean> vote(UserVote userVote) {
-        UserVote vote = userVoteDao.findByUserAndAbstractPost(userVote.getUser(), userVote.getAbstractPost());
-        if (vote == null) {
-            userVoteDao.save(userVote);
-        } else {
-            userVote.setVote(userVote.getVote());
+        if (!doesUserExist(userVote.getUser().getId())) {
+            return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        } else if (!doesTweetExist(userVote.getAbstractPost().getId())) {
+            return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        } else if (doesVoteExist(userVote)) {
+            return ResultFailure(MessageUtil.POST_ALREADY_VOTED);
         }
+        userVoteDao.save(userVote);
         return ResultSuccess(true);
+    }
+
+    @Override
+    public Result<Boolean> deleteVote(UserVote userVote) {
+        if (!doesUserExist(userVote.getUser().getId())) {
+            return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        } else if (!doesTweetExist(userVote.getAbstractPost().getId())) {
+            return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        } else if (!doesVoteExist(userVote)) {
+            return ResultFailure(MessageUtil.NOT_VOTE_ERROR_MSG);
+        }
+        userVoteDao.delete(userVote);
+        return ResultSuccess(true);
+    }
+
+    @Override
+    public Result<Boolean> changeVote(UserVote userVote) {
+        if (!doesUserExist(userVote.getUser().getId())) {
+            return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        } else if (!doesTweetExist(userVote.getAbstractPost().getId())) {
+            return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        } else if (!doesVoteExist(userVote)) {
+            return ResultFailure(MessageUtil.NOT_VOTE_ERROR_MSG);
+        }
+        UserVote userVote2 = userVoteDao.findByUserAndAbstractPost(userVote.getUser(), userVote.getAbstractPost());
+        userVote2.setVote(userVote.getVote());
+        return ResultSuccess(true);
+    }
+
+    private boolean doesTweetExist(long id) {
+        return tweetDao.exists(id);
+    }
+
+    private boolean doesUserExist(long id) {
+        return userDao.exists(id);
+    }
+
+    private boolean doesVoteExist(UserVote userVote) {
+        return userVoteDao.findByUserAndAbstractPost(userVote.getUser(), userVote.getAbstractPost()) != null;
     }
 }

@@ -5,6 +5,7 @@ import com.twitter.model.AccountStatus;
 import com.twitter.model.Result;
 import com.twitter.model.Role;
 import com.twitter.model.User;
+import com.twitter.util.MessageUtil;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;

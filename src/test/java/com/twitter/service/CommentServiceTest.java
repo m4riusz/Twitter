@@ -2,9 +2,12 @@ package com.twitter.service;
 
 import com.twitter.dao.CommentDao;
 import com.twitter.dao.TweetDao;
+import com.twitter.dao.UserDao;
+import com.twitter.dao.UserVoteDao;
 import com.twitter.model.Comment;
 import com.twitter.model.Result;
 import com.twitter.model.User;
+import com.twitter.util.MessageUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +27,6 @@ import static com.twitter.matchers.ResultIsSuccessMatcher.hasFinishedSuccessfull
 import static com.twitter.matchers.ResultMessageMatcher.hasMessageOf;
 import static com.twitter.matchers.ResultValueMatcher.hasValueOf;
 import static java.util.Collections.emptyList;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -40,36 +42,32 @@ public class CommentServiceTest {
     private TweetDao tweetDao;
     @Mock
     private CommentDao commentDao;
+    @Mock
+    private UserDao userDao;
+    @Mock
+    private UserVoteDao userVoteDao;
 
     private CommentService commentService;
 
     @Before
     public void setUp() {
-        commentService = new CommentServiceImpl(commentDao, tweetDao);
+        commentService = new CommentServiceImpl(commentDao, tweetDao, userVoteDao, userDao);
     }
 
     @Test
     public void createComment_test() {
         Comment comment = a(comment());
-        Result<Boolean> commentResult = commentService.createComment(comment);
+        when(commentDao.save(any(Comment.class))).thenReturn(comment);
+        Result<Boolean> commentResult = commentService.create(comment);
         assertThat(commentResult, hasFinishedSuccessfully());
         assertThat(commentResult, hasValueOf(true));
         assertThat(commentResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
     @Test
-    public void createComment_exceptionWhenSaving() {
-        Comment comment = a(comment());
-        when(commentDao.save(any(Comment.class))).thenThrow(new RuntimeException("Error"));
-        Result<Boolean> commentResult = commentService.createComment(comment);
-        assertThat(commentResult, hasFailed());
-        assertThat(commentResult, not(hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE)));
-    }
-
-    @Test
     public void getCommentById_commentDoesNotExist() {
         when(commentDao.exists(anyLong())).thenReturn(false);
-        Result<Comment> commentResult = commentService.getCommentById(TestUtil.ID_ONE);
+        Result<Comment> commentResult = commentService.getById(TestUtil.ID_ONE);
         assertThat(commentResult, hasFailed());
         assertThat(commentResult, hasMessageOf(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
     }
@@ -79,7 +77,7 @@ public class CommentServiceTest {
         Comment comment = a(comment());
         when(commentDao.exists(anyLong())).thenReturn(true);
         when(commentDao.findOne(anyLong())).thenReturn(comment);
-        Result<Comment> commentResult = commentService.getCommentById(TestUtil.ID_ONE);
+        Result<Comment> commentResult = commentService.getById(TestUtil.ID_ONE);
         assertThat(commentResult, hasFinishedSuccessfully());
         assertThat(commentResult, hasValueOf(comment));
         assertThat(commentResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
