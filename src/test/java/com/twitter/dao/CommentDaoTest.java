@@ -248,4 +248,40 @@ public class CommentDaoTest {
         assertThat(commentList, contains(youngestComment, olderComment, oldestComment));
     }
 
+    @Test
+    public void findByOwnerId_userDoesNotExist() {
+        List<Comment> commentList = commentDao.findByOwnerId(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(commentList, is(emptyList()));
+    }
+
+    @Test
+    public void findByOwnerId_userExistSomeComments() {
+        User user = a(user());
+        User commentatorOne = a(user());
+        User commentatorTwo = a(user());
+        userDao.save(aListWith(user, commentatorOne, commentatorTwo));
+
+        Tweet tweet = a(tweet().withOwner(user));
+        tweetDao.save(tweet);
+
+        Comment commentOne = a(comment()
+                .withOwner(commentatorOne)
+                .withTweet(tweet)
+        );
+
+        Comment commentTwo = a(comment()
+                .withOwner(commentatorOne)
+                .withTweet(tweet)
+        );
+
+        Comment commentThree = a(comment()
+                .withOwner(commentatorTwo)
+                .withTweet(tweet)
+        );
+        commentDao.save(aListWith(commentOne, commentTwo, commentThree));
+        List<Comment> commentsFromCommentatorOne = commentDao.findByOwnerId(commentatorOne.getId(), TestUtil.ALL_IN_ONE_PAGE);
+        List<Comment> commentsFromCommentatorTwo = commentDao.findByOwnerId(commentatorTwo.getId(), TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(commentsFromCommentatorOne, hasItems(commentOne, commentTwo));
+        assertThat(commentsFromCommentatorTwo, hasItem(commentThree));
+    }
 }
