@@ -4,9 +4,7 @@ import com.twitter.dao.CommentDao;
 import com.twitter.dao.TweetDao;
 import com.twitter.dao.UserDao;
 import com.twitter.dao.UserVoteDao;
-import com.twitter.model.Comment;
-import com.twitter.model.Result;
-import com.twitter.model.User;
+import com.twitter.model.*;
 import com.twitter.util.MessageUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +20,7 @@ import static com.twitter.Util.a;
 import static com.twitter.Util.aListWith;
 import static com.twitter.builders.CommentBuilder.comment;
 import static com.twitter.builders.UserBuilder.user;
+import static com.twitter.builders.UserVoteBuilder.userVote;
 import static com.twitter.matchers.ResultIsFailureMatcher.hasFailed;
 import static com.twitter.matchers.ResultIsSuccessMatcher.hasFinishedSuccessfully;
 import static com.twitter.matchers.ResultMessageMatcher.hasMessageOf;
@@ -314,4 +313,73 @@ public class CommentServiceTest {
         assertThat(tweetCommentsResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
+    @Test
+    public void vote_userDoesNotExist() {
+        when(userDao.exists(anyLong())).thenReturn(false);
+        UserVote userVote = a(userVote()
+                .withUser(
+                        a(user())
+                )
+                .withAbstractPost(
+                        a(comment())
+                )
+        );
+        Result<Boolean> voteResult = commentService.vote(userVote);
+        assertThat(voteResult, hasFailed());
+        assertThat(voteResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
+    }
+
+    @Test
+    public void vote_userExistsPostDoesNot() {
+        when(userDao.exists(anyLong())).thenReturn(true);
+        when(commentDao.exists(anyLong())).thenReturn(false);
+        UserVote userVote = a(userVote()
+                .withUser(
+                        a(user())
+                )
+                .withAbstractPost(
+                        a(comment())
+                )
+        );
+        Result<Boolean> voteResult = commentService.vote(userVote);
+        assertThat(voteResult, hasFailed());
+        assertThat(voteResult, hasMessageOf(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
+    }
+
+    @Test
+    public void vote_userAndPostExistsButPostAlreadyVoted() {
+        when(userDao.exists(anyLong())).thenReturn(true);
+        when(commentDao.exists(anyLong())).thenReturn(true);
+        UserVote userVote = a(userVote()
+                .withUser(
+                        a(user())
+                )
+                .withAbstractPost(
+                        a(comment())
+                )
+        );
+        when(userVoteDao.findByUserAndAbstractPost(any(User.class), any(AbstractPost.class))).thenReturn(userVote);
+        Result<Boolean> voteResult = commentService.vote(userVote);
+        assertThat(voteResult, hasFailed());
+        assertThat(voteResult, hasMessageOf(MessageUtil.POST_ALREADY_VOTED));
+    }
+
+    @Test
+    public void vote_successVote() {
+        when(userDao.exists(anyLong())).thenReturn(true);
+        when(commentDao.exists(anyLong())).thenReturn(true);
+        when(userVoteDao.findByUserAndAbstractPost(any(User.class), any(AbstractPost.class))).thenReturn(null);
+        UserVote userVote = a(userVote()
+                .withUser(
+                        a(user())
+                )
+                .withAbstractPost(
+                        a(comment())
+                )
+        );
+        Result<Boolean> voteResult = commentService.vote(userVote);
+        assertThat(voteResult, hasFinishedSuccessfully());
+        assertThat(voteResult, hasValueOf(true));
+        assertThat(voteResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+    }
 }

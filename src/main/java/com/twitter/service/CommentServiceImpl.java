@@ -72,15 +72,11 @@ public class CommentServiceImpl implements CommentService {
         return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
 
-    private boolean doesCommentExist(long commentId) {
-        return commentDao.exists(commentId);
-    }
-
     @Override
     public Result<Boolean> vote(UserVote userVote) {
         if (!doesUserExist(userVote.getUser().getId())) {
             return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
-        } else if (!doesTweetExist(userVote.getAbstractPost().getId())) {
+        } else if (!doesCommentExist(userVote.getAbstractPost().getId())) {
             return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
         } else if (doesVoteExist(userVote)) {
             return ResultFailure(MessageUtil.POST_ALREADY_VOTED);
@@ -93,7 +89,7 @@ public class CommentServiceImpl implements CommentService {
     public Result<Boolean> deleteVote(UserVote userVote) {
         if (!doesUserExist(userVote.getUser().getId())) {
             return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
-        } else if (!doesTweetExist(userVote.getAbstractPost().getId())) {
+        } else if (!doesCommentExist(userVote.getAbstractPost().getId())) {
             return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
         } else if (!doesVoteExist(userVote)) {
             return ResultFailure(MessageUtil.NOT_VOTE_ERROR_MSG);
@@ -106,7 +102,7 @@ public class CommentServiceImpl implements CommentService {
     public Result<Boolean> changeVote(UserVote userVote) {
         if (!doesUserExist(userVote.getUser().getId())) {
             return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
-        } else if (!doesTweetExist(userVote.getAbstractPost().getId())) {
+        } else if (!doesCommentExist(userVote.getAbstractPost().getId())) {
             return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
         } else if (!doesVoteExist(userVote)) {
             return ResultFailure(MessageUtil.NOT_VOTE_ERROR_MSG);
@@ -116,7 +112,6 @@ public class CommentServiceImpl implements CommentService {
         return ResultSuccess(true);
     }
 
-
     @Override
     public Result<List<Comment>> getTweetCommentsById(long tweetId, Pageable pageable) {
         if (doesTweetExist(tweetId)) {
@@ -124,6 +119,7 @@ public class CommentServiceImpl implements CommentService {
         }
         return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
+
 
     @Override
     public Result<List<Comment>> getLatestCommentsById(long tweetId, Pageable pageable) {
@@ -153,12 +149,16 @@ public class CommentServiceImpl implements CommentService {
         return tweetDao.exists(tweetId);
     }
 
-
     private boolean doesUserExist(long id) {
         return userDao.exists(id);
     }
 
+
     private boolean doesVoteExist(UserVote userVote) {
         return userVoteDao.findByUserAndAbstractPost(userVote.getUser(), userVote.getAbstractPost()) != null;
+    }
+
+    private boolean doesCommentExist(long commentId) {
+        return commentDao.exists(commentId);
     }
 }
