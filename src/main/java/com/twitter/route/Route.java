@@ -47,14 +47,15 @@ public final class Route {
     public static final String TWEETS_FROM_FOLLOWINGS_USERS = API + TWEET + "/my" + PAGE + SIZE;
     public static final String TWEETS_FROM_USER = API + TWEET + USER + USER_ID;
     public static final String TWEETS_MOST_VOTED = API + TWEET + POPULAR + PAGE + SIZE;
-    public static final String TWEET_VOTE = API + TWEET + TWEET_ID + VOTE;
-
+    public static final String TWEET_VOTE = API + TWEET + VOTE;
 
     public static final String TWEETS_WITH_TAGS = API + TWEET + "/tags" + PAGE + SIZE;
     public static final String COMMENT_URL = API + COMMENT;
     public static final String COMMENTS_FROM_TWEET = API + TWEET + TWEET_ID + COMMENT + PAGE + SIZE;
     public static final String COMMENT_BY_ID = API + COMMENT + COMMENT_ID;
+    public static final String COMMENTS_FROM_USER = API + COMMENT + USER + USER_ID + PAGE + SIZE;
     public static final String COMMENTS_LATEST = API + TWEET + TWEET_ID + COMMENT + LATEST + PAGE + SIZE;
     public static final String COMMENTS_OLDEST = API + TWEET + TWEET_ID + COMMENT + OLDEST + PAGE + SIZE;
     public static final String COMMENTS_POPULAR = API + TWEET + TWEET_ID + COMMENT + POPULAR + PAGE + SIZE;
+    public static final String COMMENT_VOTE = API + COMMENT + VOTE;
 }

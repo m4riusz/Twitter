@@ -11,7 +11,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,17 +29,37 @@ public class TweetController {
 
     @RequestMapping(value = Route.TWEET_URL, method = RequestMethod.POST)
     public Result<Boolean> createTweet(@Valid @RequestBody Tweet tweet) {
-        return tweetService.createTweet(tweet);
+        return tweetService.create(tweet);
     }
 
     @RequestMapping(value = Route.TWEET_BY_ID, method = RequestMethod.GET)
     public Result<Tweet> getTweetById(@PathVariable long tweetId) {
-        return tweetService.getTweetById(tweetId);
+        return tweetService.getById(tweetId);
     }
 
     @RequestMapping(value = Route.TWEET_BY_ID, method = RequestMethod.DELETE)
     public Result<Boolean> deleteTweet(@PathVariable long tweetId) {
-        return tweetService.deleteTweetById(tweetId);
+        return tweetService.delete(tweetId);
+    }
+
+    @RequestMapping(value = Route.TWEETS_FROM_USER, method = RequestMethod.GET)
+    public Result<List<Tweet>> getTweetsFromUser(@PathVariable long userId, @PathVariable int page, @PathVariable int size) {
+        return tweetService.getAllFromUserById(userId, new PageRequest(page, size));
+    }
+
+    @RequestMapping(value = Route.TWEET_VOTE, method = RequestMethod.POST)
+    public Result<Boolean> voteComment(@RequestBody @Valid UserVote userVote) {
+        return tweetService.vote(userVote);
+    }
+
+    @RequestMapping(value = Route.TWEET_VOTE, method = RequestMethod.DELETE)
+    public Result<Boolean> deleteVoteComment(@RequestBody @Valid UserVote userVote) {
+        return tweetService.deleteVote(userVote);
+    }
+
+    @RequestMapping(value = Route.TWEET_VOTE, method = RequestMethod.PUT)
+    public Result<Boolean> changeVoteComment(@RequestBody @Valid UserVote userVote) {
+        return tweetService.changeVote(userVote);
     }
 
     @RequestMapping(value = Route.TWEET_GET_ALL, method = RequestMethod.GET)
@@ -53,11 +72,6 @@ public class TweetController {
         return tweetService.getTweetsFromFollowingUsers(userId, new PageRequest(page, size));
     }
 
-    @RequestMapping(value = Route.TWEETS_FROM_USER, method = RequestMethod.GET)
-    public Result<List<Tweet>> getTweetsFromUser(@PathVariable long userId, @PathVariable int page, @PathVariable int size) {
-        return tweetService.getTweetsFromUser(userId, new PageRequest(page, size));
-    }
-
     @RequestMapping(value = Route.TWEETS_MOST_VOTED, method = RequestMethod.GET)
     public Result<List<Tweet>> getMostVotedTweets(@PathVariable int hours, @PathVariable int page, @PathVariable int size) {
         return tweetService.getMostVotedTweets(hours, new PageRequest(page, size));
@@ -67,4 +81,5 @@ public class TweetController {
     public Result<List<Tweet>> getTweetsByTags(@RequestBody Tag[] tags, @PathVariable int page, @PathVariable int size) {
         return tweetService.getTweetsByTagsOrderedByNewest(Arrays.asList(tags), new PageRequest(page, size));
     }
+
 }
