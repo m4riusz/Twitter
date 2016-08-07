@@ -1,22 +1,22 @@
 package com.twitter.builders;
 
+import com.twitter.Builder;
 import com.twitter.model.ReportSentence;
 import com.twitter.model.ReportStatus;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
  * Created by mariusz on 07.08.16.
  */
-public final class ReportSentenceBuilder {
-    private long reportId;
-    private ReportStatus reportStatus;
-    private Date dateToBlock;
+public final class ReportSentenceBuilder implements Builder<ReportSentence> {
+    private long reportId = 0;
+    private ReportStatus reportStatus = ReportStatus.WAITING_FOR_REALIZATION;
+    private Date dateToBlock = Calendar.getInstance().getTime();
 
-    private ReportSentenceBuilder() {
-    }
 
-    public static ReportSentenceBuilder aReportSentence() {
+    public static ReportSentenceBuilder reportSentence() {
         return new ReportSentenceBuilder();
     }
 
