@@ -21,6 +21,10 @@ public interface UserService extends UserDetailsService {
 
     User loadUserByUsername(String username) throws UsernameNotFoundException;
 
+    User getCurrentLoggedUser();// TODO: 07.08.16 add tests
+
+    boolean exists(long userId); // TODO: 07.08.16 add tests
+
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     Result<User> getUserById(long userId);
 

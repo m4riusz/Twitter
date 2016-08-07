@@ -1,7 +1,6 @@
 package com.twitter.service;
 
 import com.twitter.dao.TweetDao;
-import com.twitter.dao.UserDao;
 import com.twitter.dao.UserVoteDao;
 import com.twitter.model.Result;
 import com.twitter.model.Tag;
@@ -27,14 +26,14 @@ import static com.twitter.model.Result.ResultSuccess;
 public class TweetServiceImpl implements TweetService {
 
     private final TweetDao tweetDao;
-    private final UserDao userDao;
+    private final UserService userService;
     private final UserVoteDao userVoteDao;
     private final TagExtractor tagExtractor;
 
     @Autowired
-    public TweetServiceImpl(TweetDao tweetDao, UserDao userDao, UserVoteDao userVoteDao, TagExtractor tagExtractor) {
+    public TweetServiceImpl(TweetDao tweetDao, UserService userService, UserVoteDao userVoteDao, TagExtractor tagExtractor) {
         this.tweetDao = tweetDao;
-        this.userDao = userDao;
+        this.userService = userService;
         this.userVoteDao = userVoteDao;
         this.tagExtractor = tagExtractor;
     }
@@ -66,6 +65,11 @@ public class TweetServiceImpl implements TweetService {
             return ResultSuccess(true);
         }
         return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+    }
+
+    @Override
+    public boolean exists(long postId) {
+        return tweetDao.exists(postId);
     }
 
     @Override
@@ -147,7 +151,7 @@ public class TweetServiceImpl implements TweetService {
     }
 
     private boolean doesUserExist(long id) {
-        return userDao.exists(id);
+        return userService.exists(id);
     }
 
     private boolean doesVoteExist(UserVote userVote) {

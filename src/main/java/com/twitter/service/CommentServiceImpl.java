@@ -1,7 +1,6 @@
 package com.twitter.service;
 
 import com.twitter.dao.CommentDao;
-import com.twitter.dao.TweetDao;
 import com.twitter.dao.UserDao;
 import com.twitter.dao.UserVoteDao;
 import com.twitter.model.Comment;
@@ -24,17 +23,15 @@ import static com.twitter.model.Result.ResultSuccess;
 @Service
 @Transactional
 public class CommentServiceImpl implements CommentService {
-
-
     private CommentDao commentDao;
-    private TweetDao tweetDao;
+    private TweetService tweetService;
     private UserVoteDao userVoteDao;
     private UserDao userDao;
 
     @Autowired
-    public CommentServiceImpl(CommentDao commentDao, TweetDao tweetDao, UserVoteDao userVoteDao, UserDao userDao) {
+    public CommentServiceImpl(CommentDao commentDao, TweetService tweetService, UserVoteDao userVoteDao, UserDao userDao) {
         this.commentDao = commentDao;
-        this.tweetDao = tweetDao;
+        this.tweetService = tweetService;
         this.userVoteDao = userVoteDao;
         this.userDao = userDao;
     }
@@ -54,6 +51,11 @@ public class CommentServiceImpl implements CommentService {
             return ResultSuccess(true);
         }
         return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+    }
+
+    @Override
+    public boolean exists(long postId) {
+        return commentDao.exists(postId);
     }
 
     @Override
@@ -146,7 +148,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private boolean doesTweetExist(long tweetId) {
-        return tweetDao.exists(tweetId);
+        return tweetService.exists(tweetId);
     }
 
     private boolean doesUserExist(long id) {

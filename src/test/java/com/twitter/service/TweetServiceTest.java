@@ -1,7 +1,6 @@
 package com.twitter.service;
 
 import com.twitter.dao.TweetDao;
-import com.twitter.dao.UserDao;
 import com.twitter.dao.UserVoteDao;
 import com.twitter.model.*;
 import com.twitter.util.MessageUtil;
@@ -41,7 +40,7 @@ import static org.mockito.Mockito.when;
 public class TweetServiceTest {
 
     @Mock
-    private UserDao userDao;
+    private UserService userService;
 
     @Mock
     private TweetDao tweetDao;
@@ -56,7 +55,7 @@ public class TweetServiceTest {
 
     @Before
     public void setUp() {
-        tweetService = new TweetServiceImpl(tweetDao, userDao, userVoteDao, tagExtractor);
+        tweetService = new TweetServiceImpl(tweetDao, userService, userVoteDao, tagExtractor);
     }
 
     public void getTweetById_tweetDoesNotExist() {
@@ -147,7 +146,7 @@ public class TweetServiceTest {
 
 
     public void getTweetsFromFollowingUsers_userDoesNotExist() {
-        when(userDao.exists(anyLong())).thenReturn(false);
+        when(userService.exists(anyLong())).thenReturn(false);
         Result<List<Tweet>> tweetsResult = tweetService.getTweetsFromFollowingUsers(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
         assertThat(tweetsResult, hasFailed());
         assertThat(tweetsResult, hasValueOf(null));
@@ -156,7 +155,7 @@ public class TweetServiceTest {
 
     @Test
     public void getTweetsFromFollowingUsers_noTweetsFromFollowingUsers() {
-        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userService.exists(anyLong())).thenReturn(true);
         when(tweetDao.findTweetsFromFollowingUsers(anyLong(), any(Pageable.class))).thenReturn(emptyList());
         Result<List<Tweet>> tweetsFromFollowingUsers = tweetService.getTweetsFromFollowingUsers(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
         assertThat(tweetsFromFollowingUsers, hasFinishedSuccessfully());
@@ -166,7 +165,7 @@ public class TweetServiceTest {
 
     @Test
     public void getTweetsFromFollowingUsers_someTweetsFromFollowingUsers() {
-        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userService.exists(anyLong())).thenReturn(true);
         Tweet tweetOne = a(tweet());
         Tweet tweetTwo = a(tweet());
         when(tweetDao.findTweetsFromFollowingUsers(anyLong(), any(Pageable.class))).thenReturn(aListWith(tweetOne, tweetTwo));
@@ -177,7 +176,7 @@ public class TweetServiceTest {
     }
 
     public void getTweetsFromUser_userDoesNotExist() {
-        when(userDao.exists(anyLong())).thenReturn(false);
+        when(userService.exists(anyLong())).thenReturn(false);
         Result<List<Tweet>> tweetResult = tweetService.getAllFromUserById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
         assertThat(tweetResult, hasFailed());
         assertThat(tweetResult, hasValueOf(null));
@@ -186,7 +185,7 @@ public class TweetServiceTest {
 
     @Test
     public void getTweetsFromUser_noTweets() {
-        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userService.exists(anyLong())).thenReturn(true);
         when(tweetDao.findByOwnerId(anyLong(), any(Pageable.class))).thenReturn(emptyList());
         Result<List<Tweet>> tweetsFromUserResult = tweetService.getAllFromUserById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
         assertThat(tweetsFromUserResult, hasFinishedSuccessfully());
@@ -198,7 +197,7 @@ public class TweetServiceTest {
     public void getTweetsFromUser_someTweets() {
         Tweet tweetOne = a(tweet());
         Tweet tweetTwo = a(tweet());
-        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userService.exists(anyLong())).thenReturn(true);
         when(tweetDao.findByOwnerId(anyLong(), any(Pageable.class))).thenReturn(aListWith(tweetOne, tweetTwo));
         Result<List<Tweet>> tweetsFromUserResult = tweetService.getAllFromUserById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
         assertThat(tweetsFromUserResult, hasFinishedSuccessfully());
@@ -213,7 +212,7 @@ public class TweetServiceTest {
         Tweet tweetThree = a(tweet());
         Pageable pageOneRequest = new PageRequest(0, 2);
         Pageable pageTwoRequest = new PageRequest(1, 2);
-        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userService.exists(anyLong())).thenReturn(true);
         when(tweetDao.findByOwnerId(TestUtil.ID_ONE, pageOneRequest)).thenReturn(aListWith(tweetOne, tweetTwo));
         when(tweetDao.findByOwnerId(TestUtil.ID_ONE, pageTwoRequest)).thenReturn(aListWith(tweetThree));
         Result<List<Tweet>> allTweetsPageOne = tweetService.getAllFromUserById(TestUtil.ID_ONE, pageOneRequest);
@@ -260,7 +259,7 @@ public class TweetServiceTest {
         Tweet tweetThree = a(tweet());
         Pageable pageOneRequest = new PageRequest(0, 2);
         Pageable pageTwoRequest = new PageRequest(1, 2);
-        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userService.exists(anyLong())).thenReturn(true);
         when(tweetDao.findMostPopularByVotes(hours, pageOneRequest)).thenReturn(aListWith(tweetOne, tweetTwo));
         when(tweetDao.findMostPopularByVotes(hours, pageTwoRequest)).thenReturn(aListWith(tweetThree));
         Result<List<Tweet>> mostVotedTweetsPageOneResult = tweetService.getMostVotedTweets(hours, pageOneRequest);
@@ -335,7 +334,7 @@ public class TweetServiceTest {
 
     @Test
     public void vote_userDoesNotExist() {
-        when(userDao.exists(anyLong())).thenReturn(false);
+        when(userService.exists(anyLong())).thenReturn(false);
         UserVote userVote = a(userVote()
                 .withUser(
                         a(user())
@@ -351,7 +350,7 @@ public class TweetServiceTest {
 
     @Test
     public void vote_userExistsPostDoesNot() {
-        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userService.exists(anyLong())).thenReturn(true);
         when(tweetDao.exists(anyLong())).thenReturn(false);
         UserVote userVote = a(userVote()
                 .withUser(
@@ -368,7 +367,7 @@ public class TweetServiceTest {
 
     @Test
     public void vote_userAndPostExistsButPostAlreadyVoted() {
-        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userService.exists(anyLong())).thenReturn(true);
         when(tweetDao.exists(anyLong())).thenReturn(true);
         UserVote userVote = a(userVote()
                 .withUser(
@@ -386,7 +385,7 @@ public class TweetServiceTest {
 
     @Test
     public void vote_successVote() {
-        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userService.exists(anyLong())).thenReturn(true);
         when(tweetDao.exists(anyLong())).thenReturn(true);
         when(userVoteDao.findByUserAndAbstractPost(any(User.class), any(AbstractPost.class))).thenReturn(null);
         UserVote userVote = a(userVote()

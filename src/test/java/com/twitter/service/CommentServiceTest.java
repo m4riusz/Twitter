@@ -1,7 +1,6 @@
 package com.twitter.service;
 
 import com.twitter.dao.CommentDao;
-import com.twitter.dao.TweetDao;
 import com.twitter.dao.UserDao;
 import com.twitter.dao.UserVoteDao;
 import com.twitter.model.*;
@@ -38,7 +37,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class CommentServiceTest {
     @Mock
-    private TweetDao tweetDao;
+    private TweetService tweetService;
     @Mock
     private CommentDao commentDao;
     @Mock
@@ -50,7 +49,7 @@ public class CommentServiceTest {
 
     @Before
     public void setUp() {
-        commentService = new CommentServiceImpl(commentDao, tweetDao, userVoteDao, userDao);
+        commentService = new CommentServiceImpl(commentDao, tweetService, userVoteDao, userDao);
     }
 
     @Test
@@ -84,7 +83,7 @@ public class CommentServiceTest {
 
     @Test
     public void getTweetCommentsById_tweetDoesNotExist() {
-        when(tweetDao.exists(anyLong())).thenReturn(false);
+        when(tweetService.exists(anyLong())).thenReturn(false);
         Result<List<Comment>> tweetCommentsResult = commentService.getTweetCommentsById(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
@@ -95,7 +94,7 @@ public class CommentServiceTest {
 
     @Test
     public void getTweetCommentsById_tweetExistsNoComments() {
-        when(tweetDao.exists(anyLong())).thenReturn(true);
+        when(tweetService.exists(anyLong())).thenReturn(true);
         when(commentDao.findByTweetId(anyLong(), any(Pageable.class))).thenReturn(emptyList());
 
         Result<List<Comment>> tweetCommentsResult = commentService.getTweetCommentsById(
@@ -112,7 +111,7 @@ public class CommentServiceTest {
         Comment commentOne = a(comment());
         Comment commentTwo = a(comment());
 
-        when(tweetDao.exists(anyLong())).thenReturn(true);
+        when(tweetService.exists(anyLong())).thenReturn(true);
         when(commentDao.findByTweetId(anyLong(), any(Pageable.class)))
                 .thenReturn(aListWith(
                         commentOne,
@@ -131,7 +130,7 @@ public class CommentServiceTest {
 
     @Test
     public void getLatestCommentsById_tweetDoesNotExist() {
-        when(tweetDao.exists(anyLong())).thenReturn(false);
+        when(tweetService.exists(anyLong())).thenReturn(false);
         Result<List<Comment>> tweetCommentsResult = commentService.getLatestCommentsById(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
@@ -142,7 +141,7 @@ public class CommentServiceTest {
 
     @Test
     public void getLatestCommentsById_tweetExistsNoComments() {
-        when(tweetDao.exists(anyLong())).thenReturn(true);
+        when(tweetService.exists(anyLong())).thenReturn(true);
         when(commentDao.findByTweetIdOrderByCreateDateAsc(anyLong(), any(Pageable.class))).thenReturn(emptyList());
 
         Result<List<Comment>> tweetCommentsResult = commentService.getLatestCommentsById(
@@ -165,7 +164,7 @@ public class CommentServiceTest {
                 .withOwner(owner)
                 .withCreateDate(TestUtil.DATE_2002)
         );
-        when(tweetDao.exists(anyLong())).thenReturn(true);
+        when(tweetService.exists(anyLong())).thenReturn(true);
         when(commentDao.findByTweetIdOrderByCreateDateAsc(anyLong(), any(Pageable.class)))
                 .thenReturn(aListWith(
                         commentOne,
@@ -191,7 +190,7 @@ public class CommentServiceTest {
 
     @Test
     public void getOldestCommentsById_tweetDoesNotExist() {
-        when(tweetDao.exists(anyLong())).thenReturn(false);
+        when(tweetService.exists(anyLong())).thenReturn(false);
         Result<List<Comment>> tweetCommentsResult = commentService.getOldestCommentsById(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
@@ -202,7 +201,7 @@ public class CommentServiceTest {
 
     @Test
     public void getOldestCommentsById_tweetExistsNoComments() {
-        when(tweetDao.exists(anyLong())).thenReturn(true);
+        when(tweetService.exists(anyLong())).thenReturn(true);
         when(commentDao.findByTweetIdOrderByCreateDateDesc(anyLong(), any(Pageable.class))).thenReturn(emptyList());
 
         Result<List<Comment>> tweetCommentsResult = commentService.getOldestCommentsById(
@@ -225,7 +224,7 @@ public class CommentServiceTest {
                 .withOwner(owner)
                 .withCreateDate(TestUtil.DATE_2002)
         );
-        when(tweetDao.exists(anyLong())).thenReturn(true);
+        when(tweetService.exists(anyLong())).thenReturn(true);
         when(commentDao.findByTweetIdOrderByCreateDateDesc(anyLong(), any(Pageable.class)))
                 .thenReturn(aListWith(
                         commentTwo,
@@ -250,7 +249,7 @@ public class CommentServiceTest {
 
     @Test
     public void getMostVotedComments_tweetDoesNotExist() {
-        when(tweetDao.exists(anyLong())).thenReturn(false);
+        when(tweetService.exists(anyLong())).thenReturn(false);
         Result<List<Comment>> tweetCommentsResult = commentService.getMostVotedComments(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
@@ -261,7 +260,7 @@ public class CommentServiceTest {
 
     @Test
     public void getMostVotedComments_tweetExistsNoComments() {
-        when(tweetDao.exists(anyLong())).thenReturn(true);
+        when(tweetService.exists(anyLong())).thenReturn(true);
         when(commentDao.findByTweetIdOrderByVotes(anyLong(), any(Pageable.class))).thenReturn(emptyList());
 
         Result<List<Comment>> tweetCommentsResult = commentService.getMostVotedComments(
@@ -288,7 +287,7 @@ public class CommentServiceTest {
                 .withOwner(owner)
                 .withNumberOfVotesOf(30L)
         );
-        when(tweetDao.exists(anyLong())).thenReturn(true);
+        when(tweetService.exists(anyLong())).thenReturn(true);
         when(commentDao.findByTweetIdOrderByVotes(anyLong(), any(Pageable.class)))
                 .thenReturn(aListWith(
                         commentThree,

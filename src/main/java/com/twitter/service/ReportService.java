@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,7 +21,7 @@ public interface ReportService {
     Result<Boolean> createReport(Report report);
 
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
-    Result<Boolean> judgeReport(long reportId, ReportStatus reportStatus, User judge, Date timeToBlock);
+    Result<Boolean> judgeReport(ReportSentence reportSentence);
 
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
     Result<List<Report>> findLatestByStatus(ReportStatus reportStatus, Pageable pageable);

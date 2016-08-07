@@ -17,6 +17,7 @@ import java.util.List;
 import static com.twitter.Util.a;
 import static com.twitter.Util.aListWith;
 import static com.twitter.builders.ReportBuilder.report;
+import static com.twitter.builders.ReportSentenceBuilder.reportSentence;
 import static com.twitter.builders.TweetBuilder.tweet;
 import static com.twitter.builders.UserBuilder.user;
 import static com.twitter.matchers.ResultIsFailureMatcher.hasFailed;
@@ -39,12 +40,14 @@ public class ReportServiceTest {
 
     @Mock
     private ReportDao reportDao;
+    @Mock
+    private UserService userService;
 
     private ReportService reportService;
 
     @Before
     public void setUp() {
-        reportService = new ReportServiceImpl(reportDao);
+        reportService = new ReportServiceImpl(reportDao, userService);
     }
 
     public void findById_reportDoesNotExist() {
@@ -90,7 +93,10 @@ public class ReportServiceTest {
 
     public void judgeReport_reportDoesNotExist() {
         when(reportDao.exists(anyLong())).thenReturn(false);
-        Result<Boolean> reportResult = reportService.judgeReport(1L, ReportStatus.GUILTY, null, null);
+        ReportSentence reportSentence = a(reportSentence()
+                .withReportStatus(ReportStatus.GUILTY)
+        );
+        Result<Boolean> reportResult = reportService.judgeReport(reportSentence);
         assertThat(reportResult, hasFailed());
         assertThat(reportResult, hasValueOf(null));
         assertThat(reportResult, hasMessageOf(MessageUtil.REPORT_NOT_FOUND_BY_ID_ERROR_MSG));
@@ -98,9 +104,12 @@ public class ReportServiceTest {
 
     public void judgeReport_userIsGuiltyAndDataIsNotSet() {
         Report report = a(report());
+        ReportSentence reportSentence = a(reportSentence()
+                .withReportId(report.getId())
+                .withReportStatus(ReportStatus.GUILTY)
+        );
         when(reportDao.findOne(anyLong())).thenReturn(report);
-        User judge = a(user());
-        Result<Boolean> reportResult = reportService.judgeReport(report.getId(), ReportStatus.GUILTY, judge, null);
+        Result<Boolean> reportResult = reportService.judgeReport(reportSentence);
         assertThat(reportResult, hasFailed());
         assertThat(reportResult, hasValueOf(null));
         assertThat(reportResult, hasMessageOf(MessageUtil.REPORT_DATE_NOT_SET_ERROR_MSG));
@@ -108,10 +117,14 @@ public class ReportServiceTest {
 
     public void judgeReport_userIsGuiltyAndDataIsInvalid() {
         Report report = a(report());
-        when(reportDao.findOne(anyLong())).thenReturn(report);
-        User judge = a(user());
         Date dateBeforeNow = DateTime.now().minusDays(1).toDate();
-        Result<Boolean> reportResult = reportService.judgeReport(report.getId(), ReportStatus.GUILTY, judge, dateBeforeNow);
+        ReportSentence reportSentence = a(reportSentence()
+                .withReportId(report.getId())
+                .withReportStatus(ReportStatus.GUILTY)
+                .withDateToBlock(dateBeforeNow)
+        );
+        when(reportDao.findOne(anyLong())).thenReturn(report);
+        Result<Boolean> reportResult = reportService.judgeReport(reportSentence);
         assertThat(reportResult, hasFailed());
         assertThat(reportResult, hasValueOf(null));
         assertThat(reportResult, hasMessageOf(MessageUtil.REPORT_DATE_IS_INVALID_ERROR_MSG));
@@ -119,6 +132,7 @@ public class ReportServiceTest {
 
     @Test
     public void judgeReport_userIsGuilty() {
+        Date dateWhenBanExpired = DateTime.now().plusDays(2).toDate();
         User tweetOwner = a(user());
         User accuser = a(user());
         User judge = a(user());
@@ -129,19 +143,21 @@ public class ReportServiceTest {
                 .withUser(accuser)
                 .withAbstractPost(tweet)
         );
-        when(reportDao.findOne(report.getId())).thenReturn(report);
-
-        Date dateWhenBanExpired = DateTime.now().plusDays(2).toDate();
-        Result<Boolean> judgeReportResult = reportService.judgeReport(
-                report.getId(),
-                ReportStatus.GUILTY,
-                judge,
-                dateWhenBanExpired
+        ReportSentence reportSentence = a(reportSentence()
+                .withReportId(report.getId())
+                .withReportStatus(ReportStatus.GUILTY)
+                .withDateToBlock(dateWhenBanExpired)
         );
+        when(reportDao.exists(anyLong())).thenReturn(true);
+        when(reportDao.findOne(anyLong())).thenReturn(report);
+        when(userService.getCurrentLoggedUser()).thenReturn(judge);
+        
+        Result<Boolean> judgeReportResult = reportService.judgeReport(reportSentence);
         assertThat(judgeReportResult, hasFinishedSuccessfully());
         assertThat(judgeReportResult, hasValueOf(true));
         assertThat(judgeReportResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
         assertThat(tweetOwner, isBanned(true));
+        assertThat(tweet.isBanned(), is(true));
         assertThat(tweet.getContent(), is(MessageUtil.DELETE_ABSTRACT_POST_CONTENT));
         assertThat(report.getJudge(), is(judge));
     }

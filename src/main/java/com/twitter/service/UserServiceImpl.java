@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +47,17 @@ public class UserServiceImpl implements UserService {
             throw new UsernameNotFoundException(username);
         }
         return user;
+    }
+
+    @Override
+    public User getCurrentLoggedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return loadUserByUsername(authentication.getName());
+    }
+
+    @Override
+    public boolean exists(long userId) {
+        return userDao.exists(userId);
     }
 
     @Override
