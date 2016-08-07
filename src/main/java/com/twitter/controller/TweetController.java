@@ -78,7 +78,7 @@ public class TweetController {
     }
 
     @RequestMapping(value = Route.TWEETS_WITH_TAGS, method = RequestMethod.GET)
-    public Result<List<Tweet>> getTweetsByTags(@RequestBody Tag[] tags, @PathVariable int page, @PathVariable int size) {
+    public Result<List<Tweet>> getTweetsByTags(@RequestBody @Valid Tag[] tags, @PathVariable int page, @PathVariable int size) {
         return tweetService.getTweetsByTagsOrderedByNewest(Arrays.asList(tags), new PageRequest(page, size));
     }
 
