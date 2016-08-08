@@ -12,12 +12,12 @@ import java.util.List;
  * Created by mariusz on 31.07.16.
  */
 @Service
+@PreAuthorize(SecurityUtil.AUTHENTICATED)
 public interface ReportService {
-
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
     Result<Report> findById(long reportId);
 
-    @PreAuthorize(SecurityUtil.AUTHENTICATED)
+    @PreAuthorize(SecurityUtil.PERSONAL_REPORT)
     Result<Boolean> createReport(Report report);
 
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)

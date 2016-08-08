@@ -17,37 +17,9 @@ import java.util.List;
  */
 @Service
 @PreAuthorize(SecurityUtil.AUTHENTICATED)
-public interface TweetService extends AbstractPostService<Tweet> {
+public interface TweetService extends PostService<Tweet> {
 
-    @Override
-    @PreAuthorize(SecurityUtil.POST_PERSONAL)
-    Result<Boolean> create(@Param("post") Tweet post);
-
-    @Override
-    @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
-    Result<Boolean> delete(long postId);
-
-    @Override
-    boolean exists(long postId); //// TODO: 07.08.16 add tests
-
-    @Override
     Result<List<Tweet>> getAllFromUserById(long userId, Pageable pageable);
-
-    @Override
-    Result<Tweet> getById(long postId);
-
-    @Override
-    @PreAuthorize(SecurityUtil.PERSONAL_VOTE)
-    Result<Boolean> vote(UserVote userVote);
-
-    @Override
-    @PreAuthorize(SecurityUtil.PERSONAL_VOTE)
-    Result<Boolean> deleteVote(UserVote userVote);
-
-    @Override
-    @PreAuthorize(SecurityUtil.PERSONAL_VOTE)
-    Result<Boolean> changeVote(UserVote userVote);
-
 
     Result<List<Tweet>> getAllTweets(Pageable pageable);
 

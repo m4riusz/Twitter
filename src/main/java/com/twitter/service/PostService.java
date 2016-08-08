@@ -3,29 +3,32 @@ package com.twitter.service;
 import com.twitter.model.AbstractPost;
 import com.twitter.model.Result;
 import com.twitter.model.UserVote;
-import org.springframework.data.domain.Pageable;
+import com.twitter.util.SecurityUtil;
 import org.springframework.data.repository.query.Param;
-
-import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * Created by mariusz on 05.08.16.
  */
-interface AbstractPostService<T extends AbstractPost> {
 
+interface PostService<T extends AbstractPost> {
+
+    @PreAuthorize(SecurityUtil.POST_PERSONAL)
     Result<Boolean> create(@Param("post") T post);
 
+    @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
     Result<Boolean> delete(long postId);
 
     boolean exists(long postId);
 
-    Result<List<T>> getAllFromUserById(long userId, Pageable pageable);
-
     Result<T> getById(long postId);
 
+    @PreAuthorize(SecurityUtil.PERSONAL_VOTE)
     Result<Boolean> vote(UserVote userVote);
 
-    Result<Boolean> deleteVote(UserVote userVote);
+    @PreAuthorize(SecurityUtil.PERSONAL_VOTE)
+    Result<Boolean> deleteVote(long voteId);
 
+    @PreAuthorize(SecurityUtil.PERSONAL_VOTE)
     Result<Boolean> changeVote(UserVote userVote);
 }

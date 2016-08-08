@@ -1,7 +1,6 @@
 package com.twitter.service;
 
 import com.twitter.dao.CommentDao;
-import com.twitter.dao.UserDao;
 import com.twitter.dao.UserVoteDao;
 import com.twitter.model.*;
 import com.twitter.util.MessageUtil;
@@ -41,7 +40,7 @@ public class CommentServiceTest {
     @Mock
     private CommentDao commentDao;
     @Mock
-    private UserDao userDao;
+    private UserService userService;
     @Mock
     private UserVoteDao userVoteDao;
 
@@ -49,7 +48,7 @@ public class CommentServiceTest {
 
     @Before
     public void setUp() {
-        commentService = new CommentServiceImpl(commentDao, tweetService, userVoteDao, userDao);
+        commentService = new CommentServiceImpl(commentDao, tweetService, userVoteDao, userService);
     }
 
     @Test
@@ -314,7 +313,7 @@ public class CommentServiceTest {
 
     @Test
     public void vote_userDoesNotExist() {
-        when(userDao.exists(anyLong())).thenReturn(false);
+        when(userService.exists(anyLong())).thenReturn(false);
         UserVote userVote = a(userVote()
                 .withUser(
                         a(user())
@@ -330,7 +329,7 @@ public class CommentServiceTest {
 
     @Test
     public void vote_userExistsPostDoesNot() {
-        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userService.exists(anyLong())).thenReturn(true);
         when(commentDao.exists(anyLong())).thenReturn(false);
         UserVote userVote = a(userVote()
                 .withUser(
@@ -347,7 +346,7 @@ public class CommentServiceTest {
 
     @Test
     public void vote_userAndPostExistsButPostAlreadyVoted() {
-        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userService.exists(anyLong())).thenReturn(true);
         when(commentDao.exists(anyLong())).thenReturn(true);
         UserVote userVote = a(userVote()
                 .withUser(
@@ -365,7 +364,7 @@ public class CommentServiceTest {
 
     @Test
     public void vote_successVote() {
-        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userService.exists(anyLong())).thenReturn(true);
         when(commentDao.exists(anyLong())).thenReturn(true);
         when(userVoteDao.findByUserAndAbstractPost(any(User.class), any(AbstractPost.class))).thenReturn(null);
         UserVote userVote = a(userVote()
