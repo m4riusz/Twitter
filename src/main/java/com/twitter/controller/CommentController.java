@@ -50,9 +50,9 @@ public class CommentController {
         return commentService.vote(userVote);
     }
 
-    @RequestMapping(value = Route.COMMENT_VOTE, method = RequestMethod.DELETE)
-    public Result<Boolean> deleteVoteComment(@RequestBody @Valid UserVote userVote) {
-        return commentService.deleteVote(userVote);
+    @RequestMapping(value = Route.COMMENT_VOTE_BY_ID, method = RequestMethod.DELETE)
+    public Result<Boolean> deleteVoteComment(@PathVariable long voteId) {
+        return commentService.deleteVote(voteId);
     }
 
     @RequestMapping(value = Route.COMMENT_VOTE, method = RequestMethod.PUT)

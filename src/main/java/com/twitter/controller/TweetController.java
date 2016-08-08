@@ -48,17 +48,17 @@ public class TweetController {
     }
 
     @RequestMapping(value = Route.TWEET_VOTE, method = RequestMethod.POST)
-    public Result<Boolean> voteComment(@RequestBody @Valid UserVote userVote) {
+    public Result<Boolean> voteTweet(@RequestBody @Valid UserVote userVote) {
         return tweetService.vote(userVote);
     }
 
-    @RequestMapping(value = Route.TWEET_VOTE, method = RequestMethod.DELETE)
-    public Result<Boolean> deleteVoteComment(@RequestBody @Valid UserVote userVote) {
-        return tweetService.deleteVote(userVote);
+    @RequestMapping(value = Route.TWEET_VOTE_BY_ID, method = RequestMethod.DELETE)
+    public Result<Boolean> deleteVoteTweet(@PathVariable long voteId) {
+        return tweetService.deleteVote(voteId);
     }
 
     @RequestMapping(value = Route.TWEET_VOTE, method = RequestMethod.PUT)
-    public Result<Boolean> changeVoteComment(@RequestBody @Valid UserVote userVote) {
+    public Result<Boolean> changeVoteTweet(@RequestBody @Valid UserVote userVote) {
         return tweetService.changeVote(userVote);
     }
 

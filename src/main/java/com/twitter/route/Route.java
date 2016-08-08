@@ -24,6 +24,7 @@ public final class Route {
     private static final String OLDEST = "/oldest";
     private static final String POPULAR = "/popular";
     private static final String VOTE = "/vote";
+    private static final String VOTE_ID = "/{voteId}";
     private static final String REPORT = "/report";
     private static final String REPORT_ID = "/{reportId}";
     private static final String STATUS = "/status";
@@ -33,41 +34,45 @@ public final class Route {
 
     public static final String LOGIN_URL = API + "/login";
     public static final String LOGOUT_URL = API + "/logout";
-    public static final String REGISTER_USER = API + USER;
     public static final String ALL_REQUESTS_REGEX = API + ALL;
-
     public static final String VERIFY_USER_URL = API + USER + VERIFY + "/{verifyKey}";
     public static final String VERIFY_USER_URL_REGEX = API + USER + VERIFY + ALL;
-    public static final String USER_BY_ID = API + USER + USER_ID;
-    public static final String USER_FOLLOW = API + USER + FOLLOW + USER_ID;
-    public static final String USER_GET_ALL = API + USER + PAGE + SIZE;
-    public static final String USER_COUNT_GET_ALL = API + USER + COUNT;
-    public static final String USER_GET_FOLLOWERS = API + USER + USER_ID + FOLLOWERS + PAGE + SIZE;
 
-    public static final String USER_COUNT_GET_FOLLOWERS = API + USER + USER_ID + FOLLOWERS + COUNT;
-    public static final String USER_GET_FOLLOWING = API + USER + USER_ID + FOLLOWING + PAGE + SIZE;
-    public static final String USER_COUNT_GET_FOLLOWING = API + USER + USER_ID + FOLLOWING + COUNT;
+    public static final String USER_URL = API + USER;
+    public static final String USER_BY_ID = USER_URL + USER_ID;
+    public static final String USER_FOLLOW = USER_URL + FOLLOW + USER_ID;
+    public static final String USER_GET_ALL = USER_URL + PAGE + SIZE;
+    public static final String USER_COUNT_GET_ALL = USER_URL + COUNT;
+    public static final String REGISTER_USER = USER_URL;
+    public static final String USER_GET_FOLLOWERS = USER_BY_ID + FOLLOWERS + PAGE + SIZE;
+    public static final String USER_COUNT_GET_FOLLOWERS = USER_BY_ID + FOLLOWERS + COUNT;
+    public static final String USER_GET_FOLLOWING = USER_BY_ID + FOLLOWING + PAGE + SIZE;
+    public static final String USER_COUNT_GET_FOLLOWING = USER_BY_ID + FOLLOWING + COUNT;
+
     public static final String TWEET_URL = API + TWEET;
-    public static final String TWEET_BY_ID = API + TWEET + TWEET_ID;
-    public static final String TWEET_GET_ALL = API + TWEET + PAGE + SIZE;
-    public static final String TWEETS_FROM_FOLLOWINGS_USERS = API + TWEET + "/my" + PAGE + SIZE;
-    public static final String TWEETS_FROM_USER = API + TWEET + USER + USER_ID;
-    public static final String TWEETS_MOST_VOTED = API + TWEET + POPULAR + PAGE + SIZE;
+    public static final String TWEET_BY_ID = TWEET_URL + TWEET_ID;
+    public static final String TWEET_GET_ALL = TWEET_URL + PAGE + SIZE;
+    public static final String TWEETS_FROM_FOLLOWINGS_USERS = TWEET_URL + "/my" + PAGE + SIZE;
+    public static final String TWEETS_FROM_USER = TWEET_URL + USER + USER_ID;
+    public static final String TWEETS_MOST_VOTED = TWEET_URL + POPULAR + PAGE + SIZE;
+    public static final String TWEET_VOTE = TWEET_URL + VOTE;
+    public static final String TWEET_VOTE_BY_ID = TWEET_VOTE + VOTE_ID;
+    public static final String TWEETS_WITH_TAGS = TWEET_URL + "/tags" + PAGE + SIZE;
 
-    public static final String TWEET_VOTE = API + TWEET + VOTE;
-    public static final String TWEETS_WITH_TAGS = API + TWEET + "/tags" + PAGE + SIZE;
     public static final String COMMENT_URL = API + COMMENT;
-    public static final String COMMENTS_FROM_TWEET = API + TWEET + TWEET_ID + COMMENT + PAGE + SIZE;
-    public static final String COMMENT_BY_ID = API + COMMENT + COMMENT_ID;
-    public static final String COMMENTS_FROM_USER = API + COMMENT + USER + USER_ID + PAGE + SIZE;
-    public static final String COMMENTS_LATEST = API + TWEET + TWEET_ID + COMMENT + LATEST + PAGE + SIZE;
-    public static final String COMMENTS_OLDEST = API + TWEET + TWEET_ID + COMMENT + OLDEST + PAGE + SIZE;
-    public static final String COMMENTS_POPULAR = API + TWEET + TWEET_ID + COMMENT + POPULAR + PAGE + SIZE;
-    public static final String COMMENT_VOTE = API + COMMENT + VOTE;
+    public static final String COMMENTS_FROM_TWEET = TWEET_BY_ID + COMMENT + PAGE + SIZE;
+    public static final String COMMENT_BY_ID = COMMENT_URL + COMMENT_ID;
+    public static final String COMMENTS_FROM_USER = COMMENT_URL + USER + USER_ID + PAGE + SIZE;
+    public static final String COMMENTS_LATEST = TWEET_BY_ID + COMMENT + LATEST + PAGE + SIZE;
+    public static final String COMMENTS_OLDEST = TWEET_BY_ID + COMMENT + OLDEST + PAGE + SIZE;
+    public static final String COMMENTS_POPULAR = TWEET_BY_ID + COMMENT + POPULAR + PAGE + SIZE;
+    public static final String COMMENT_VOTE = COMMENT_URL + VOTE;
+    public static final String COMMENT_VOTE_BY_ID = COMMENT_VOTE + VOTE_ID;
+
     public static final String REPORT_URL = API + REPORT;
-    public static final String REPORT_BY_ID = API + REPORT + REPORT_ID;
-    public static final String REPORT_GET_ALL_BY_STATUS = API + REPORT + STATUS + REPORT_STATUS + PAGE + SIZE;
-    public static final String REPORT_GET_ALL_BY_CATEGORY = API + REPORT + CATEGORY + REPORT_CATEGORY + PAGE + SIZE;
-    public static final String REPORT_GET_ALL_BY_STATUS_AND_CATEGORY = API + REPORT + STATUS + REPORT_STATUS +
+    public static final String REPORT_BY_ID = REPORT_URL + REPORT_ID;
+    public static final String REPORT_GET_ALL_BY_STATUS = REPORT_URL + STATUS + REPORT_STATUS + PAGE + SIZE;
+    public static final String REPORT_GET_ALL_BY_CATEGORY = REPORT_URL + CATEGORY + REPORT_CATEGORY + PAGE + SIZE;
+    public static final String REPORT_GET_ALL_BY_STATUS_AND_CATEGORY = REPORT_URL + STATUS + REPORT_STATUS +
             CATEGORY + REPORT_CATEGORY + PAGE + SIZE;
 }

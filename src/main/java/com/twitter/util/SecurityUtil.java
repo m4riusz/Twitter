@@ -10,4 +10,5 @@ public class SecurityUtil {
     public static final String PERSONAL_USAGE = "#userId == principal.id";
     public static final String POST_PERSONAL = "#post.owner.id == principal.id";
     public static final String PERSONAL_VOTE = "#userVote.user.id == principal.id";
+    public static final String PERSONAL_REPORT = "#report.user.id == principal.id";
 }
