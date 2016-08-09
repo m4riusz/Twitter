@@ -1,5 +1,6 @@
 package com.twitter.service;
 
+import com.twitter.config.Profiles;
 import com.twitter.dao.UserDao;
 import com.twitter.model.AccountStatus;
 import com.twitter.model.Result;
@@ -19,12 +20,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Date;
 import java.util.List;
 
-import static com.twitter.util.Util.a;
-import static com.twitter.util.Util.aListWith;
 import static com.twitter.builders.UserBuilder.user;
 import static com.twitter.matchers.ResultIsFailureMatcher.hasFailed;
 import static com.twitter.matchers.ResultIsSuccessMatcher.hasFinishedSuccessfully;
@@ -33,6 +33,8 @@ import static com.twitter.matchers.ResultValueMatcher.hasValueOf;
 import static com.twitter.matchers.UserFollowerMatcher.hasFollowers;
 import static com.twitter.matchers.UserIsBanned.isBanned;
 import static com.twitter.matchers.UserIsEnabled.isEnabled;
+import static com.twitter.util.Util.a;
+import static com.twitter.util.Util.aListWith;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -46,6 +48,7 @@ import static org.mockito.Mockito.*;
  */
 
 @SpringBootTest
+@ActiveProfiles(Profiles.DEV)
 @RunWith(MockitoJUnitRunner.class)
 public class  UserServiceTest {
 

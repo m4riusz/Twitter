@@ -1,5 +1,6 @@
 package com.twitter.dao;
 
+import com.twitter.config.Profiles;
 import com.twitter.model.*;
 import com.twitter.util.TestUtil;
 import org.junit.Test;
@@ -8,15 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
-import static com.twitter.util.Util.a;
-import static com.twitter.util.Util.aListWith;
 import static com.twitter.builders.ReportBuilder.report;
 import static com.twitter.builders.TweetBuilder.tweet;
 import static com.twitter.builders.UserBuilder.user;
+import static com.twitter.util.Util.a;
+import static com.twitter.util.Util.aListWith;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
@@ -26,6 +28,7 @@ import static org.junit.Assert.assertThat;
  */
 @SpringBootTest
 @RunWith(SpringJUnit4ClassRunner.class)
+@ActiveProfiles(Profiles.DEV)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ReportDaoTest {
 

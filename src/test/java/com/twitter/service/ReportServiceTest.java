@@ -1,5 +1,6 @@
 package com.twitter.service;
 
+import com.twitter.config.Profiles;
 import com.twitter.dao.ReportDao;
 import com.twitter.model.*;
 import com.twitter.util.MessageUtil;
@@ -11,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Date;
 import java.util.List;
@@ -36,6 +38,7 @@ import static org.mockito.Mockito.when;
  * Created by mariusz on 01.08.16.
  */
 @SpringBootTest
+@ActiveProfiles(Profiles.DEV)
 @RunWith(MockitoJUnitRunner.class)
 public class ReportServiceTest {
 

@@ -1,5 +1,6 @@
 package com.twitter.service;
 
+import com.twitter.config.Profiles;
 import com.twitter.dao.CommentDao;
 import com.twitter.dao.UserVoteDao;
 import com.twitter.model.*;
@@ -12,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
@@ -34,6 +36,7 @@ import static org.mockito.Mockito.when;
  * Created by mariusz on 03.08.16.
  */
 @SpringBootTest
+@ActiveProfiles(Profiles.DEV)
 @RunWith(MockitoJUnitRunner.class)
 public class CommentServiceTest {
     @Mock
