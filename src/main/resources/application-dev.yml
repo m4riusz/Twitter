@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/twitterAppDev
+  jpa:
+    database: postgresql
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        current_session_context_class: org.springframework.orm.hibernate4.SpringSessionContext
+
+  mail:
+    properties:
+      mail.smtp.starttls.enable: true
+      smtp.auth: true;
+    host: *****
+    username: *****
+    password: *****
+    port: ***
