@@ -4,6 +4,7 @@ import com.twitter.dao.CommentDao;
 import com.twitter.dao.UserVoteDao;
 import com.twitter.model.*;
 import com.twitter.util.MessageUtil;
+import com.twitter.util.TestUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,8 +15,8 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-import static com.twitter.Util.a;
-import static com.twitter.Util.aListWith;
+import static com.twitter.util.Util.a;
+import static com.twitter.util.Util.aListWith;
 import static com.twitter.builders.CommentBuilder.comment;
 import static com.twitter.builders.UserBuilder.user;
 import static com.twitter.builders.UserVoteBuilder.userVote;

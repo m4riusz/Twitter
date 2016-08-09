@@ -5,6 +5,7 @@ import com.twitter.dao.UserVoteDao;
 import com.twitter.model.*;
 import com.twitter.util.MessageUtil;
 import com.twitter.util.TagExtractor;
+import com.twitter.util.TestUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,8 +18,8 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-import static com.twitter.Util.a;
-import static com.twitter.Util.aListWith;
+import static com.twitter.util.Util.a;
+import static com.twitter.util.Util.aListWith;
 import static com.twitter.builders.TagBuilder.tag;
 import static com.twitter.builders.TweetBuilder.tweet;
 import static com.twitter.builders.UserBuilder.user;
@@ -58,11 +59,11 @@ public class TweetServiceTest {
         tweetService = new TweetServiceImpl(tweetDao, userService, userVoteDao, tagExtractor);
     }
 
+    @Test
     public void getTweetById_tweetDoesNotExist() {
         when(tweetDao.exists(anyLong())).thenReturn(false);
         Result<Tweet> tweetResult = tweetService.getById(1L);
         assertThat(tweetResult, hasFailed());
-        assertThat(tweetResult, hasValueOf(null));
         assertThat(tweetResult, hasMessageOf(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
     }
 
@@ -87,12 +88,11 @@ public class TweetServiceTest {
         assertThat(tweetResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
-
+    @Test
     public void deleteTweetById_tweetDoesNotExist() {
         when(tweetDao.exists(anyLong())).thenReturn(false);
         Result<Boolean> tweetResult = tweetService.delete(TestUtil.ID_ONE);
         assertThat(tweetResult, hasFailed());
-        assertThat(tweetResult, hasValueOf(null));
         assertThat(tweetResult, hasMessageOf(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
     }
 
@@ -144,12 +144,11 @@ public class TweetServiceTest {
         assertThat(allTweetsPageTwo, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
-
+    @Test
     public void getTweetsFromFollowingUsers_userDoesNotExist() {
         when(userService.exists(anyLong())).thenReturn(false);
         Result<List<Tweet>> tweetsResult = tweetService.getTweetsFromFollowingUsers(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
         assertThat(tweetsResult, hasFailed());
-        assertThat(tweetsResult, hasValueOf(null));
         assertThat(tweetsResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
     }
 
@@ -175,11 +174,11 @@ public class TweetServiceTest {
         assertThat(tweetsFromFollowingUsers, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
+    @Test
     public void getTweetsFromUser_userDoesNotExist() {
         when(userService.exists(anyLong())).thenReturn(false);
         Result<List<Tweet>> tweetResult = tweetService.getAllFromUserById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
         assertThat(tweetResult, hasFailed());
-        assertThat(tweetResult, hasValueOf(null));
         assertThat(tweetResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
     }
 
@@ -225,18 +224,16 @@ public class TweetServiceTest {
         assertThat(allTweetsPageTwo, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
-
+    @Test
     public void getMostVotedTweets_hoursSmallerThanZero() {
         Result<List<Tweet>> tweetResult = tweetService.getMostVotedTweets(-1, TestUtil.ALL_IN_ONE_PAGE);
         assertThat(tweetResult, hasFailed());
-        assertThat(tweetResult, hasValueOf(null));
         assertThat(tweetResult, hasMessageOf(MessageUtil.HOURS_CANT_BE_LESS_OR_EQUAL_0_ERROR_MSG));
     }
-
+    @Test
     public void getMostVotedTweets_hoursEqualsZero() {
         Result<List<Tweet>> tweetResult = tweetService.getMostVotedTweets(0, TestUtil.ALL_IN_ONE_PAGE);
         assertThat(tweetResult, hasFailed());
-        assertThat(tweetResult, hasValueOf(null));
         assertThat(tweetResult, hasMessageOf(MessageUtil.HOURS_CANT_BE_LESS_OR_EQUAL_0_ERROR_MSG));
     }
 

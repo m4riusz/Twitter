@@ -2,7 +2,7 @@ package com.twitter.dao;
 
 import com.twitter.model.AccountStatus;
 import com.twitter.model.User;
-import com.twitter.service.TestUtil;
+import com.twitter.util.TestUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +12,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
-import static com.twitter.Util.a;
-import static com.twitter.Util.aListWith;
+import static com.twitter.util.Util.a;
+import static com.twitter.util.Util.aListWith;
 import static com.twitter.builders.UserBuilder.user;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.Matchers.*;

@@ -1,4 +1,4 @@
-package com.twitter.service;
+package com.twitter.util;
 
 import org.joda.time.DateTime;
 import org.springframework.data.domain.PageRequest;

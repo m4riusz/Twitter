@@ -3,6 +3,7 @@ package com.twitter.service;
 import com.twitter.dao.ReportDao;
 import com.twitter.model.*;
 import com.twitter.util.MessageUtil;
+import com.twitter.util.TestUtil;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,8 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.Date;
 import java.util.List;
 
-import static com.twitter.Util.a;
-import static com.twitter.Util.aListWith;
 import static com.twitter.builders.ReportBuilder.report;
 import static com.twitter.builders.ReportSentenceBuilder.reportSentence;
 import static com.twitter.builders.TweetBuilder.tweet;
@@ -25,6 +24,8 @@ import static com.twitter.matchers.ResultIsSuccessMatcher.hasFinishedSuccessfull
 import static com.twitter.matchers.ResultMessageMatcher.hasMessageOf;
 import static com.twitter.matchers.ResultValueMatcher.hasValueOf;
 import static com.twitter.matchers.UserIsBanned.isBanned;
+import static com.twitter.util.Util.a;
+import static com.twitter.util.Util.aListWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
@@ -50,11 +51,11 @@ public class ReportServiceTest {
         reportService = new ReportServiceImpl(reportDao, userService);
     }
 
+    @Test
     public void findById_reportDoesNotExist() {
         when(reportDao.exists(anyLong())).thenReturn(false);
         Result<Report> reportResult = reportService.findById(TestUtil.ID_ONE);
         assertThat(reportResult, hasFailed());
-        assertThat(reportResult, hasValueOf(null));
         assertThat(reportResult, hasMessageOf(MessageUtil.REPORT_NOT_FOUND_BY_ID_ERROR_MSG));
     }
 
@@ -90,7 +91,7 @@ public class ReportServiceTest {
         assertThat(createReportResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
-
+    @Test
     public void judgeReport_reportDoesNotExist() {
         when(reportDao.exists(anyLong())).thenReturn(false);
         ReportSentence reportSentence = a(reportSentence()
@@ -98,23 +99,33 @@ public class ReportServiceTest {
         );
         Result<Boolean> reportResult = reportService.judgeReport(reportSentence);
         assertThat(reportResult, hasFailed());
-        assertThat(reportResult, hasValueOf(null));
         assertThat(reportResult, hasMessageOf(MessageUtil.REPORT_NOT_FOUND_BY_ID_ERROR_MSG));
     }
 
+    @Test
     public void judgeReport_userIsGuiltyAndDataIsNotSet() {
-        Report report = a(report());
+        User postOwner = a(user());
+        User accuser = a(user());
+        Tweet tweet = a(tweet()
+                .withOwner(postOwner)
+        );
+        Report report = a(report()
+                .withAbstractPost(tweet)
+                .withUser(accuser)
+        );
         ReportSentence reportSentence = a(reportSentence()
                 .withReportId(report.getId())
                 .withReportStatus(ReportStatus.GUILTY)
+                .withDateToBlock(null)
         );
+        when(reportDao.exists(anyLong())).thenReturn(true);
         when(reportDao.findOne(anyLong())).thenReturn(report);
         Result<Boolean> reportResult = reportService.judgeReport(reportSentence);
         assertThat(reportResult, hasFailed());
-        assertThat(reportResult, hasValueOf(null));
         assertThat(reportResult, hasMessageOf(MessageUtil.REPORT_DATE_NOT_SET_ERROR_MSG));
     }
 
+    @Test
     public void judgeReport_userIsGuiltyAndDataIsInvalid() {
         Report report = a(report());
         Date dateBeforeNow = DateTime.now().minusDays(1).toDate();
@@ -123,10 +134,10 @@ public class ReportServiceTest {
                 .withReportStatus(ReportStatus.GUILTY)
                 .withDateToBlock(dateBeforeNow)
         );
+        when(reportDao.exists(anyLong())).thenReturn(true);
         when(reportDao.findOne(anyLong())).thenReturn(report);
         Result<Boolean> reportResult = reportService.judgeReport(reportSentence);
         assertThat(reportResult, hasFailed());
-        assertThat(reportResult, hasValueOf(null));
         assertThat(reportResult, hasMessageOf(MessageUtil.REPORT_DATE_IS_INVALID_ERROR_MSG));
     }
 

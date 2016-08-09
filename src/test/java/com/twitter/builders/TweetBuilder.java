@@ -1,6 +1,6 @@
 package com.twitter.builders;
 
-import com.twitter.Builder;
+import com.twitter.util.Builder;
 import com.twitter.model.*;
 
 import java.util.ArrayList;
@@ -8,7 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import static com.twitter.Util.a;
+import static com.twitter.util.Util.a;
 import static com.twitter.builders.UserBuilder.user;
 import static com.twitter.builders.UserVoteBuilder.userVote;
 

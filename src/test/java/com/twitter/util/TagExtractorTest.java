@@ -9,7 +9,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
-import static com.twitter.Util.a;
+import static com.twitter.util.Util.a;
 import static com.twitter.builders.TagBuilder.tag;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.*;

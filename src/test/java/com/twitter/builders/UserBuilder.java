@@ -1,7 +1,7 @@
 package com.twitter.builders;
 
 
-import com.twitter.Builder;
+import com.twitter.util.Builder;
 import com.twitter.model.*;
 
 import java.util.ArrayList;

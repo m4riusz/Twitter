@@ -1,6 +1,6 @@
 package com.twitter.builders;
 
-import com.twitter.Builder;
+import com.twitter.util.Builder;
 import com.twitter.model.AbstractPost;
 import com.twitter.model.User;
 import com.twitter.model.UserVote;
