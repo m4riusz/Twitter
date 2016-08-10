@@ -11,7 +11,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.security.Principal;
 import java.util.List;
 
 /**
@@ -88,14 +87,12 @@ public class UserController {
     }
 
     @RequestMapping(value = Route.USER_FOLLOW, method = RequestMethod.POST)
-    public Result<Boolean> followUser(@PathVariable long userId, Principal principal) {
-        User user = userService.loadUserByUsername(principal.getName());
-        return userService.follow(user, userId);
+    public Result<Boolean> followUser(@PathVariable long userId) {
+        return userService.follow(userId);
     }
 
     @RequestMapping(value = Route.USER_FOLLOW, method = RequestMethod.DELETE)
-    public Result<Boolean> unfollowUser(@PathVariable long userId, Principal principal) {
-        User user = userService.loadUserByUsername(principal.getName());
-        return userService.unfollow(user, userId);
+    public Result<Boolean> unfollowUser(@PathVariable long userId) {
+        return userService.unfollow(userId);
     }
 }

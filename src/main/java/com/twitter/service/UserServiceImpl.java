@@ -88,7 +88,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Result<Boolean> follow(User user, long userToFollowId) {
+    public Result<Boolean> follow(long userToFollowId) {
+        User user = getCurrentLoggedUser();
         User userToFollow = userDao.findOne(userToFollowId);
         if (userToFollow == null) {
             return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
@@ -102,7 +103,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Result<Boolean> unfollow(User user, long userToUnfollowId) {
+    public Result<Boolean> unfollow(long userToUnfollowId) {
+        User user = getCurrentLoggedUser();
         User userToUnfollow = userDao.findOne(userToUnfollowId);
         if (userToUnfollow == null) {
             return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);

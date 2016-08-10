@@ -31,10 +31,10 @@ public interface UserService extends UserDetailsService {
     Result<Boolean> create(User user);
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
-    Result<Boolean> follow(User user, long userToFollowId);
+    Result<Boolean> follow(long userToFollowId);
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
-    Result<Boolean> unfollow(User user, long userToUnfollowId);
+    Result<Boolean> unfollow(long userToUnfollowId);
 
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
     Result<Boolean> banUser(long userToBanId, Date date);

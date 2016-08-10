@@ -13,12 +13,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -42,6 +46,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Created by mariusz on 14.07.16.
@@ -49,7 +55,8 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ActiveProfiles(Profiles.DEV)
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({SecurityContextHolder.class})
 public class  UserServiceTest {
 
     @Mock
@@ -57,12 +64,17 @@ public class  UserServiceTest {
 
     @Mock
     private JavaMailSender javaMailSender;
-
     private UserService userService;
+    private Authentication authentication;
 
     @Before
     public void setUp() {
         userService = new UserServiceImpl(userDao, javaMailSender);
+        authentication = mock(Authentication.class);
+        mockStatic(SecurityContextHolder.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(SecurityContextHolder.getContext()).thenReturn(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
     }
 
     @Test
@@ -131,8 +143,10 @@ public class  UserServiceTest {
     public void follow_userFollowsOtherUser() {
         User userOne = a(user().withId(TestUtil.ID_ONE));
         User userTwo = a(user().withId(TestUtil.ID_TWO));
+        when(authentication.getName()).thenReturn(userTwo.getUsername());
+        when(userDao.findByUsername(userTwo.getUsername())).thenReturn(userTwo);
         when(userDao.findOne(TestUtil.ID_ONE)).thenReturn(userOne);
-        Result<Boolean> followResult = userService.follow(userTwo, userOne.getId());
+        Result<Boolean> followResult = userService.follow(userOne.getId());
         assertThat(userOne, hasFollowers(userTwo));
         assertThat(followResult, hasFinishedSuccessfully());
         assertThat(followResult, hasValueOf(true));
@@ -142,8 +156,10 @@ public class  UserServiceTest {
     @Test
     public void follow_userFollowHimself() {
         User user = a(user().withId(TestUtil.ID_ONE));
+        when(authentication.getName()).thenReturn(user.getUsername());
+        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
         when(userDao.findOne(TestUtil.ID_ONE)).thenReturn(user);
-        Result<Boolean> userResult = userService.follow(user, user.getId());
+        Result<Boolean> userResult = userService.follow(user.getId());
         assertThat(userResult, hasFailed());
         assertThat(userResult, hasMessageOf(MessageUtil.FOLLOW_YOURSELF_ERROR_MSG));
     }
@@ -152,8 +168,10 @@ public class  UserServiceTest {
     public void follow_userAlreadyFollowed() {
         User user = a(user().withId(TestUtil.ID_ONE));
         User userToFollow = a(user().withId(TestUtil.ID_TWO).withFollowers(aListWith(user)));
+        when(authentication.getName()).thenReturn(user.getUsername());
+        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
         when(userDao.findOne(TestUtil.ID_TWO)).thenReturn(userToFollow);
-        Result<Boolean> userResult = userService.follow(user, userToFollow.getId());
+        Result<Boolean> userResult = userService.follow(userToFollow.getId());
         assertThat(userResult, hasFailed());
         assertThat(userResult, hasMessageOf(MessageUtil.FOLLOW_ALREADY_FOLLOWED_ERROR_MSG));
     }
@@ -161,8 +179,10 @@ public class  UserServiceTest {
     @Test
     public void follow_userToFollowDoesNotExists() {
         User user = a(user());
+        when(authentication.getName()).thenReturn(user.getUsername());
+        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
         when(userDao.findOne(anyLong())).thenReturn(null);
-        Result<Boolean> userResult = userService.follow(user, TestUtil.ID_ONE);
+        Result<Boolean> userResult = userService.follow(TestUtil.ID_ONE);
         assertThat(userResult, hasFailed());
         assertThat(userResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
     }
@@ -171,8 +191,10 @@ public class  UserServiceTest {
     public void unfollow_userFollowsOtherUser() {
         User user = a(user().withId(TestUtil.ID_ONE));
         User userToUnfollow = a(user().withId(TestUtil.ID_TWO).withFollowers(aListWith(user)));
+        when(authentication.getName()).thenReturn(user.getUsername());
+        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
         when(userDao.findOne(TestUtil.ID_TWO)).thenReturn(userToUnfollow);
-        Result<Boolean> unfollowResult = userService.unfollow(user, userToUnfollow.getId());
+        Result<Boolean> unfollowResult = userService.unfollow(userToUnfollow.getId());
         assertThat(userToUnfollow, not(hasFollowers(user)));
         assertThat(unfollowResult, hasFinishedSuccessfully());
         assertThat(unfollowResult, hasValueOf(true));
@@ -182,8 +204,10 @@ public class  UserServiceTest {
     @Test
     public void unfollow_userUnfollowsHimself() {
         User user = a(user());
+        when(authentication.getName()).thenReturn(user.getUsername());
+        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
         when(userDao.findOne(anyLong())).thenReturn(user);
-        Result<Boolean> userResult = userService.unfollow(user, user.getId());
+        Result<Boolean> userResult = userService.unfollow(user.getId());
         assertThat(userResult, hasFailed());
         assertThat(userResult, hasMessageOf(MessageUtil.UNFOLLOW_YOURSELF_ERROR_MSG));
     }
@@ -192,8 +216,10 @@ public class  UserServiceTest {
     public void unfollow_userNotFollowed() {
         User user = a(user().withId(TestUtil.ID_ONE));
         User userToUnfollow = a(user().withId(TestUtil.ID_TWO));
+        when(authentication.getName()).thenReturn(user.getUsername());
+        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
         when(userDao.findOne(anyLong())).thenReturn(userToUnfollow);
-        Result<Boolean> userResult = userService.unfollow(user, userToUnfollow.getId());
+        Result<Boolean> userResult = userService.unfollow(userToUnfollow.getId());
         assertThat(userResult, hasFailed());
         assertThat(userResult, hasMessageOf(MessageUtil.UNFOLLOW_UNFOLLOWED_ERROR_MSG));
     }
@@ -201,8 +227,10 @@ public class  UserServiceTest {
     @Test
     public void unfollow_userToUnfollowDoesNotExists() {
         User user = a(user());
+        when(authentication.getName()).thenReturn(user.getUsername());
+        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
         when(userDao.findOne(anyLong())).thenReturn(null);
-        Result<Boolean> userResult = userService.unfollow(user, TestUtil.ID_ONE);
+        Result<Boolean> userResult = userService.unfollow(TestUtil.ID_ONE);
         assertThat(userResult, hasFailed());
         assertThat(userResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
     }

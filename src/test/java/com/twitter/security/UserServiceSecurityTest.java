@@ -44,13 +44,13 @@ public class UserServiceSecurityTest {
     @WithAnonymousUser
     @Test(expected = AccessDeniedException.class)
     public void follow_anonymousAccessDenied() {
-        userService.follow(a(user()), TestUtil.ID_ONE);
+        userService.follow(TestUtil.ID_ONE);
     }
 
     @WithAnonymousUser
     @Test(expected = AccessDeniedException.class)
     public void unfollow_anonymousAccessDenied() {
-        userService.unfollow(a(user()), TestUtil.ID_ONE);
+        userService.unfollow(TestUtil.ID_ONE);
     }
 
     @WithAnonymousUser
