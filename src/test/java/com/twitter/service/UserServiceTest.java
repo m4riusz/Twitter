@@ -143,8 +143,8 @@ public class  UserServiceTest {
     public void follow_userFollowsOtherUser() {
         User userOne = a(user().withId(TestUtil.ID_ONE));
         User userTwo = a(user().withId(TestUtil.ID_TWO));
-        when(authentication.getName()).thenReturn(userTwo.getUsername());
-        when(userDao.findByUsername(userTwo.getUsername())).thenReturn(userTwo);
+        when(authentication.getPrincipal()).thenReturn(userTwo);
+        when(userDao.findOne(TestUtil.ID_TWO)).thenReturn(userTwo);
         when(userDao.findOne(TestUtil.ID_ONE)).thenReturn(userOne);
         Result<Boolean> followResult = userService.follow(userOne.getId());
         assertThat(userOne, hasFollowers(userTwo));
@@ -156,8 +156,7 @@ public class  UserServiceTest {
     @Test
     public void follow_userFollowHimself() {
         User user = a(user().withId(TestUtil.ID_ONE));
-        when(authentication.getName()).thenReturn(user.getUsername());
-        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        when(authentication.getPrincipal()).thenReturn(user);
         when(userDao.findOne(TestUtil.ID_ONE)).thenReturn(user);
         Result<Boolean> userResult = userService.follow(user.getId());
         assertThat(userResult, hasFailed());
@@ -168,8 +167,8 @@ public class  UserServiceTest {
     public void follow_userAlreadyFollowed() {
         User user = a(user().withId(TestUtil.ID_ONE));
         User userToFollow = a(user().withId(TestUtil.ID_TWO).withFollowers(aListWith(user)));
-        when(authentication.getName()).thenReturn(user.getUsername());
-        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        when(authentication.getPrincipal()).thenReturn(user);
+        when(userDao.findOne(TestUtil.ID_ONE)).thenReturn(user);
         when(userDao.findOne(TestUtil.ID_TWO)).thenReturn(userToFollow);
         Result<Boolean> userResult = userService.follow(userToFollow.getId());
         assertThat(userResult, hasFailed());
@@ -179,8 +178,7 @@ public class  UserServiceTest {
     @Test
     public void follow_userToFollowDoesNotExists() {
         User user = a(user());
-        when(authentication.getName()).thenReturn(user.getUsername());
-        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        when(authentication.getPrincipal()).thenReturn(user);
         when(userDao.findOne(anyLong())).thenReturn(null);
         Result<Boolean> userResult = userService.follow(TestUtil.ID_ONE);
         assertThat(userResult, hasFailed());
@@ -191,8 +189,7 @@ public class  UserServiceTest {
     public void unfollow_userFollowsOtherUser() {
         User user = a(user().withId(TestUtil.ID_ONE));
         User userToUnfollow = a(user().withId(TestUtil.ID_TWO).withFollowers(aListWith(user)));
-        when(authentication.getName()).thenReturn(user.getUsername());
-        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        when(authentication.getPrincipal()).thenReturn(user);
         when(userDao.findOne(TestUtil.ID_TWO)).thenReturn(userToUnfollow);
         Result<Boolean> unfollowResult = userService.unfollow(userToUnfollow.getId());
         assertThat(userToUnfollow, not(hasFollowers(user)));
@@ -204,8 +201,7 @@ public class  UserServiceTest {
     @Test
     public void unfollow_userUnfollowsHimself() {
         User user = a(user());
-        when(authentication.getName()).thenReturn(user.getUsername());
-        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        when(authentication.getPrincipal()).thenReturn(user);
         when(userDao.findOne(anyLong())).thenReturn(user);
         Result<Boolean> userResult = userService.unfollow(user.getId());
         assertThat(userResult, hasFailed());
@@ -216,8 +212,7 @@ public class  UserServiceTest {
     public void unfollow_userNotFollowed() {
         User user = a(user().withId(TestUtil.ID_ONE));
         User userToUnfollow = a(user().withId(TestUtil.ID_TWO));
-        when(authentication.getName()).thenReturn(user.getUsername());
-        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        when(authentication.getPrincipal()).thenReturn(user);
         when(userDao.findOne(anyLong())).thenReturn(userToUnfollow);
         Result<Boolean> userResult = userService.unfollow(userToUnfollow.getId());
         assertThat(userResult, hasFailed());
@@ -227,8 +222,7 @@ public class  UserServiceTest {
     @Test
     public void unfollow_userToUnfollowDoesNotExists() {
         User user = a(user());
-        when(authentication.getName()).thenReturn(user.getUsername());
-        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        when(authentication.getPrincipal()).thenReturn(user);
         when(userDao.findOne(anyLong())).thenReturn(null);
         Result<Boolean> userResult = userService.unfollow(TestUtil.ID_ONE);
         assertThat(userResult, hasFailed());
@@ -521,6 +515,36 @@ public class  UserServiceTest {
         assertThat(userResult, hasValueOf(true));
         assertThat(userResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
+
+    @Test
+    public void getCurrentLoggedUser_userNotFound() {
+        when(authentication.getPrincipal()).thenReturn(null);
+        User currentLoggedUser = userService.getCurrentLoggedUser();
+        assertThat(currentLoggedUser, is(nullValue()));
+    }
+
+    @Test
+    public void getCurrentLoggedUser_userFound() {
+        User user = a(user());
+        when(authentication.getPrincipal()).thenReturn(user);
+        User currentLoggedUser = userService.getCurrentLoggedUser();
+        assertThat(currentLoggedUser, is(user));
+    }
+
+    @Test
+    public void exists_userNotExists() {
+        when(userDao.exists(anyLong())).thenReturn(false);
+        boolean userExist = userService.exists(TestUtil.ID_ONE);
+        assertThat(userExist, is(false));
+    }
+
+    @Test
+    public void exists_userExists() {
+        when(userDao.exists(anyLong())).thenReturn(true);
+        boolean userExist = userService.exists(TestUtil.ID_ONE);
+        assertThat(userExist, is(true));
+    }
+
 }
 
 

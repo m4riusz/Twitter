@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -51,8 +50,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getCurrentLoggedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return loadUserByUsername(authentication.getName());
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     @Override
@@ -89,7 +87,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result<Boolean> follow(long userToFollowId) {
-        User user = getCurrentLoggedUser();
+        User user = userDao.findOne(getCurrentLoggedUser().getId());
         User userToFollow = userDao.findOne(userToFollowId);
         if (userToFollow == null) {
             return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);

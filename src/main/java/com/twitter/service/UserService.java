@@ -5,6 +5,7 @@ import com.twitter.model.Role;
 import com.twitter.model.User;
 import com.twitter.util.SecurityUtil;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,16 +20,20 @@ import java.util.List;
 @Service
 public interface UserService extends UserDetailsService {
 
+    Result<Boolean> create(User user);
+
     User loadUserByUsername(String username) throws UsernameNotFoundException;
 
-    User getCurrentLoggedUser();// TODO: 07.08.16 add tests
+    Result<Boolean> activateAccount(String verifyKey);
 
-    boolean exists(long userId); // TODO: 07.08.16 add tests
+    @PreAuthorize(SecurityUtil.AUTHENTICATED)
+    User getCurrentLoggedUser();
+
+    @PreAuthorize(SecurityUtil.AUTHENTICATED)
+    boolean exists(long userId);
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     Result<User> getUserById(long userId);
-
-    Result<Boolean> create(User user);
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     Result<Boolean> follow(long userToFollowId);
@@ -49,7 +54,7 @@ public interface UserService extends UserDetailsService {
     Result<Boolean> deleteUserById(long userId);
 
     @PreAuthorize(SecurityUtil.PERSONAL_USAGE)
-    Result<Boolean> changeUserPasswordById(long userId, String password);
+    Result<Boolean> changeUserPasswordById(@Param("userId") long userId, String password);
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     Result<Long> getAllUsersCount();
@@ -68,7 +73,5 @@ public interface UserService extends UserDetailsService {
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     Result<List<User>> getUserFollowingsById(long userId, Pageable pageable);
-
-    Result<Boolean> activateAccount(String verifyKey);
 
 }
