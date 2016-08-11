@@ -19,14 +19,16 @@ interface PostService<T extends AbstractPost> {
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
     Result<Boolean> delete(long postId);
 
+    @PreAuthorize(SecurityUtil.AUTHENTICATED)
     boolean exists(long postId);
 
+    @PreAuthorize(SecurityUtil.AUTHENTICATED)
     Result<T> getById(long postId);
 
     @PreAuthorize(SecurityUtil.PERSONAL_VOTE)
     Result<Boolean> vote(UserVote userVote);
 
-    @PreAuthorize(SecurityUtil.PERSONAL_VOTE)
+    @PreAuthorize(SecurityUtil.AUTHENTICATED)
     Result<Boolean> deleteVote(long voteId);
 
     @PreAuthorize(SecurityUtil.PERSONAL_VOTE)

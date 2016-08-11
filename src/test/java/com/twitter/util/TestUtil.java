@@ -17,4 +17,9 @@ public class TestUtil {
     public static final Date DATE_2001 = DateTime.now().withYear(2001).toDate();
     public static final Date DATE_2002 = DateTime.now().withYear(2002).toDate();
     public static final Date DATE_2003 = DateTime.now().withYear(2003).toDate();
+
+    public static final String ADMIN = "ADMIN";
+    public static final String MODERATOR = "MODERATOR";
+    public static final String USER = "USER";
+    public static final String ANONYMOUS = "ANONYMOUS";
 }

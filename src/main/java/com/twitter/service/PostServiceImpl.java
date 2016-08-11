@@ -39,8 +39,12 @@ public abstract class PostServiceImpl<T extends AbstractPost, TRepository extend
     @Override
     public Result<Boolean> delete(long postId) {
         if (repository.exists(postId)) {
-            repository.delete(postId);
-            return ResultSuccess(true);
+            User currentLoggedUser = userService.getCurrentLoggedUser();
+            T post = repository.findOne(postId);
+            if (post.getOwner().equals(currentLoggedUser)) {
+                repository.delete(postId);
+                return ResultSuccess(true);
+            }
         }
         return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
