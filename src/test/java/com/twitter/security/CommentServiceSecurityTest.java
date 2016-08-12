@@ -1,8 +1,8 @@
 package com.twitter.security;
 
 import com.twitter.config.Profiles;
-import com.twitter.model.Tweet;
-import com.twitter.service.TweetService;
+import com.twitter.model.Comment;
+import com.twitter.service.CommentService;
 import com.twitter.util.TestUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,41 +14,41 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import static com.twitter.builders.CommentBuilder.comment;
 import static com.twitter.builders.TweetBuilder.tweet;
 import static com.twitter.builders.UserBuilder.user;
 import static com.twitter.builders.UserVoteBuilder.userVote;
 import static com.twitter.util.Util.a;
-import static java.util.Collections.emptyList;
 
 /**
- * Created by mariusz on 11.08.16.
+ * Created by mariusz on 12.08.16.
  */
 @RunWith(SpringRunner.class)
 @ActiveProfiles(Profiles.DEV)
 @SpringBootTest
-public class TweetServiceSecurityTest {
+public class CommentServiceSecurityTest {
 
     @Autowired
-    private TweetService tweetService;
+    private CommentService commentService;
 
     @WithCustomMockUser(id = TestUtil.ID_TWO, authorities = TestUtil.USER)
     @Test(expected = AccessDeniedException.class)
     public void create_wrongUserDenied() {
-        Tweet tweet = a(tweet()
+        Comment comment = a(comment()
                 .withOwner(
                         a(user()
                                 .withId(TestUtil.ID_ONE)
                         )
-
                 )
+                .withTweet(a(tweet()))
         );
-        tweetService.create(tweet);
+        commentService.create(comment);
     }
 
     @WithCustomMockUser(authorities = TestUtil.ANONYMOUS)
     @Test(expected = AccessDeniedException.class)
     public void create_anonymousAccessDenied() {
-        Tweet tweet = a(tweet()
+        Comment comment = a(comment()
                 .withOwner(
                         a(user()
                                 .withId(TestUtil.ID_ONE)
@@ -56,38 +56,37 @@ public class TweetServiceSecurityTest {
 
                 )
         );
-        tweetService.create(tweet);
+        commentService.create(comment);
     }
-
 
     @WithAnonymousUser
     @Test(expected = AccessDeniedException.class)
     public void delete_anonymousAccessDenied() {
-        tweetService.delete(TestUtil.ID_ONE);
+        commentService.delete(TestUtil.ID_ONE);
     }
 
     @WithMockUser(authorities = TestUtil.USER)
     @Test(expected = AccessDeniedException.class)
     public void delete_userAccessDenied() {
-        tweetService.delete(TestUtil.ID_ONE);
+        commentService.delete(TestUtil.ID_ONE);
     }
 
     @WithAnonymousUser
     @Test(expected = AccessDeniedException.class)
     public void exists_anonymousAccessDenied() {
-        tweetService.exists(TestUtil.ID_ONE);
+        commentService.exists(TestUtil.ID_ONE);
     }
 
     @WithAnonymousUser
     @Test(expected = AccessDeniedException.class)
     public void getById_anonymousAccessDenied() {
-        tweetService.getById(TestUtil.ID_ONE);
+        commentService.getById(TestUtil.ID_ONE);
     }
 
     @WithCustomMockUser(authorities = TestUtil.ANONYMOUS)
     @Test(expected = AccessDeniedException.class)
     public void vote_anonymousAccessDenied() {
-        tweetService.vote(a(userVote()
+        commentService.vote(a(userVote()
                         .withUser(
                                 a(user()
                                         .withId(TestUtil.ID_ONE)
@@ -100,7 +99,7 @@ public class TweetServiceSecurityTest {
     @WithCustomMockUser(id = TestUtil.ID_TWO, authorities = TestUtil.USER)
     @Test(expected = AccessDeniedException.class)
     public void vote_wrongUserAccessDenied() {
-        tweetService.vote(a(userVote()
+        commentService.vote(a(userVote()
                         .withUser(
                                 a(user()
                                         .withId(TestUtil.ID_ONE)
@@ -113,7 +112,7 @@ public class TweetServiceSecurityTest {
     @WithCustomMockUser(authorities = TestUtil.ANONYMOUS)
     @Test(expected = AccessDeniedException.class)
     public void changeVote_anonymousAccessDenied() {
-        tweetService.changeVote(a(userVote()
+        commentService.changeVote(a(userVote()
                         .withUser(
                                 a(user()
                                         .withId(TestUtil.ID_ONE)
@@ -126,7 +125,7 @@ public class TweetServiceSecurityTest {
     @WithCustomMockUser(id = TestUtil.ID_TWO, authorities = TestUtil.USER)
     @Test(expected = AccessDeniedException.class)
     public void changeVote_wrongUserAccessDenied() {
-        tweetService.changeVote(a(userVote()
+        commentService.changeVote(a(userVote()
                         .withUser(
                                 a(user()
                                         .withId(TestUtil.ID_ONE)
@@ -139,36 +138,37 @@ public class TweetServiceSecurityTest {
     @WithAnonymousUser
     @Test(expected = AccessDeniedException.class)
     public void deleteVote_anonymousAccessDenied() {
-        tweetService.deleteVote(TestUtil.ID_ONE);
+        commentService.deleteVote(TestUtil.ID_ONE);
     }
 
     @WithAnonymousUser
     @Test(expected = AccessDeniedException.class)
     public void getAllFromUserById_anonymousAccessDenied() {
-        tweetService.getAllFromUserById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
+        commentService.getAllFromUserById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
     }
 
     @WithAnonymousUser
     @Test(expected = AccessDeniedException.class)
-    public void getAllTweets_anonymousAccessDenied() {
-        tweetService.getAllTweets(TestUtil.ALL_IN_ONE_PAGE);
+    public void getTweetCommentsById_anonymousAccessDenied() {
+        commentService.getTweetCommentsById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
     }
 
     @WithAnonymousUser
     @Test(expected = AccessDeniedException.class)
-    public void getTweetsFromFollowingUsers_anonymousAccessDenied() {
-        tweetService.getTweetsFromFollowingUsers(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
+    public void getLatestCommentsById_anonymousAccessDenied() {
+        commentService.getLatestCommentsById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
     }
 
     @WithAnonymousUser
     @Test(expected = AccessDeniedException.class)
-    public void getMostVotedTweets_anonymousAccessDenied() {
-        tweetService.getMostVotedTweets(10, TestUtil.ALL_IN_ONE_PAGE);
+    public void getOldestCommentsById_anonymousAccessDenied() {
+        commentService.getOldestCommentsById(10, TestUtil.ALL_IN_ONE_PAGE);
     }
 
     @WithAnonymousUser
     @Test(expected = AccessDeniedException.class)
-    public void getTweetsByTagsOrderedByNewest_anonymousAccessDenied() {
-        tweetService.getTweetsByTagsOrderedByNewest(emptyList(), TestUtil.ALL_IN_ONE_PAGE);
+    public void getMostVotedComments_anonymousAccessDenied() {
+        commentService.getMostVotedComments(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
     }
+
 }
