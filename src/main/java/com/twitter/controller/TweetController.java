@@ -1,13 +1,15 @@
 package com.twitter.controller;
 
-import com.twitter.model.Result;
 import com.twitter.model.Tag;
 import com.twitter.model.Tweet;
 import com.twitter.model.UserVote;
+import com.twitter.model.dto.PostVote;
 import com.twitter.route.Route;
 import com.twitter.service.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -28,58 +30,60 @@ public class TweetController {
     }
 
     @RequestMapping(value = Route.TWEET_URL, method = RequestMethod.POST)
-    public Result<Boolean> createTweet(@Valid @RequestBody Tweet tweet) {
-        return tweetService.create(tweet);
+    public ResponseEntity<Tweet> createTweet(@Valid @RequestBody Tweet tweet) {
+        return new ResponseEntity<>(tweetService.create(tweet), HttpStatus.CREATED);
     }
 
     @RequestMapping(value = Route.TWEET_BY_ID, method = RequestMethod.GET)
-    public Result<Tweet> getTweetById(@PathVariable long tweetId) {
-        return tweetService.getById(tweetId);
+    public ResponseEntity<Tweet> getTweetById(@PathVariable long tweetId) {
+        return new ResponseEntity<>(tweetService.getById(tweetId), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.TWEET_BY_ID, method = RequestMethod.DELETE)
-    public Result<Boolean> deleteTweet(@PathVariable long tweetId) {
-        return tweetService.delete(tweetId);
+    public ResponseEntity deleteTweet(@PathVariable long tweetId) {
+        tweetService.delete(tweetId);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.TWEETS_FROM_USER, method = RequestMethod.GET)
-    public Result<List<Tweet>> getTweetsFromUser(@PathVariable long userId, @PathVariable int page, @PathVariable int size) {
-        return tweetService.getAllFromUserById(userId, new PageRequest(page, size));
+    public ResponseEntity<List<Tweet>> getTweetsFromUser(@PathVariable long userId, @PathVariable int page, @PathVariable int size) {
+        return new ResponseEntity<>(tweetService.getAllFromUserById(userId, new PageRequest(page, size)), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.TWEET_VOTE, method = RequestMethod.POST)
-    public Result<Boolean> voteTweet(@RequestBody @Valid UserVote userVote) {
-        return tweetService.vote(userVote);
-    }
-
-    @RequestMapping(value = Route.TWEET_VOTE_BY_ID, method = RequestMethod.DELETE)
-    public Result<Boolean> deleteVoteTweet(@PathVariable long voteId) {
-        return tweetService.deleteVote(voteId);
+    public ResponseEntity<UserVote> voteTweet(@RequestBody @Valid PostVote postVote) {
+        return new ResponseEntity<>(tweetService.vote(postVote), HttpStatus.CREATED);
     }
 
     @RequestMapping(value = Route.TWEET_VOTE, method = RequestMethod.PUT)
-    public Result<Boolean> changeVoteTweet(@RequestBody @Valid UserVote userVote) {
-        return tweetService.changeVote(userVote);
+    public ResponseEntity<UserVote> changeVoteTweet(@RequestBody @Valid PostVote postVote) {
+        return new ResponseEntity<>(tweetService.vote(postVote), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = Route.TWEET_VOTE_BY_ID, method = RequestMethod.DELETE)
+    public ResponseEntity deleteVoteTweet(@PathVariable long voteId) {
+        tweetService.deleteVote(voteId);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.TWEET_GET_ALL, method = RequestMethod.GET)
-    public Result<List<Tweet>> getAllTweets(@PathVariable int page, @PathVariable int size) {
-        return tweetService.getAllTweets(new PageRequest(page, size));
+    public ResponseEntity<List<Tweet>> getAllTweets(@PathVariable int page, @PathVariable int size) {
+        return new ResponseEntity<>(tweetService.getAllTweets(new PageRequest(page, size)), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.TWEETS_FROM_FOLLOWINGS_USERS, method = RequestMethod.GET)
-    public Result<List<Tweet>> getTweetsFromFollowingUsers(@PathVariable long userId, @PathVariable int page, @PathVariable int size) {
-        return tweetService.getTweetsFromFollowingUsers(userId, new PageRequest(page, size));
+    public ResponseEntity<List<Tweet>> getTweetsFromFollowingUsers(@PathVariable long userId, @PathVariable int page, @PathVariable int size) {
+        return new ResponseEntity<>(tweetService.getTweetsFromFollowingUsers(userId, new PageRequest(page, size)), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.TWEETS_MOST_VOTED, method = RequestMethod.GET)
-    public Result<List<Tweet>> getMostVotedTweets(@PathVariable int hours, @PathVariable int page, @PathVariable int size) {
-        return tweetService.getMostVotedTweets(hours, new PageRequest(page, size));
+    public ResponseEntity<List<Tweet>> getMostVotedTweets(@PathVariable int hours, @PathVariable int page, @PathVariable int size) {
+        return new ResponseEntity<>(tweetService.getMostVotedTweets(hours, new PageRequest(page, size)), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.TWEETS_WITH_TAGS, method = RequestMethod.GET)
-    public Result<List<Tweet>> getTweetsByTags(@RequestBody @Valid Tag[] tags, @PathVariable int page, @PathVariable int size) {
-        return tweetService.getTweetsByTagsOrderedByNewest(Arrays.asList(tags), new PageRequest(page, size));
+    public ResponseEntity<List<Tweet>> getTweetsByTags(@RequestBody @Valid Tag[] tags, @PathVariable int page, @PathVariable int size) {
+        return new ResponseEntity<>(tweetService.getTweetsByTagsOrderedByNewest(Arrays.asList(tags), new PageRequest(page, size)), HttpStatus.OK);
     }
 
 }

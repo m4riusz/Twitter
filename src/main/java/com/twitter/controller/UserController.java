@@ -1,13 +1,14 @@
 package com.twitter.controller;
 
 import com.twitter.model.Password;
-import com.twitter.model.Result;
 import com.twitter.model.Role;
 import com.twitter.model.User;
 import com.twitter.route.Route;
 import com.twitter.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -27,72 +28,76 @@ public class UserController {
     }
 
     @RequestMapping(value = Route.REGISTER_USER, method = RequestMethod.POST)
-    public Result<Boolean> createUser(@Valid @RequestBody User user) {
-        return userService.create(user);
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+        return new ResponseEntity<>(userService.create(user), HttpStatus.CREATED);
     }
 
     @RequestMapping(value = Route.VERIFY_USER_URL, method = RequestMethod.GET)
-    public Result<Boolean> verifyUser(@PathVariable String verifyKey) {
-        return userService.activateAccount(verifyKey);
+    public ResponseEntity verifyUser(@PathVariable String verifyKey) {
+        userService.activateAccount(verifyKey);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.USER_BY_ID, method = RequestMethod.GET)
-    public Result<User> getUserById(@PathVariable long userId) {
-        return userService.getUserById(userId);
+    public ResponseEntity<User> getUserById(@PathVariable long userId) {
+        return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.USER_BY_ID, method = RequestMethod.PUT)
-    public Result<Boolean> updateUserById(@PathVariable long userId, @RequestBody Password password) {
-        return userService.changeUserPasswordById(userId, password.getPassword());
+    public ResponseEntity<User> updateUserById(@PathVariable long userId, @RequestBody Password password) {
+        return new ResponseEntity<>(userService.changeUserPasswordById(userId, password.getPassword()), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.USER_BY_ID, method = RequestMethod.PUT, params = "role")
-    public Result<Boolean> changeUserRole(@PathVariable long userId, @RequestBody Role role) {
-        return userService.changeUserRole(userId, role);
+    public ResponseEntity<User> changeUserRole(@PathVariable long userId, @RequestParam Role role) {
+        return new ResponseEntity<>(userService.changeUserRole(userId, role), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.USER_BY_ID, method = RequestMethod.DELETE)
-    public Result<Boolean> deleteUser(@PathVariable long userId) {
-        return userService.deleteUserById(userId);
+    public ResponseEntity deleteUser(@PathVariable long userId) {
+        userService.deleteUserById(userId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.USER_GET_ALL, method = RequestMethod.GET)
-    public Result<List<User>> getAllUsers(@PathVariable int page, @PathVariable int size) {
-        return userService.getAllUsers(new PageRequest(page, size));
+    public ResponseEntity<List<User>> getAllUsers(@PathVariable int page, @PathVariable int size) {
+        return new ResponseEntity<>(userService.getAllUsers(new PageRequest(page, size)), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.USER_COUNT_GET_ALL, method = RequestMethod.GET)
-    public Result<Long> getAllUsersCount() {
-        return userService.getAllUsersCount();
+    public ResponseEntity<Long> getAllUsersCount() {
+        return new ResponseEntity<>(userService.getAllUsersCount(), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.USER_GET_FOLLOWERS, method = RequestMethod.GET)
-    public Result<List<User>> getFollowersUserById(@PathVariable long userId, @PathVariable int page, @PathVariable int size) {
-        return userService.getUserFollowersById(userId, new PageRequest(page, size));
+    public ResponseEntity<List<User>> getFollowersUserById(@PathVariable long userId, @PathVariable int page, @PathVariable int size) {
+        return new ResponseEntity<>(userService.getUserFollowersById(userId, new PageRequest(page, size)), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.USER_COUNT_GET_FOLLOWERS, method = RequestMethod.GET)
-    public Result<Long> getFollowersUserCount(@PathVariable long userId) {
-        return userService.getUserFollowersCountById(userId);
+    public ResponseEntity<Long> getFollowersUserCount(@PathVariable long userId) {
+        return new ResponseEntity<>(userService.getUserFollowersCountById(userId), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.USER_GET_FOLLOWING, method = RequestMethod.GET)
-    public Result<List<User>> getFollowingUsersById(@PathVariable long userId, @PathVariable int page, @PathVariable int size) {
-        return userService.getUserFollowingsById(userId, new PageRequest(page, size));
+    public ResponseEntity<List<User>> getFollowingUsersById(@PathVariable long userId, @PathVariable int page, @PathVariable int size) {
+        return new ResponseEntity<>(userService.getUserFollowingsById(userId, new PageRequest(page, size)), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.USER_COUNT_GET_FOLLOWING, method = RequestMethod.GET)
-    public Result<Long> getFollowingsUserCount(@PathVariable long userId) {
-        return userService.getUserFollowingCountById(userId);
+    public ResponseEntity<Long> getFollowingsUserCount(@PathVariable long userId) {
+        return new ResponseEntity<>(userService.getUserFollowingCountById(userId), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.USER_FOLLOW, method = RequestMethod.POST)
-    public Result<Boolean> followUser(@PathVariable long userId) {
-        return userService.follow(userId);
+    public ResponseEntity followUser(@PathVariable long userId) {
+        userService.follow(userId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.USER_FOLLOW, method = RequestMethod.DELETE)
-    public Result<Boolean> unfollowUser(@PathVariable long userId) {
-        return userService.unfollow(userId);
+    public ResponseEntity unfollowUser(@PathVariable long userId) {
+        userService.unfollow(userId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
