@@ -1,6 +1,5 @@
 package com.twitter.service;
 
-import com.twitter.model.Result;
 import com.twitter.model.Role;
 import com.twitter.model.User;
 import com.twitter.util.SecurityUtil;
@@ -20,11 +19,11 @@ import java.util.List;
 @Service
 public interface UserService extends UserDetailsService {
 
-    Result<Boolean> create(User user);
+    User create(User user);
 
     User loadUserByUsername(String username) throws UsernameNotFoundException;
 
-    Result<Boolean> activateAccount(String verifyKey);
+    void activateAccount(String verifyKey);
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     User getCurrentLoggedUser();
@@ -33,45 +32,45 @@ public interface UserService extends UserDetailsService {
     boolean exists(long userId);
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
-    Result<User> getUserById(long userId);
+    User getUserById(long userId);
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
-    Result<Boolean> follow(long userToFollowId);
+    void follow(long userToFollowId);
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
-    Result<Boolean> unfollow(long userToUnfollowId);
+    void unfollow(long userToUnfollowId);
 
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
-    Result<Boolean> banUser(long userToBanId, Date date);
+    void banUser(long userToBanId, Date date);
 
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
-    Result<Boolean> unbanUser(long userToUnbanId);
+    void unbanUser(long userToUnbanId);
 
     @PreAuthorize(SecurityUtil.ADMIN)
-    Result<Boolean> changeUserRole(long userToChangeId, Role role);
+    User changeUserRole(long userToChangeId, Role role);
 
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
-    Result<Boolean> deleteUserById(long userId);
+    void deleteUserById(long userId);
 
     @PreAuthorize(SecurityUtil.PERSONAL_USAGE)
-    Result<Boolean> changeUserPasswordById(@Param("userId") long userId, String password);
+    User changeUserPasswordById(@Param("userId") long userId, String password);
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
-    Result<Long> getAllUsersCount();
+    Long getAllUsersCount();
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
-    Result<List<User>> getAllUsers(Pageable pageable);
+    List<User> getAllUsers(Pageable pageable);
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
-    Result<Long> getUserFollowersCountById(long userId);
+    Long getUserFollowersCountById(long userId);
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
-    Result<List<User>> getUserFollowersById(long userId, Pageable pageable);
+    List<User> getUserFollowersById(long userId, Pageable pageable);
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
-    Result<Long> getUserFollowingCountById(long userId);
+    Long getUserFollowingCountById(long userId);
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
-    Result<List<User>> getUserFollowingsById(long userId, Pageable pageable);
+    List<User> getUserFollowingsById(long userId, Pageable pageable);
 
 }

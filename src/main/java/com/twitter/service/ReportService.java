@@ -1,6 +1,7 @@
 package com.twitter.service;
 
 import com.twitter.model.*;
+import com.twitter.model.dto.ReportSentence;
 import com.twitter.util.SecurityUtil;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,21 +16,21 @@ import java.util.List;
 @PreAuthorize(SecurityUtil.AUTHENTICATED)
 public interface ReportService {
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
-    Result<Report> findById(long reportId);
+    Report findById(long reportId);
 
     @PreAuthorize(SecurityUtil.PERSONAL_REPORT)
-    Result<Boolean> createReport(Report report);
+    Report createReport(Report report);
 
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
-    Result<Boolean> judgeReport(ReportSentence reportSentence);
+    Report judgeReport(ReportSentence reportSentence);
 
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
-    Result<List<Report>> findLatestByStatus(ReportStatus reportStatus, Pageable pageable);
+    List<Report> findLatestByStatus(ReportStatus reportStatus, Pageable pageable);
 
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
-    Result<List<Report>> findLatestByCategory(ReportCategory reportCategory, Pageable pageable);
+    List<Report> findLatestByCategory(ReportCategory reportCategory, Pageable pageable);
 
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
-    Result<List<Report>> findLatestByStatusAndCategory(ReportStatus reportStatus, ReportCategory reportCategory, Pageable pageable);
+    List<Report> findLatestByStatusAndCategory(ReportStatus reportStatus, ReportCategory reportCategory, Pageable pageable);
 
 }

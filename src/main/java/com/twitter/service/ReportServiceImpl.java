@@ -1,7 +1,13 @@
 package com.twitter.service;
 
 import com.twitter.dao.ReportDao;
-import com.twitter.model.*;
+import com.twitter.exception.ReportException;
+import com.twitter.exception.ReportNotFoundException;
+import com.twitter.model.Report;
+import com.twitter.model.ReportCategory;
+import com.twitter.model.ReportStatus;
+import com.twitter.model.User;
+import com.twitter.model.dto.ReportSentence;
 import com.twitter.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -10,9 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
 import java.util.List;
-
-import static com.twitter.model.Result.ResultFailure;
-import static com.twitter.model.Result.ResultSuccess;
 
 /**
  * Created by mariusz on 31.07.16.
@@ -31,54 +34,49 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Result<Report> findById(long reportId) {
+    public Report findById(long reportId) {
         if (doesReportExist(reportId)) {
-            return ResultSuccess(reportDao.findOne(reportId));
+            return reportDao.findOne(reportId);
         }
-        return ResultFailure(MessageUtil.REPORT_NOT_FOUND_BY_ID_ERROR_MSG);
+        throw new ReportNotFoundException(MessageUtil.REPORT_NOT_FOUND_BY_ID_ERROR_MSG);
     }
 
     @Override
-    public Result<Boolean> createReport(Report report) {
-        try {
-            report.setJudge(null);
-            report.setUser(userService.getCurrentLoggedUser());
-            reportDao.save(report);
-            return ResultSuccess(true);
-        } catch (Exception e) {
-            return ResultFailure(e.getMessage());
-        }
+    public Report createReport(Report report) {
+        report.setJudge(null);
+        report.setUser(userService.getCurrentLoggedUser());
+        return reportDao.save(report);
     }
 
     @Override
-    public Result<Boolean> judgeReport(ReportSentence reportSentence) {
+    public Report judgeReport(ReportSentence reportSentence) {
         Report reportFromDb = reportDao.findOne(reportSentence.getReportId());
         if (!doesReportExist(reportSentence.getReportId())) {
-            return ResultFailure(MessageUtil.REPORT_NOT_FOUND_BY_ID_ERROR_MSG);
+            throw new ReportNotFoundException(MessageUtil.REPORT_NOT_FOUND_BY_ID_ERROR_MSG);
         } else if (isGuiltyAndDateIsNotSet(reportSentence)) {
-            return ResultFailure(MessageUtil.REPORT_DATE_NOT_SET_ERROR_MSG);
+            throw new ReportException(MessageUtil.DATE_IS_NOT_SET);
         } else if (isGuiltyAndDateIsInvalid(reportSentence)) {
-            return ResultFailure(MessageUtil.REPORT_DATE_IS_INVALID_ERROR_MSG);
+            throw new ReportException(MessageUtil.REPORT_DATE_IS_INVALID_ERROR_MSG);
         } else if (isGuilty(reportSentence)) {
             banPostAndPostOwner(reportSentence, reportFromDb);
         }
         updateReportStatus(reportSentence, reportFromDb);
-        return ResultSuccess(true);
+        return reportFromDb;
     }
 
     @Override
-    public Result<List<Report>> findLatestByStatus(ReportStatus reportStatus, Pageable pageable) {
-        return ResultSuccess(reportDao.findByStatusOrderByCreateDateAsc(reportStatus, pageable));
+    public List<Report> findLatestByStatus(ReportStatus reportStatus, Pageable pageable) {
+        return reportDao.findByStatusOrderByCreateDateAsc(reportStatus, pageable);
     }
 
     @Override
-    public Result<List<Report>> findLatestByCategory(ReportCategory reportCategory, Pageable pageable) {
-        return ResultSuccess(reportDao.findByCategoryOrderByCreateDateAsc(reportCategory, pageable));
+    public List<Report> findLatestByCategory(ReportCategory reportCategory, Pageable pageable) {
+        return reportDao.findByCategoryOrderByCreateDateAsc(reportCategory, pageable);
     }
 
     @Override
-    public Result<List<Report>> findLatestByStatusAndCategory(ReportStatus reportStatus, ReportCategory reportCategory, Pageable pageable) {
-        return ResultSuccess(reportDao.findByStatusAndCategoryOrderByCreateDateAsc(reportStatus, reportCategory, pageable));
+    public List<Report> findLatestByStatusAndCategory(ReportStatus reportStatus, ReportCategory reportCategory, Pageable pageable) {
+        return reportDao.findByStatusAndCategoryOrderByCreateDateAsc(reportStatus, reportCategory, pageable);
     }
 
     private boolean isGuilty(ReportSentence reportSentence) {
@@ -93,8 +91,8 @@ public class ReportServiceImpl implements ReportService {
         return isGuilty(reportSentence) && reportSentence.getDateToBlock() == null;
     }
 
-    private boolean doesReportExist(long id) {
-        return reportDao.exists(id);
+    private boolean doesReportExist(long reportId) {
+        return reportDao.exists(reportId);
     }
 
     private void updateReportStatus(ReportSentence reportSentence, Report reportFromDb) {

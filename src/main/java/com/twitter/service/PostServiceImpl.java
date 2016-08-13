@@ -1,22 +1,20 @@
 package com.twitter.service;
 
 import com.twitter.dao.UserVoteDao;
+import com.twitter.exception.UserVoteException;
 import com.twitter.model.AbstractPost;
-import com.twitter.model.Result;
 import com.twitter.model.User;
 import com.twitter.model.UserVote;
+import com.twitter.model.dto.PostVote;
 import com.twitter.util.MessageUtil;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
-
-import static com.twitter.model.Result.ResultFailure;
-import static com.twitter.model.Result.ResultSuccess;
 
 /**
  * Created by mariusz on 08.08.16.
  */
 
-public abstract class PostServiceImpl<T extends AbstractPost, TRepository extends CrudRepository<T, Long>> implements PostService<T> {
+abstract class PostServiceImpl<T extends AbstractPost, TRepository extends CrudRepository<T, Long>> implements PostService<T> {
 
     protected final TRepository repository;
     private final UserService userService;
@@ -29,24 +27,18 @@ public abstract class PostServiceImpl<T extends AbstractPost, TRepository extend
     }
 
     @Override
-    public Result<Boolean> create(@Param("post") T post) {
-        if (repository.save(post) != null) {
-            return ResultSuccess(true);
-        }
-        return ResultFailure(MessageUtil.SAVE_COMMENT_ERROR);
+    public T create(@Param("post") T post) {
+        return repository.save(post);
     }
 
     @Override
-    public Result<Boolean> delete(long postId) {
-        if (repository.exists(postId)) {
-            User currentLoggedUser = userService.getCurrentLoggedUser();
-            T post = repository.findOne(postId);
-            if (post.getOwner().equals(currentLoggedUser)) {
-                repository.delete(postId);
-                return ResultSuccess(true);
-            }
+    public void delete(long postId) {
+        checkIfPostExists(postId);
+        T post = getById(postId);
+        User currentLoggedUser = userService.getCurrentLoggedUser();
+        if (post.getOwner().equals(currentLoggedUser)) {
+            repository.delete(postId);
         }
-        return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
 
     @Override
@@ -55,62 +47,48 @@ public abstract class PostServiceImpl<T extends AbstractPost, TRepository extend
     }
 
     @Override
-    public Result<T> getById(long postId) {
-        if (repository.exists(postId)) {
-            return ResultSuccess(repository.findOne(postId));
-        }
-        return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+    public T getById(long postId) {
+        checkIfPostExists(postId);
+        return repository.findOne(postId);
     }
 
     @Override
-    public Result<Boolean> vote(UserVote userVote) {
-        if (!doesUserExist(userVote.getUser().getId())) {
-            return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
-        } else if (!doesPostExist(userVote.getAbstractPost().getId())) {
-            return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
-        } else if (doesVoteExist(userVote)) {
-            return ResultFailure(MessageUtil.POST_ALREADY_VOTED);
+    public UserVote vote(PostVote postVote) {
+        User user = userService.getCurrentLoggedUser();
+        T post = getById(postVote.getPostId());
+        UserVote userVote = userVoteDao.findByUserAndAbstractPost(user, post);
+        if (userVote == null) {
+            userVote = new UserVote(postVote.getVote(), user, post);
+            userVoteDao.save(userVote);
+        } else {
+            userVote.setVote(postVote.getVote());
         }
-        userVoteDao.save(userVote);
-        return ResultSuccess(true);
+        return userVote;
     }
 
     @Override
-    public Result<Boolean> deleteVote(long voteId) {
+    public void deleteVote(long voteId) {
         User user = userService.getCurrentLoggedUser();
         UserVote userVote = userVoteDao.findOne(voteId);
-        if (!userVoteDao.exists(voteId)) {
-            return ResultFailure(MessageUtil.VOTE_DOES_NOT_EXIST_ERROR_MSG);
-        } else if (userVote.getUser() != user) {
-            return ResultFailure(MessageUtil.VOTE_DELETE_ERROR_MSG);
+        checkIfUserVoteExist(voteId);
+        if (userVote.getUser() != user) {
+            throw new UserVoteException(MessageUtil.VOTE_DELETE_ERROR_MSG);
         }
         userVoteDao.delete(userVote);
-        return ResultSuccess(true);
     }
 
-    @Override
-    public Result<Boolean> changeVote(UserVote userVote) {
-        if (!doesUserExist(userVote.getUser().getId())) {
-            return ResultFailure(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
-        } else if (!doesPostExist(userVote.getAbstractPost().getId())) {
-            return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
-        } else if (!doesVoteExist(userVote)) {
-            return ResultFailure(MessageUtil.NOT_VOTE_ERROR_MSG);
+    private void checkIfPostExists(long postID) {
+        getById(postID);
+    }
+
+    private void checkIfUserVoteExist(long userVoteId) {
+        if (!userVoteDao.exists(userVoteId)) {
+            throw new UserVoteException(MessageUtil.VOTE_DOES_NOT_EXIST_ERROR_MSG);
         }
-        UserVote userVoteFromDb = userVoteDao.findByUserAndAbstractPost(userVote.getUser(), userVote.getAbstractPost());
-        userVoteFromDb.setVote(userVote.getVote());
-        return ResultSuccess(true);
     }
 
-    protected boolean doesPostExist(long postId) {
-        return repository.exists(postId);
-    }
-
-    protected boolean doesUserExist(long userId) {
+    boolean doesUserExist(long userId) {
         return userService.exists(userId);
     }
 
-    private boolean doesVoteExist(UserVote userVote) {
-        return userVoteDao.findByUserAndAbstractPost(userVote.getUser(), userVote.getAbstractPost()) != null;
-    }
 }

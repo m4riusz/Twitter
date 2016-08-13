@@ -3,6 +3,7 @@ package com.twitter.service;
 import com.twitter.config.Profiles;
 import com.twitter.dao.ReportDao;
 import com.twitter.model.*;
+import com.twitter.model.dto.ReportSentence;
 import com.twitter.util.MessageUtil;
 import com.twitter.util.TestUtil;
 import org.joda.time.DateTime;
@@ -125,7 +126,7 @@ public class ReportServiceTest {
         when(reportDao.findOne(anyLong())).thenReturn(report);
         Result<Boolean> reportResult = reportService.judgeReport(reportSentence);
         assertThat(reportResult, hasFailed());
-        assertThat(reportResult, hasMessageOf(MessageUtil.REPORT_DATE_NOT_SET_ERROR_MSG));
+        assertThat(reportResult, hasMessageOf(MessageUtil.DATE_IS_NOT_SET));
     }
 
     @Test

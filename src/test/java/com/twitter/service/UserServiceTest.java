@@ -434,7 +434,7 @@ public class  UserServiceTest {
         Result<Boolean> userResult = userService.banUser(user.getId(), null);
         assertThat(user, isBanned(false));
         assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.REPORT_DATE_NOT_SET_ERROR_MSG));
+        assertThat(userResult, hasMessageOf(MessageUtil.DATE_IS_NOT_SET));
     }
 
     @Test

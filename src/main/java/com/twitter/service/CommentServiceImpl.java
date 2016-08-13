@@ -2,8 +2,9 @@ package com.twitter.service;
 
 import com.twitter.dao.CommentDao;
 import com.twitter.dao.UserVoteDao;
+import com.twitter.exception.PostNotFoundException;
+import com.twitter.exception.UserNotFoundException;
 import com.twitter.model.Comment;
-import com.twitter.model.Result;
 import com.twitter.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -11,9 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
-import static com.twitter.model.Result.ResultFailure;
-import static com.twitter.model.Result.ResultSuccess;
 
 /**
  * Created by mariusz on 03.08.16.
@@ -31,40 +29,43 @@ public class CommentServiceImpl extends PostServiceImpl<Comment, CommentDao> imp
     }
 
     @Override
-    public Result<List<Comment>> getTweetCommentsById(long tweetId, Pageable pageable) {
+    public List<Comment> getTweetCommentsById(long tweetId, Pageable pageable) {
         if (doesTweetExist(tweetId)) {
-            return ResultSuccess(repository.findByTweetId(tweetId, pageable));
+            return repository.findByTweetId(tweetId, pageable);
         }
-        return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        throw new PostNotFoundException(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
 
     @Override
-    public Result<List<Comment>> getLatestCommentsById(long tweetId, Pageable pageable) {
+    public List<Comment> getLatestCommentsById(long tweetId, Pageable pageable) {
         if (doesTweetExist(tweetId)) {
-            return ResultSuccess(repository.findByTweetIdOrderByCreateDateAsc(tweetId, pageable));
+            return repository.findByTweetIdOrderByCreateDateAsc(tweetId, pageable);
         }
-        return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        throw new PostNotFoundException(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
 
     @Override
-    public Result<List<Comment>> getOldestCommentsById(long tweetId, Pageable pageable) {
+    public List<Comment> getOldestCommentsById(long tweetId, Pageable pageable) {
         if (doesTweetExist(tweetId)) {
-            return ResultSuccess(repository.findByTweetIdOrderByCreateDateDesc(tweetId, pageable));
+            return repository.findByTweetIdOrderByCreateDateDesc(tweetId, pageable);
         }
-        return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        throw new PostNotFoundException(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
 
     @Override
-    public Result<List<Comment>> getMostVotedComments(long tweetId, Pageable pageable) {
+    public List<Comment> getMostVotedComments(long tweetId, Pageable pageable) {
         if (doesTweetExist(tweetId)) {
-            return ResultSuccess(repository.findByTweetIdOrderByVotes(tweetId, pageable));
+            return repository.findByTweetIdOrderByVotes(tweetId, pageable);
         }
-        return ResultFailure(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        throw new PostNotFoundException(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
 
     @Override
-    public Result<List<Comment>> getAllFromUserById(long userId, Pageable pageable) {
-        return null;
+    public List<Comment> getAllFromUserById(long userId, Pageable pageable) {
+        if (!doesUserExist(userId)) {
+            throw new UserNotFoundException(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        }
+        return repository.findByOwnerId(userId, pageable);
     }
 
     private boolean doesTweetExist(long tweetId) {
