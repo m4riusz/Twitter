@@ -1,6 +1,7 @@
 package com.twitter.service;
 
 import com.twitter.dao.UserVoteDao;
+import com.twitter.exception.PostNotFoundException;
 import com.twitter.exception.UserVoteException;
 import com.twitter.model.AbstractPost;
 import com.twitter.model.User;
@@ -77,8 +78,10 @@ abstract class PostServiceImpl<T extends AbstractPost, TRepository extends CrudR
         userVoteDao.delete(userVote);
     }
 
-    private void checkIfPostExists(long postID) {
-        getById(postID);
+    private void checkIfPostExists(long postId) {
+        if (!repository.exists(postId)) {
+            throw new PostNotFoundException(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+        }
     }
 
     private void checkIfUserVoteExist(long userVoteId) {

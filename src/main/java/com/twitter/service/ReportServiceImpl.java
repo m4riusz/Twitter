@@ -3,6 +3,7 @@ package com.twitter.service;
 import com.twitter.dao.ReportDao;
 import com.twitter.exception.ReportException;
 import com.twitter.exception.ReportNotFoundException;
+import com.twitter.exception.TwitterDateException;
 import com.twitter.model.Report;
 import com.twitter.model.ReportCategory;
 import com.twitter.model.ReportStatus;
@@ -54,9 +55,9 @@ public class ReportServiceImpl implements ReportService {
         if (!doesReportExist(reportSentence.getReportId())) {
             throw new ReportNotFoundException(MessageUtil.REPORT_NOT_FOUND_BY_ID_ERROR_MSG);
         } else if (isGuiltyAndDateIsNotSet(reportSentence)) {
-            throw new ReportException(MessageUtil.DATE_IS_NOT_SET);
+            throw new TwitterDateException(MessageUtil.DATE_IS_NOT_SET);
         } else if (isGuiltyAndDateIsInvalid(reportSentence)) {
-            throw new ReportException(MessageUtil.REPORT_DATE_IS_INVALID_ERROR_MSG);
+            throw new TwitterDateException(MessageUtil.REPORT_DATE_IS_INVALID_ERROR_MSG);
         } else if (isGuilty(reportSentence)) {
             banPostAndPostOwner(reportSentence, reportFromDb);
         }

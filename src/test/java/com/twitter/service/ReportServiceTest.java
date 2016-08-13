@@ -2,6 +2,9 @@ package com.twitter.service;
 
 import com.twitter.config.Profiles;
 import com.twitter.dao.ReportDao;
+import com.twitter.exception.PostNotFoundException;
+import com.twitter.exception.ReportNotFoundException;
+import com.twitter.exception.TwitterDateException;
 import com.twitter.model.*;
 import com.twitter.model.dto.ReportSentence;
 import com.twitter.util.MessageUtil;
@@ -22,14 +25,11 @@ import static com.twitter.builders.ReportBuilder.report;
 import static com.twitter.builders.ReportSentenceBuilder.reportSentence;
 import static com.twitter.builders.TweetBuilder.tweet;
 import static com.twitter.builders.UserBuilder.user;
-import static com.twitter.matchers.ResultIsFailureMatcher.hasFailed;
-import static com.twitter.matchers.ResultIsSuccessMatcher.hasFinishedSuccessfully;
-import static com.twitter.matchers.ResultMessageMatcher.hasMessageOf;
-import static com.twitter.matchers.ResultValueMatcher.hasValueOf;
 import static com.twitter.matchers.UserIsBanned.isBanned;
 import static com.twitter.util.Util.a;
 import static com.twitter.util.Util.aListWith;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -55,26 +55,21 @@ public class ReportServiceTest {
         reportService = new ReportServiceImpl(reportDao, userService);
     }
 
-    @Test
+    @Test(expected = ReportNotFoundException.class)
     public void findById_reportDoesNotExist() {
         when(reportDao.exists(anyLong())).thenReturn(false);
-        Result<Report> reportResult = reportService.findById(TestUtil.ID_ONE);
-        assertThat(reportResult, hasFailed());
-        assertThat(reportResult, hasMessageOf(MessageUtil.REPORT_NOT_FOUND_BY_ID_ERROR_MSG));
+        reportService.findById(TestUtil.ID_ONE);
     }
-
 
     @Test
     public void findById_reportDoesExist() {
-        when(reportDao.exists(anyLong())).thenReturn(true);
         User reportOwner = a(user());
         Tweet tweet = a(tweet().withOwner(a(user())));
         Report report = a(report().withUser(reportOwner).withAbstractPost(tweet));
+        when(reportDao.exists(anyLong())).thenReturn(true);
         when(reportDao.findOne(anyLong())).thenReturn(report);
-        Result<Report> reportResult = reportService.findById(TestUtil.ID_ONE);
-        assertThat(reportResult, hasFinishedSuccessfully());
-        assertThat(reportResult, hasValueOf(report));
-        assertThat(reportResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        Report reportFromDb = reportService.findById(TestUtil.ID_ONE);
+        assertThat(reportFromDb, is(report));
     }
 
     @Test
@@ -89,24 +84,21 @@ public class ReportServiceTest {
                 .withUser(accuser)
         );
         when(reportDao.save(any(Report.class))).thenReturn(report);
-        Result<Boolean> createReportResult = reportService.createReport(report);
-        assertThat(createReportResult, hasFinishedSuccessfully());
-        assertThat(createReportResult, hasValueOf(true));
-        assertThat(createReportResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        Report savedReport = reportService.createReport(report);
+        assertThat(savedReport, is(report));
     }
 
-    @Test
+    @Test(expected = ReportNotFoundException.class)
     public void judgeReport_reportDoesNotExist() {
         when(reportDao.exists(anyLong())).thenReturn(false);
         ReportSentence reportSentence = a(reportSentence()
                 .withReportStatus(ReportStatus.GUILTY)
         );
-        Result<Boolean> reportResult = reportService.judgeReport(reportSentence);
-        assertThat(reportResult, hasFailed());
-        assertThat(reportResult, hasMessageOf(MessageUtil.REPORT_NOT_FOUND_BY_ID_ERROR_MSG));
+        reportService.judgeReport(reportSentence);
+
     }
 
-    @Test
+    @Test(expected = TwitterDateException.class)
     public void judgeReport_userIsGuiltyAndDataIsNotSet() {
         User postOwner = a(user());
         User accuser = a(user());
@@ -124,12 +116,10 @@ public class ReportServiceTest {
         );
         when(reportDao.exists(anyLong())).thenReturn(true);
         when(reportDao.findOne(anyLong())).thenReturn(report);
-        Result<Boolean> reportResult = reportService.judgeReport(reportSentence);
-        assertThat(reportResult, hasFailed());
-        assertThat(reportResult, hasMessageOf(MessageUtil.DATE_IS_NOT_SET));
+        reportService.judgeReport(reportSentence);
     }
 
-    @Test
+    @Test(expected = TwitterDateException.class)
     public void judgeReport_userIsGuiltyAndDataIsInvalid() {
         Report report = a(report());
         Date dateBeforeNow = DateTime.now().minusDays(1).toDate();
@@ -140,9 +130,7 @@ public class ReportServiceTest {
         );
         when(reportDao.exists(anyLong())).thenReturn(true);
         when(reportDao.findOne(anyLong())).thenReturn(report);
-        Result<Boolean> reportResult = reportService.judgeReport(reportSentence);
-        assertThat(reportResult, hasFailed());
-        assertThat(reportResult, hasMessageOf(MessageUtil.REPORT_DATE_IS_INVALID_ERROR_MSG));
+        reportService.judgeReport(reportSentence);
     }
 
     @Test
@@ -166,110 +154,97 @@ public class ReportServiceTest {
         when(reportDao.exists(anyLong())).thenReturn(true);
         when(reportDao.findOne(anyLong())).thenReturn(report);
         when(userService.getCurrentLoggedUser()).thenReturn(judge);
-        
-        Result<Boolean> judgeReportResult = reportService.judgeReport(reportSentence);
-        assertThat(judgeReportResult, hasFinishedSuccessfully());
-        assertThat(judgeReportResult, hasValueOf(true));
-        assertThat(judgeReportResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+
+        reportService.judgeReport(reportSentence);
         assertThat(tweetOwner, isBanned(true));
         assertThat(tweet.isBanned(), is(true));
         assertThat(tweet.getContent(), is(MessageUtil.DELETE_ABSTRACT_POST_CONTENT));
         assertThat(report.getJudge(), is(judge));
+        assertThat(report.getStatus(), is(ReportStatus.GUILTY));
     }
 
     @Test
     public void findLatestByStatus_someReports() {
-        List<Report> reportList = aListWith(
-                a(report()
-                        .withStatus(ReportStatus.WAITING_FOR_REALIZATION)
-                        .withCreateDate(TestUtil.DATE_2003)
-                ),
-                a(report()
-                        .withStatus(ReportStatus.WAITING_FOR_REALIZATION)
-                        .withCreateDate(TestUtil.DATE_2002)
-                ),
-                a(report()
-                        .withStatus(ReportStatus.WAITING_FOR_REALIZATION)
-                        .withCreateDate(TestUtil.DATE_2001)
-                )
+        Report reportOne = a(report()
+                .withStatus(ReportStatus.WAITING_FOR_REALIZATION)
+                .withCreateDate(TestUtil.DATE_2003)
+        );
+        Report reportTwo = a(report()
+                .withStatus(ReportStatus.WAITING_FOR_REALIZATION)
+                .withCreateDate(TestUtil.DATE_2002)
+        );
+        Report reportThree = a(report()
+                .withStatus(ReportStatus.WAITING_FOR_REALIZATION)
+                .withCreateDate(TestUtil.DATE_2001)
         );
         when(reportDao.findByStatusOrderByCreateDateAsc(
                 ReportStatus.WAITING_FOR_REALIZATION,
                 TestUtil.ALL_IN_ONE_PAGE)
-        ).thenReturn(reportList);
+        ).thenReturn(aListWith(reportOne, reportTwo, reportThree));
 
-        Result<List<Report>> latestReportsByStatusResult = reportService.findLatestByStatus(
+        List<Report> latestReportsByStatusResult = reportService.findLatestByStatus(
                 ReportStatus.WAITING_FOR_REALIZATION,
                 TestUtil.ALL_IN_ONE_PAGE
         );
-        assertThat(latestReportsByStatusResult, hasFinishedSuccessfully());
-        assertThat(latestReportsByStatusResult, hasValueOf(reportList));
-        assertThat(latestReportsByStatusResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        assertThat(latestReportsByStatusResult, contains(reportOne, reportTwo, reportThree));
     }
 
     @Test
     public void findLatestByCategory_someReports() {
-        List<Report> reportList = aListWith(
-                a(report()
-                        .withCategory(ReportCategory.HATE_SPEECH)
-                        .withCreateDate(TestUtil.DATE_2003)
-                ),
-                a(report()
-                        .withCategory(ReportCategory.HATE_SPEECH)
-                        .withCreateDate(TestUtil.DATE_2002)
-                ),
-                a(report()
-                        .withCategory(ReportCategory.HATE_SPEECH)
-                        .withCreateDate(TestUtil.DATE_2001)
-                )
+        Report reportOne = a(report()
+                .withCategory(ReportCategory.HATE_SPEECH)
+                .withCreateDate(TestUtil.DATE_2003)
+        );
+        Report reportTwo = a(report()
+                .withCategory(ReportCategory.HATE_SPEECH)
+                .withCreateDate(TestUtil.DATE_2002)
+        );
+        Report reportThree = a(report()
+                .withCategory(ReportCategory.HATE_SPEECH)
+                .withCreateDate(TestUtil.DATE_2001)
         );
         when(reportDao.findByCategoryOrderByCreateDateAsc(
                 ReportCategory.HATE_SPEECH,
                 TestUtil.ALL_IN_ONE_PAGE)
-        ).thenReturn(reportList);
+        ).thenReturn(aListWith(reportOne, reportTwo, reportThree));
 
-        Result<List<Report>> latestReportsByStatusResult = reportService.findLatestByCategory(
+        List<Report> latestReportsByStatusResult = reportService.findLatestByCategory(
                 ReportCategory.HATE_SPEECH,
                 TestUtil.ALL_IN_ONE_PAGE
         );
-        assertThat(latestReportsByStatusResult, hasFinishedSuccessfully());
-        assertThat(latestReportsByStatusResult, hasValueOf(reportList));
-        assertThat(latestReportsByStatusResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        assertThat(latestReportsByStatusResult, contains(reportOne, reportTwo, reportThree));
     }
 
     @Test
     public void findLatestByStatusAndCategory_someReports() {
-        List<Report> reportList = aListWith(
-                a(report()
-                        .withStatus(ReportStatus.WAITING_FOR_REALIZATION)
-                        .withCategory(ReportCategory.HATE_SPEECH)
-                        .withCreateDate(TestUtil.DATE_2003)
-                ),
-                a(report()
-                        .withStatus(ReportStatus.WAITING_FOR_REALIZATION)
-                        .withCategory(ReportCategory.HATE_SPEECH)
-                        .withCreateDate(TestUtil.DATE_2002)
-                ),
-                a(report()
-                        .withStatus(ReportStatus.WAITING_FOR_REALIZATION)
-                        .withCategory(ReportCategory.HATE_SPEECH)
-                        .withCreateDate(TestUtil.DATE_2001)
-                )
+        Report reportOne = a(report()
+                .withStatus(ReportStatus.WAITING_FOR_REALIZATION)
+                .withCategory(ReportCategory.HATE_SPEECH)
+                .withCreateDate(TestUtil.DATE_2003)
         );
+        Report reportTwo = a(report()
+                .withStatus(ReportStatus.WAITING_FOR_REALIZATION)
+                .withCategory(ReportCategory.HATE_SPEECH)
+                .withCreateDate(TestUtil.DATE_2002)
+        );
+        Report reportThree = a(report()
+                .withStatus(ReportStatus.WAITING_FOR_REALIZATION)
+                .withCategory(ReportCategory.HATE_SPEECH)
+                .withCreateDate(TestUtil.DATE_2001)
+        );
+
         when(reportDao.findByStatusAndCategoryOrderByCreateDateAsc(
                 ReportStatus.WAITING_FOR_REALIZATION,
                 ReportCategory.HATE_SPEECH,
                 TestUtil.ALL_IN_ONE_PAGE)
-        ).thenReturn(reportList);
+        ).thenReturn(aListWith(reportOne, reportTwo, reportThree));
 
-        Result<List<Report>> latestReportsByStatusResult = reportService.findLatestByStatusAndCategory(
+        List<Report> latestReportsByStatusResult = reportService.findLatestByStatusAndCategory(
                 ReportStatus.WAITING_FOR_REALIZATION,
                 ReportCategory.HATE_SPEECH,
                 TestUtil.ALL_IN_ONE_PAGE
         );
-        assertThat(latestReportsByStatusResult, hasFinishedSuccessfully());
-        assertThat(latestReportsByStatusResult, hasValueOf(reportList));
-        assertThat(latestReportsByStatusResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        assertThat(latestReportsByStatusResult, is(aListWith(reportOne, reportTwo, reportThree)));
     }
 
 }

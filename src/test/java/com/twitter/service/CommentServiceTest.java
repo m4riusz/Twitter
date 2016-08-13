@@ -3,8 +3,10 @@ package com.twitter.service;
 import com.twitter.config.Profiles;
 import com.twitter.dao.CommentDao;
 import com.twitter.dao.UserVoteDao;
+import com.twitter.exception.PostNotFoundException;
+import com.twitter.exception.UserNotFoundException;
 import com.twitter.model.*;
-import com.twitter.util.MessageUtil;
+import com.twitter.model.dto.PostVote;
 import com.twitter.util.TestUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,17 +19,16 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
-import static com.twitter.util.Util.a;
-import static com.twitter.util.Util.aListWith;
 import static com.twitter.builders.CommentBuilder.comment;
 import static com.twitter.builders.UserBuilder.user;
 import static com.twitter.builders.UserVoteBuilder.userVote;
-import static com.twitter.matchers.ResultIsFailureMatcher.hasFailed;
-import static com.twitter.matchers.ResultIsSuccessMatcher.hasFinishedSuccessfully;
-import static com.twitter.matchers.ResultMessageMatcher.hasMessageOf;
-import static com.twitter.matchers.ResultValueMatcher.hasValueOf;
+import static com.twitter.util.Util.a;
+import static com.twitter.util.Util.aListWith;
 import static java.util.Collections.emptyList;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.when;
@@ -59,18 +60,14 @@ public class CommentServiceTest {
     public void createComment_test() {
         Comment comment = a(comment());
         when(commentDao.save(any(Comment.class))).thenReturn(comment);
-        Result<Boolean> commentResult = commentService.create(comment);
-        assertThat(commentResult, hasFinishedSuccessfully());
-        assertThat(commentResult, hasValueOf(true));
-        assertThat(commentResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        Comment savedComment = commentService.create(comment);
+        assertThat(savedComment, is(comment));
     }
 
-    @Test
+    @Test(expected = PostNotFoundException.class)
     public void getCommentById_commentDoesNotExist() {
         when(commentDao.exists(anyLong())).thenReturn(false);
-        Result<Comment> commentResult = commentService.getById(TestUtil.ID_ONE);
-        assertThat(commentResult, hasFailed());
-        assertThat(commentResult, hasMessageOf(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
+        commentService.getById(TestUtil.ID_ONE);
     }
 
     @Test
@@ -78,21 +75,17 @@ public class CommentServiceTest {
         Comment comment = a(comment());
         when(commentDao.exists(anyLong())).thenReturn(true);
         when(commentDao.findOne(anyLong())).thenReturn(comment);
-        Result<Comment> commentResult = commentService.getById(TestUtil.ID_ONE);
-        assertThat(commentResult, hasFinishedSuccessfully());
-        assertThat(commentResult, hasValueOf(comment));
-        assertThat(commentResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        Comment foundComment = commentService.getById(TestUtil.ID_ONE);
+        assertThat(foundComment, is(comment));
     }
 
-    @Test
+    @Test(expected = PostNotFoundException.class)
     public void getTweetCommentsById_tweetDoesNotExist() {
         when(tweetService.exists(anyLong())).thenReturn(false);
-        Result<List<Comment>> tweetCommentsResult = commentService.getTweetCommentsById(
+        List<Comment> tweetComments = commentService.getTweetCommentsById(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
         );
-        assertThat(tweetCommentsResult, hasFailed());
-        assertThat(tweetCommentsResult, hasMessageOf(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
     }
 
     @Test
@@ -100,13 +93,11 @@ public class CommentServiceTest {
         when(tweetService.exists(anyLong())).thenReturn(true);
         when(commentDao.findByTweetId(anyLong(), any(Pageable.class))).thenReturn(emptyList());
 
-        Result<List<Comment>> tweetCommentsResult = commentService.getTweetCommentsById(
+        List<Comment> tweetComments = commentService.getTweetCommentsById(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
         );
-        assertThat(tweetCommentsResult, hasFinishedSuccessfully());
-        assertThat(tweetCommentsResult, hasValueOf(emptyList()));
-        assertThat(tweetCommentsResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        assertThat(tweetComments, is(emptyList()));
     }
 
     @Test
@@ -121,25 +112,21 @@ public class CommentServiceTest {
                         commentTwo
                 ));
 
-        Result<List<Comment>> tweetCommentsResult = commentService.getTweetCommentsById(
+        List<Comment> tweetComments = commentService.getTweetCommentsById(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
         );
-        assertThat(tweetCommentsResult, hasFinishedSuccessfully());
-        assertThat(tweetCommentsResult, hasValueOf(aListWith(commentOne, commentTwo)));
-        assertThat(tweetCommentsResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        assertThat(tweetComments, hasItems(commentOne, commentTwo));
     }
 
 
-    @Test
+    @Test(expected = PostNotFoundException.class)
     public void getLatestCommentsById_tweetDoesNotExist() {
         when(tweetService.exists(anyLong())).thenReturn(false);
-        Result<List<Comment>> tweetCommentsResult = commentService.getLatestCommentsById(
+        List<Comment> tweetComments = commentService.getLatestCommentsById(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
         );
-        assertThat(tweetCommentsResult, hasFailed());
-        assertThat(tweetCommentsResult, hasMessageOf(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
     }
 
     @Test
@@ -147,13 +134,11 @@ public class CommentServiceTest {
         when(tweetService.exists(anyLong())).thenReturn(true);
         when(commentDao.findByTweetIdOrderByCreateDateAsc(anyLong(), any(Pageable.class))).thenReturn(emptyList());
 
-        Result<List<Comment>> tweetCommentsResult = commentService.getLatestCommentsById(
+        List<Comment> tweetComments = commentService.getLatestCommentsById(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
         );
-        assertThat(tweetCommentsResult, hasFinishedSuccessfully());
-        assertThat(tweetCommentsResult, hasValueOf(emptyList()));
-        assertThat(tweetCommentsResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        assertThat(tweetComments, is(emptyList()));
     }
 
     @Test
@@ -174,32 +159,21 @@ public class CommentServiceTest {
                         commentTwo
                 ));
 
-        Result<List<Comment>> tweetCommentsResult = commentService.getLatestCommentsById(
+        List<Comment> tweetComments = commentService.getLatestCommentsById(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
         );
-        assertThat(tweetCommentsResult, hasFinishedSuccessfully());
-        assertThat(
-                tweetCommentsResult, hasValueOf(
-                        aListWith(
-                                commentOne,
-                                commentTwo
-                        )
-                )
-        );
-        assertThat(tweetCommentsResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        assertThat(tweetComments, contains(commentOne, commentTwo));
     }
 
 
-    @Test
+    @Test(expected = PostNotFoundException.class)
     public void getOldestCommentsById_tweetDoesNotExist() {
         when(tweetService.exists(anyLong())).thenReturn(false);
-        Result<List<Comment>> tweetCommentsResult = commentService.getOldestCommentsById(
+        List<Comment> tweetCommentsResult = commentService.getOldestCommentsById(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
         );
-        assertThat(tweetCommentsResult, hasFailed());
-        assertThat(tweetCommentsResult, hasMessageOf(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
     }
 
     @Test
@@ -207,13 +181,11 @@ public class CommentServiceTest {
         when(tweetService.exists(anyLong())).thenReturn(true);
         when(commentDao.findByTweetIdOrderByCreateDateDesc(anyLong(), any(Pageable.class))).thenReturn(emptyList());
 
-        Result<List<Comment>> tweetCommentsResult = commentService.getOldestCommentsById(
+        List<Comment> tweetCommentsResult = commentService.getOldestCommentsById(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
         );
-        assertThat(tweetCommentsResult, hasFinishedSuccessfully());
-        assertThat(tweetCommentsResult, hasValueOf(emptyList()));
-        assertThat(tweetCommentsResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        assertThat(tweetCommentsResult, is(emptyList()));
     }
 
     @Test
@@ -234,31 +206,20 @@ public class CommentServiceTest {
                         commentOne
                 ));
 
-        Result<List<Comment>> tweetCommentsResult = commentService.getOldestCommentsById(
+        List<Comment> tweetCommentsResult = commentService.getOldestCommentsById(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
         );
-        assertThat(tweetCommentsResult, hasFinishedSuccessfully());
-        assertThat(
-                tweetCommentsResult, hasValueOf(
-                        aListWith(
-                                commentTwo,
-                                commentOne
-                        )
-                )
-        );
-        assertThat(tweetCommentsResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        assertThat(tweetCommentsResult, contains(commentTwo, commentOne));
     }
 
-    @Test
+    @Test(expected = PostNotFoundException.class)
     public void getMostVotedComments_tweetDoesNotExist() {
         when(tweetService.exists(anyLong())).thenReturn(false);
-        Result<List<Comment>> tweetCommentsResult = commentService.getMostVotedComments(
+        List<Comment> tweetCommentsResult = commentService.getMostVotedComments(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
         );
-        assertThat(tweetCommentsResult, hasFailed());
-        assertThat(tweetCommentsResult, hasMessageOf(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
     }
 
     @Test
@@ -266,13 +227,11 @@ public class CommentServiceTest {
         when(tweetService.exists(anyLong())).thenReturn(true);
         when(commentDao.findByTweetIdOrderByVotes(anyLong(), any(Pageable.class))).thenReturn(emptyList());
 
-        Result<List<Comment>> tweetCommentsResult = commentService.getMostVotedComments(
+        List<Comment> tweetCommentsResult = commentService.getMostVotedComments(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
         );
-        assertThat(tweetCommentsResult, hasFinishedSuccessfully());
-        assertThat(tweetCommentsResult, hasValueOf(emptyList()));
-        assertThat(tweetCommentsResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        assertThat(tweetCommentsResult, is(emptyList()));
     }
 
     @Test
@@ -298,90 +257,72 @@ public class CommentServiceTest {
                         commentTwo
                 ));
 
-        Result<List<Comment>> tweetCommentsResult = commentService.getMostVotedComments(
+        List<Comment> tweetCommentsResult = commentService.getMostVotedComments(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
         );
-        assertThat(tweetCommentsResult, hasFinishedSuccessfully());
-        assertThat(
-                tweetCommentsResult, hasValueOf(
-                        aListWith(
-                                commentThree,
-                                commentOne,
-                                commentTwo
-                        )
-                )
-        );
-        assertThat(tweetCommentsResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        assertThat(tweetCommentsResult, contains(commentThree, commentOne, commentTwo));
     }
 
-    @Test
+    @Test(expected = UserNotFoundException.class)
     public void vote_userDoesNotExist() {
-        when(userService.exists(anyLong())).thenReturn(false);
-        UserVote userVote = a(userVote()
-                .withUser(
-                        a(user())
-                )
-                .withAbstractPost(
-                        a(comment())
-                )
-        );
-        Result<Boolean> voteResult = commentService.vote(userVote);
-        assertThat(voteResult, hasFailed());
-        assertThat(voteResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
+        when(userService.getCurrentLoggedUser()).thenThrow(UserNotFoundException.class);
+        commentService.vote(new PostVote(TestUtil.ID_ONE, Vote.UP));
     }
 
-    @Test
+    @Test(expected = PostNotFoundException.class)
     public void vote_userExistsPostDoesNot() {
-        when(userService.exists(anyLong())).thenReturn(true);
+        when(userService.getCurrentLoggedUser()).thenReturn(a(user()));
         when(commentDao.exists(anyLong())).thenReturn(false);
-        UserVote userVote = a(userVote()
-                .withUser(
-                        a(user())
-                )
-                .withAbstractPost(
-                        a(comment())
-                )
-        );
-        Result<Boolean> voteResult = commentService.vote(userVote);
-        assertThat(voteResult, hasFailed());
-        assertThat(voteResult, hasMessageOf(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
-    }
-
-    @Test
-    public void vote_userAndPostExistsButPostAlreadyVoted() {
-        when(userService.exists(anyLong())).thenReturn(true);
-        when(commentDao.exists(anyLong())).thenReturn(true);
-        UserVote userVote = a(userVote()
-                .withUser(
-                        a(user())
-                )
-                .withAbstractPost(
-                        a(comment())
-                )
-        );
-        when(userVoteDao.findByUserAndAbstractPost(any(User.class), any(AbstractPost.class))).thenReturn(userVote);
-        Result<Boolean> voteResult = commentService.vote(userVote);
-        assertThat(voteResult, hasFailed());
-        assertThat(voteResult, hasMessageOf(MessageUtil.POST_ALREADY_VOTED));
+        commentService.vote(new PostVote(TestUtil.ID_ONE, Vote.UP));
     }
 
     @Test
     public void vote_successVote() {
-        when(userService.exists(anyLong())).thenReturn(true);
+        User user = a(user());
+        Comment comment = a(comment());
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
         when(commentDao.exists(anyLong())).thenReturn(true);
+        when(commentDao.findOne(anyLong())).thenReturn(comment);
         when(userVoteDao.findByUserAndAbstractPost(any(User.class), any(AbstractPost.class))).thenReturn(null);
+
         UserVote userVote = a(userVote()
                 .withUser(
-                        a(user())
+                        user
                 )
                 .withAbstractPost(
-                        a(comment())
+                        comment
                 )
         );
-        Result<Boolean> voteResult = commentService.vote(userVote);
-        assertThat(voteResult, hasFinishedSuccessfully());
-        assertThat(voteResult, hasValueOf(true));
-        assertThat(voteResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        UserVote vote = commentService.vote(new PostVote(comment.getId(), Vote.UP));
+        assertThat(vote, is(userVote));
+    }
+
+    @Test
+    public void vote_successVoteChange() {
+        User user = a(user());
+        Comment comment = a(comment());
+
+
+        UserVote userVote = a(userVote()
+                .withVote(
+                        Vote.DOWN
+                )
+                .withUser(
+                        user
+                )
+                .withAbstractPost(
+                        comment
+                )
+        );
+
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
+        when(commentDao.exists(anyLong())).thenReturn(true);
+        when(commentDao.findOne(anyLong())).thenReturn(comment);
+        when(userVoteDao.findByUserAndAbstractPost(any(User.class), any(AbstractPost.class))).thenReturn(userVote);
+
+        UserVote vote = commentService.vote(new PostVote(comment.getId(), Vote.UP));
+        assertThat(vote, is(userVote));
+        assertThat(vote.getVote(), is(Vote.UP));
     }
 }
