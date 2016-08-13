@@ -2,7 +2,6 @@ package com.twitter.service;
 
 import com.twitter.config.Profiles;
 import com.twitter.dao.ReportDao;
-import com.twitter.exception.PostNotFoundException;
 import com.twitter.exception.ReportNotFoundException;
 import com.twitter.exception.TwitterDateException;
 import com.twitter.model.*;
@@ -38,6 +37,8 @@ import static org.mockito.Mockito.when;
 /**
  * Created by mariusz on 01.08.16.
  */
+
+// TODO: 13.08.16 add test for sentence already banned post 
 @SpringBootTest
 @ActiveProfiles(Profiles.DEV)
 @RunWith(MockitoJUnitRunner.class)

@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
     public User loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userDao.findByUsername(username);
         if (user == null) {
-            throw new UsernameNotFoundException(MessageUtil.USER_ALREADY_EXISTS_USERNAME_ERROR_MSG);
+            throw new UsernameNotFoundException(MessageUtil.USER_DOES_NOT_EXISTS_BY_USERNAME_ERROR_MSG);
         }
         return user;
     }
@@ -213,7 +213,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private boolean userWithUsernameExists(String username) {
-        return loadUserByUsername(username) != null;
+        return userDao.findByUsername(username) != null;
     }
     private boolean isBanDateBeforeNow(Date date) {
         return date.before(Calendar.getInstance().getTime());

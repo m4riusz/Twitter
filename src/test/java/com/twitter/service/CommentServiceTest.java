@@ -3,11 +3,13 @@ package com.twitter.service;
 import com.twitter.config.Profiles;
 import com.twitter.dao.CommentDao;
 import com.twitter.dao.UserVoteDao;
+import com.twitter.exception.PostDeleteException;
 import com.twitter.exception.PostNotFoundException;
 import com.twitter.exception.UserNotFoundException;
 import com.twitter.model.*;
-import com.twitter.model.dto.PostVote;
+import com.twitter.util.MessageUtil;
 import com.twitter.util.TestUtil;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +22,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.List;
 
 import static com.twitter.builders.CommentBuilder.comment;
+import static com.twitter.builders.PostVoteBuilder.postVote;
 import static com.twitter.builders.UserBuilder.user;
 import static com.twitter.builders.UserVoteBuilder.userVote;
 import static com.twitter.util.Util.a;
@@ -36,6 +39,9 @@ import static org.mockito.Mockito.when;
 /**
  * Created by mariusz on 03.08.16.
  */
+
+//// TODO: 13.08.16 add test for already deleted comment
+
 @SpringBootTest
 @ActiveProfiles(Profiles.DEV)
 @RunWith(MockitoJUnitRunner.class)
@@ -62,6 +68,39 @@ public class CommentServiceTest {
         when(commentDao.save(any(Comment.class))).thenReturn(comment);
         Comment savedComment = commentService.create(comment);
         assertThat(savedComment, is(comment));
+    }
+
+    @Test(expected = PostNotFoundException.class)
+    public void deleteCommentById_tweetDoesNotExist() {
+        when(commentDao.exists(anyLong())).thenReturn(false);
+        commentService.delete(TestUtil.ID_ONE);
+    }
+
+    @Test(expected = PostDeleteException.class)
+    public void deleteCommentById_tweetExistsUserIsNotPostOwner() {
+        User user = a(user());
+        User otherUser = a(user());
+        Comment comment = a(comment()
+                .withOwner(user)
+        );
+        when(commentDao.exists(anyLong())).thenReturn(true);
+        when(commentDao.findOne(anyLong())).thenReturn(comment);
+        when(userService.getCurrentLoggedUser()).thenReturn(otherUser);
+        commentService.delete(comment.getId());
+    }
+
+    @Test
+    public void deleteCommentById_tweetExistsUserIsPostOwner() {
+        User user = a(user());
+        Comment comment = a(comment()
+                .withOwner(user)
+        );
+        when(commentDao.exists(anyLong())).thenReturn(true);
+        when(commentDao.findOne(anyLong())).thenReturn(comment);
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
+        commentService.delete(comment.getId());
+        assertThat(comment.getContent(), is(MessageUtil.DELETE_BY_OWNED_ABSTRACT_POST_CONTENT));
+        assertThat(comment.isBanned(), is(true));
     }
 
     @Test(expected = PostNotFoundException.class)
@@ -267,62 +306,58 @@ public class CommentServiceTest {
     @Test(expected = UserNotFoundException.class)
     public void vote_userDoesNotExist() {
         when(userService.getCurrentLoggedUser()).thenThrow(UserNotFoundException.class);
-        commentService.vote(new PostVote(TestUtil.ID_ONE, Vote.UP));
+        commentService.vote(a(postVote()));
     }
 
     @Test(expected = PostNotFoundException.class)
     public void vote_userExistsPostDoesNot() {
         when(userService.getCurrentLoggedUser()).thenReturn(a(user()));
         when(commentDao.exists(anyLong())).thenReturn(false);
-        commentService.vote(new PostVote(TestUtil.ID_ONE, Vote.UP));
+        commentService.vote(a(postVote()));
     }
 
     @Test
-    public void vote_successVote() {
+    public void vote_successVoteCreate() {
         User user = a(user());
         Comment comment = a(comment());
-        when(userService.getCurrentLoggedUser()).thenReturn(user);
         when(commentDao.exists(anyLong())).thenReturn(true);
         when(commentDao.findOne(anyLong())).thenReturn(comment);
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
         when(userVoteDao.findByUserAndAbstractPost(any(User.class), any(AbstractPost.class))).thenReturn(null);
-
-        UserVote userVote = a(userVote()
-                .withUser(
-                        user
-                )
-                .withAbstractPost(
-                        comment
+        UserVote userVote = commentService.vote(
+                a(postVote()
+                        .withPostId(comment.getId())
+                        .withVote(Vote.UP)
                 )
         );
-        UserVote vote = commentService.vote(new PostVote(comment.getId(), Vote.UP));
-        assertThat(vote, is(userVote));
+        assertThat(userVote.getVote(), Matchers.is(Vote.UP));
+        assertThat(userVote.getAbstractPost(), Matchers.is(comment));
+        assertThat(userVote.getUser(), Matchers.is(user));
     }
 
     @Test
     public void vote_successVoteChange() {
         User user = a(user());
         Comment comment = a(comment());
+        when(commentDao.exists(anyLong())).thenReturn(true);
+        when(commentDao.findOne(anyLong())).thenReturn(comment);
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
 
-
-        UserVote userVote = a(userVote()
-                .withVote(
-                        Vote.DOWN
-                )
-                .withUser(
-                        user
-                )
-                .withAbstractPost(
-                        comment
+        UserVote vote = a(userVote()
+                .withUser(user)
+                .withAbstractPost(comment)
+                .withVote(Vote.UP)
+        );
+        when(userVoteDao.findByUserAndAbstractPost(any(User.class), any(AbstractPost.class))).thenReturn(vote);
+        UserVote userVote = commentService.vote(
+                a(postVote()
+                        .withPostId(comment.getId())
+                        .withVote(Vote.DOWN)
                 )
         );
 
-        when(userService.getCurrentLoggedUser()).thenReturn(user);
-        when(commentDao.exists(anyLong())).thenReturn(true);
-        when(commentDao.findOne(anyLong())).thenReturn(comment);
-        when(userVoteDao.findByUserAndAbstractPost(any(User.class), any(AbstractPost.class))).thenReturn(userVote);
-
-        UserVote vote = commentService.vote(new PostVote(comment.getId(), Vote.UP));
-        assertThat(vote, is(userVote));
-        assertThat(vote.getVote(), is(Vote.UP));
+        assertThat(userVote.getVote(), is(Vote.DOWN));
+        assertThat(userVote.getAbstractPost(), is(comment));
+        assertThat(userVote.getUser(), is(user));
     }
 }

@@ -1,6 +1,7 @@
 package com.twitter.service;
 
 import com.twitter.dao.UserVoteDao;
+import com.twitter.exception.PostDeleteException;
 import com.twitter.exception.PostNotFoundException;
 import com.twitter.exception.UserVoteException;
 import com.twitter.model.AbstractPost;
@@ -38,8 +39,11 @@ abstract class PostServiceImpl<T extends AbstractPost, TRepository extends CrudR
         T post = getById(postId);
         User currentLoggedUser = userService.getCurrentLoggedUser();
         if (post.getOwner().equals(currentLoggedUser)) {
-            repository.delete(postId);
+            post.setContent(MessageUtil.DELETE_BY_OWNED_ABSTRACT_POST_CONTENT);
+            post.setBanned(true);
+            return;
         }
+        throw new PostDeleteException(MessageUtil.DELETE_NOT_OWN_POST);
     }
 
     @Override

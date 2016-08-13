@@ -18,7 +18,7 @@ public interface PostService<T extends AbstractPost> {
     @PreAuthorize(SecurityUtil.POST_PERSONAL)
     T create(@Param("post") T post);
 
-    @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
+    @PreAuthorize(SecurityUtil.AUTHENTICATED)
     void delete(long postId);
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)

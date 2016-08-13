@@ -2,11 +2,10 @@ package com.twitter.service;
 
 import com.twitter.config.Profiles;
 import com.twitter.dao.UserDao;
+import com.twitter.exception.*;
 import com.twitter.model.AccountStatus;
-import com.twitter.model.Result;
 import com.twitter.model.Role;
 import com.twitter.model.User;
-import com.twitter.util.MessageUtil;
 import com.twitter.util.TestUtil;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -30,10 +29,6 @@ import java.util.Date;
 import java.util.List;
 
 import static com.twitter.builders.UserBuilder.user;
-import static com.twitter.matchers.ResultIsFailureMatcher.hasFailed;
-import static com.twitter.matchers.ResultIsSuccessMatcher.hasFinishedSuccessfully;
-import static com.twitter.matchers.ResultMessageMatcher.hasMessageOf;
-import static com.twitter.matchers.ResultValueMatcher.hasValueOf;
 import static com.twitter.matchers.UserFollowerMatcher.hasFollowers;
 import static com.twitter.matchers.UserIsBanned.isBanned;
 import static com.twitter.matchers.UserIsEnabled.isEnabled;
@@ -53,6 +48,8 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Created by mariusz on 14.07.16.
  */
 
+// TODO: 13.08.16 add test for ban method (ban already banned user)
+
 @SpringBootTest
 @ActiveProfiles(Profiles.DEV)
 @RunWith(PowerMockRunner.class)
@@ -61,10 +58,11 @@ public class  UserServiceTest {
 
     @Mock
     private UserDao userDao;
-
     @Mock
     private JavaMailSender javaMailSender;
+
     private UserService userService;
+
     private Authentication authentication;
 
     @Before
@@ -80,19 +78,17 @@ public class  UserServiceTest {
     @Test
     public void getUserByIdTest_userExists() {
         User user = a(user());
+        when(userDao.exists(anyLong())).thenReturn(true);
         when(userDao.findOne(TestUtil.ID_ONE)).thenReturn(user);
-        Result<User> userResult = userService.getUserById(TestUtil.ID_ONE);
-        assertThat(userResult, hasFinishedSuccessfully());
-        assertThat(userResult, hasValueOf(user));
-        assertThat(userResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        User userResult = userService.getUserById(TestUtil.ID_ONE);
+        assertThat(userResult, is(user));
     }
 
-    @Test
+    @Test(expected = UserNotFoundException.class)
     public void getUserByIdTest_userDoesNotExists() {
+        when(userDao.exists(anyLong())).thenReturn(false);
         when(userDao.findOne(TestUtil.ID_ONE)).thenReturn(null);
-        Result<User> userResult = userService.getUserById(TestUtil.ID_ONE);
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
+        userService.getUserById(TestUtil.ID_ONE);
     }
 
     @Test
@@ -115,28 +111,25 @@ public class  UserServiceTest {
     public void create_userCreateTest() {
         User user = a(user());
         when(userDao.findByUsername(anyString())).thenReturn(null);
+        when(userDao.findByEmail(anyString())).thenReturn(null);
         when(userDao.save(any(User.class))).thenReturn(user);
-        Result<Boolean> createResult = userService.create(user);
-        assertThat(createResult, hasFinishedSuccessfully());
-        assertThat(createResult, hasValueOf(true));
+        User createResult = userService.create(user);
+        assertThat(createResult, is(user));
         verify(javaMailSender, times(1)).send(any(SimpleMailMessage.class));
     }
 
-    @Test
+    @Test(expected = UserAlreadyExistsException.class)
     public void create_usernameAlreadyExist() {
         when(userDao.findByUsername(anyString())).thenReturn(a(user()));
-        Result<Boolean> userResult = userService.create(a(user()));
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.USER_ALREADY_EXISTS_USERNAME_ERROR_MSG));
+        userService.create(a(user()));
     }
 
-    @Test
+    @Test(expected = UserAlreadyExistsException.class)
     public void create_emailAlreadyExist() {
         User user = a(user());
+        when(userDao.findByUsername(anyString())).thenReturn(null);
         when(userDao.findByEmail(anyString())).thenReturn(user);
-        Result<Boolean> userResult = userService.create(user);
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.USER_ALREADY_EXISTS_EMAIL_ERROR_MSG));
+        userService.create(user);
     }
 
     @Test
@@ -144,124 +137,118 @@ public class  UserServiceTest {
         User userOne = a(user().withId(TestUtil.ID_ONE));
         User userTwo = a(user().withId(TestUtil.ID_TWO));
         when(authentication.getPrincipal()).thenReturn(userTwo);
+        when(userDao.exists(anyLong())).thenReturn(true);
         when(userDao.findOne(TestUtil.ID_TWO)).thenReturn(userTwo);
         when(userDao.findOne(TestUtil.ID_ONE)).thenReturn(userOne);
-        Result<Boolean> followResult = userService.follow(userOne.getId());
+        userService.follow(userOne.getId());
         assertThat(userOne, hasFollowers(userTwo));
-        assertThat(followResult, hasFinishedSuccessfully());
-        assertThat(followResult, hasValueOf(true));
-        assertThat(followResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
-    @Test
+    @Test(expected = UserFollowException.class)
     public void follow_userFollowHimself() {
         User user = a(user().withId(TestUtil.ID_ONE));
         when(authentication.getPrincipal()).thenReturn(user);
-        when(userDao.findOne(TestUtil.ID_ONE)).thenReturn(user);
-        Result<Boolean> userResult = userService.follow(user.getId());
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.FOLLOW_YOURSELF_ERROR_MSG));
+        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userDao.findOne(anyLong())).thenReturn(user);
+        userService.follow(user.getId());
     }
 
-    @Test
+    @Test(expected = UserFollowException.class)
     public void follow_userAlreadyFollowed() {
-        User user = a(user().withId(TestUtil.ID_ONE));
-        User userToFollow = a(user().withId(TestUtil.ID_TWO).withFollowers(aListWith(user)));
+        User user = a(user()
+                .withId(TestUtil.ID_ONE)
+        );
+        User userToFollow = a(user()
+                .withId(TestUtil.ID_TWO)
+                .withFollowers(aListWith(user)
+                )
+        );
         when(authentication.getPrincipal()).thenReturn(user);
+        when(userDao.exists(anyLong())).thenReturn(true);
         when(userDao.findOne(TestUtil.ID_ONE)).thenReturn(user);
         when(userDao.findOne(TestUtil.ID_TWO)).thenReturn(userToFollow);
-        Result<Boolean> userResult = userService.follow(userToFollow.getId());
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.FOLLOW_ALREADY_FOLLOWED_ERROR_MSG));
+        userService.follow(userToFollow.getId());
     }
 
-    @Test
+    @Test(expected = UserNotFoundException.class)
     public void follow_userToFollowDoesNotExists() {
-        User user = a(user());
-        when(authentication.getPrincipal()).thenReturn(user);
+        when(authentication.getPrincipal()).thenReturn(a(user()));
         when(userDao.findOne(anyLong())).thenReturn(null);
-        Result<Boolean> userResult = userService.follow(TestUtil.ID_ONE);
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
+        userService.follow(TestUtil.ID_ONE);
     }
 
     @Test
     public void unfollow_userFollowsOtherUser() {
-        User user = a(user().withId(TestUtil.ID_ONE));
-        User userToUnfollow = a(user().withId(TestUtil.ID_TWO).withFollowers(aListWith(user)));
+        User user = a(user()
+                .withId(TestUtil.ID_ONE)
+        );
+        User userToUnfollow = a(user()
+                .withId(TestUtil.ID_TWO)
+                .withFollowers(aListWith(user)
+                )
+        );
         when(authentication.getPrincipal()).thenReturn(user);
+        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userDao.findOne(TestUtil.ID_ONE)).thenReturn(user);
         when(userDao.findOne(TestUtil.ID_TWO)).thenReturn(userToUnfollow);
-        Result<Boolean> unfollowResult = userService.unfollow(userToUnfollow.getId());
+        userService.unfollow(userToUnfollow.getId());
         assertThat(userToUnfollow, not(hasFollowers(user)));
-        assertThat(unfollowResult, hasFinishedSuccessfully());
-        assertThat(unfollowResult, hasValueOf(true));
-        assertThat(unfollowResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
-    @Test
+    @Test(expected = UserUnfollowException.class)
     public void unfollow_userUnfollowsHimself() {
         User user = a(user());
         when(authentication.getPrincipal()).thenReturn(user);
+        when(userDao.exists(anyLong())).thenReturn(true);
         when(userDao.findOne(anyLong())).thenReturn(user);
-        Result<Boolean> userResult = userService.unfollow(user.getId());
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.UNFOLLOW_YOURSELF_ERROR_MSG));
+        userService.unfollow(user.getId());
     }
 
-    @Test
+    @Test(expected = UserUnfollowException.class)
     public void unfollow_userNotFollowed() {
-        User user = a(user().withId(TestUtil.ID_ONE));
-        User userToUnfollow = a(user().withId(TestUtil.ID_TWO));
+        User user = a(user()
+                .withId(TestUtil.ID_ONE)
+        );
+        User userToUnfollow = a(user()
+                .withId(TestUtil.ID_TWO)
+        );
         when(authentication.getPrincipal()).thenReturn(user);
-        when(userDao.findOne(anyLong())).thenReturn(userToUnfollow);
-        Result<Boolean> userResult = userService.unfollow(userToUnfollow.getId());
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.UNFOLLOW_UNFOLLOWED_ERROR_MSG));
+        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userDao.findOne(TestUtil.ID_ONE)).thenReturn(user);
+        when(userDao.findOne(TestUtil.ID_TWO)).thenReturn(userToUnfollow);
+        userService.unfollow(userToUnfollow.getId());
     }
 
-    @Test
+    @Test(expected = UserNotFoundException.class)
     public void unfollow_userToUnfollowDoesNotExists() {
-        User user = a(user());
-        when(authentication.getPrincipal()).thenReturn(user);
         when(userDao.findOne(anyLong())).thenReturn(null);
-        Result<Boolean> userResult = userService.unfollow(TestUtil.ID_ONE);
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
+        userService.unfollow(TestUtil.ID_ONE);
     }
 
-    @Test
+    @Test(expected = UserNotFoundException.class)
     public void deleteUserById_userDoesNotExist() {
         when(userDao.exists(anyLong())).thenReturn(false);
-        Result<Boolean> userResult = userService.deleteUserById(TestUtil.ID_ONE);
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
+        userService.deleteUserById(TestUtil.ID_ONE);
     }
 
     @Test
     public void deleteUserById_userExists() {
         when(userDao.exists(anyLong())).thenReturn(true);
-        Result<Boolean> removeUser = userService.deleteUserById(TestUtil.ID_ONE);
-        assertThat(removeUser, hasFinishedSuccessfully());
-        assertThat(removeUser, hasValueOf(true));
-        assertThat(removeUser, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        userService.deleteUserById(TestUtil.ID_ONE);
     }
 
     @Test
     public void getAllUsersCount_noUsers() {
         when(userDao.count()).thenReturn(0L);
-        Result<Long> allUsersCount = userService.getAllUsersCount();
-        assertThat(allUsersCount, hasFinishedSuccessfully());
-        assertThat(allUsersCount, hasValueOf(0L));
-        assertThat(allUsersCount, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        Long allUsersCount = userService.getAllUsersCount();
+        assertThat(allUsersCount, is(equalTo(0L)));
     }
 
     @Test
     public void getAllUsersCount_someUsers() {
         when(userDao.count()).thenReturn(5L);
-        Result<Long> allUsersCount = userService.getAllUsersCount();
-        assertThat(allUsersCount, hasFinishedSuccessfully());
-        assertThat(allUsersCount, hasValueOf(5L));
-        assertThat(allUsersCount, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        Long allUsersCount = userService.getAllUsersCount();
+        assertThat(allUsersCount, is(equalTo(5L)));
     }
 
     @Test
@@ -269,56 +256,45 @@ public class  UserServiceTest {
         User userOne = a(user());
         User userTwo = a(user());
         when(userDao.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(aListWith(userOne, userTwo)));
-        Result<List<User>> allUsers = userService.getAllUsers(TestUtil.ALL_IN_ONE_PAGE);
-        assertThat(allUsers, hasFinishedSuccessfully());
-        assertThat(allUsers, hasValueOf(aListWith(userOne, userTwo)));
-        assertThat(allUsers, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        List<User> allUsers = userService.getAllUsers(TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(allUsers, is(aListWith(userOne, userTwo)));
     }
 
-    @Test
+    @Test(expected = UserNotFoundException.class)
     public void getUserFollowersCountById_userDoesNotExists() {
         when(userDao.exists(anyLong())).thenReturn(false);
-        Result<Long> userResult = userService.getUserFollowersCountById(TestUtil.ID_ONE);
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
+        userService.getUserFollowersCountById(TestUtil.ID_ONE);
     }
 
     @Test
     public void getUserFollowersCountById_userExistsNoFollowers() {
         when(userDao.exists(TestUtil.ID_ONE)).thenReturn(true);
         when(userDao.findFollowersCountByUserId(TestUtil.ID_ONE)).thenReturn(0L);
-        Result<Long> userFollowersCountById = userService.getUserFollowersCountById(TestUtil.ID_ONE);
-        assertThat(userFollowersCountById, hasFinishedSuccessfully());
-        assertThat(userFollowersCountById, hasValueOf(0L));
-        assertThat(userFollowersCountById, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        Long userFollowersCountById = userService.getUserFollowersCountById(TestUtil.ID_ONE);
+        assertThat(userFollowersCountById, is(equalTo(0L)));
+        ;
     }
 
     @Test
     public void getUserFollowersCountById_userExistsSomeFollowers() {
         when(userDao.exists(TestUtil.ID_ONE)).thenReturn(true);
         when(userDao.findFollowersCountByUserId(TestUtil.ID_ONE)).thenReturn(2L);
-        Result<Long> userFollowersById = userService.getUserFollowersCountById(TestUtil.ID_ONE);
-        assertThat(userFollowersById, hasFinishedSuccessfully());
-        assertThat(userFollowersById, hasValueOf(2L));
-        assertThat(userFollowersById, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        Long userFollowersById = userService.getUserFollowersCountById(TestUtil.ID_ONE);
+        assertThat(userFollowersById, is(equalTo(2L)));
     }
 
-    @Test
+    @Test(expected = UserNotFoundException.class)
     public void getUserFollowersById_userDoesNotExists() {
         when(userDao.exists(anyLong())).thenReturn(false);
-        Result<List<User>> userResult = userService.getUserFollowersById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
+        userService.getUserFollowersById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
     }
 
     @Test
     public void getUserFollowersById_noFollowers() {
         when(userDao.exists(anyLong())).thenReturn(true);
         when(userDao.findFollowersByUserId(anyLong(), any(Pageable.class))).thenReturn(emptyList());
-        Result<List<User>> userFollowersById = userService.getUserFollowersById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
-        assertThat(userFollowersById, hasFinishedSuccessfully());
-        assertThat(userFollowersById, hasValueOf(emptyList()));
-        assertThat(userFollowersById, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        List<User> userFollowersById = userService.getUserFollowersById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(userFollowersById, is(emptyList()));
     }
 
     @Test
@@ -327,56 +303,45 @@ public class  UserServiceTest {
         User userTwo = a(user());
         when(userDao.exists(anyLong())).thenReturn(true);
         when(userDao.findFollowersByUserId(anyLong(), any(Pageable.class))).thenReturn(aListWith(userOne, userTwo));
-        Result<List<User>> userFollowersById = userService.getUserFollowersById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
-        assertThat(userFollowersById, hasFinishedSuccessfully());
-        assertThat(userFollowersById, hasValueOf(aListWith(userOne, userTwo)));
-        assertThat(userFollowersById, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        List<User> userFollowersById = userService.getUserFollowersById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(userFollowersById, is(aListWith(userOne, userTwo)));
     }
 
-    @Test
+    @Test(expected = UserNotFoundException.class)
     public void getUserFollowingCountById_userDoesNotExists() {
         when(userDao.exists(anyLong())).thenReturn(false);
-        Result<Long> userResult = userService.getUserFollowingCountById(TestUtil.ID_ONE);
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
+        userService.getUserFollowingCountById(TestUtil.ID_ONE);
     }
 
     @Test
     public void getUserFollowingCountById_userExistsNoFollowers() {
         when(userDao.exists(anyLong())).thenReturn(true);
         when(userDao.findFollowingCountByUserId(anyLong())).thenReturn(0L);
-        Result<Long> userFollowingCountById = userService.getUserFollowingCountById(TestUtil.ID_ONE);
-        assertThat(userFollowingCountById, hasFinishedSuccessfully());
-        assertThat(userFollowingCountById, hasValueOf(0L));
-        assertThat(userFollowingCountById, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        Long userFollowingCountById = userService.getUserFollowingCountById(TestUtil.ID_ONE);
+        assertThat(userFollowingCountById, is(equalTo(0L)));
     }
 
     @Test
     public void getUserFollowingCountById_userExistsSomeFollowers() {
         when(userDao.exists(anyLong())).thenReturn(true);
         when(userDao.findFollowingCountByUserId(anyLong())).thenReturn(2L);
-        Result<Long> userFollowersById = userService.getUserFollowingCountById(TestUtil.ID_ONE);
-        assertThat(userFollowersById, hasFinishedSuccessfully());
-        assertThat(userFollowersById, hasValueOf(2L));
-        assertThat(userFollowersById, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        Long userFollowersById = userService.getUserFollowingCountById(TestUtil.ID_ONE);
+        assertThat(userFollowersById, is(equalTo(2L)));
     }
 
-    @Test
+    @Test(expected = UserNotFoundException.class)
     public void getUserFollowingsById_userDoesNotExists() {
         when(userDao.exists(anyLong())).thenReturn(false);
-        Result<List<User>> userResult = userService.getUserFollowingsById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
+        userService.getUserFollowingsById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
+
     }
 
     @Test
     public void getUserFollowingsById_noFollowers() {
         when(userDao.exists(TestUtil.ID_ONE)).thenReturn(true);
         when(userDao.findFollowingByUserId(anyLong(), any(Pageable.class))).thenReturn(emptyList());
-        Result<List<User>> userFollowingsById = userService.getUserFollowingsById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
-        assertThat(userFollowingsById, hasFinishedSuccessfully());
-        assertThat(userFollowingsById, hasValueOf(emptyList()));
-        assertThat(userFollowingsById, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        List<User> userFollowingsById = userService.getUserFollowingsById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(userFollowingsById, is(emptyList()));
     }
 
     @Test
@@ -385,135 +350,109 @@ public class  UserServiceTest {
         User userTwo = a(user());
         when(userDao.exists(TestUtil.ID_ONE)).thenReturn(true);
         when(userDao.findFollowingByUserId(anyLong(), any(Pageable.class))).thenReturn(aListWith(userOne, userTwo));
-        Result<List<User>> userFollowingsById = userService.getUserFollowingsById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
-        assertThat(userFollowingsById, hasFinishedSuccessfully());
-        assertThat(userFollowingsById, hasValueOf(aListWith(userOne, userTwo)));
-        assertThat(userFollowingsById, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
+        List<User> userFollowingsById = userService.getUserFollowingsById(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(userFollowingsById, is(aListWith(userOne, userTwo)));
+
     }
 
-    @Test
+    @Test(expected = UserException.class)
     public void activateAccount_verifyKeyNotFound() {
         when(userDao.findOneByAccountStatusVerifyKey(anyString())).thenReturn(null);
-        Result<Boolean> activateResult = userService.activateAccount("someKey");
-        assertThat(activateResult, hasFailed());
-        assertThat(activateResult, hasMessageOf(MessageUtil.INVALID_VERIFY_KEY));
+        userService.activateAccount("someKey");
     }
 
-    @Test
+    @Test(expected = UserException.class)
     public void activateAccount_accountAlreadyActivated() {
         User user = a(user().withAccountStatus(new AccountStatus(true, "someKey")));
         when(userDao.findOneByAccountStatusVerifyKey(anyString())).thenReturn(user);
-        Result<Boolean> activateResult = userService.activateAccount("someKey");
-        assertThat(activateResult, hasFailed());
-        assertThat(activateResult, hasMessageOf(MessageUtil.ACCOUNT_HAS_BEEN_ALREADY_ENABLED));
+        userService.activateAccount("someKey");
     }
 
     @Test
     public void activateAccount_accountNotActivated() {
         User user = a(user().withAccountStatus(new AccountStatus(false, "someKey")));
         when(userDao.findOneByAccountStatusVerifyKey(anyString())).thenReturn(user);
-        Result<Boolean> activateResult = userService.activateAccount("someKey");
+        userService.activateAccount("someKey");
         assertThat(user, isEnabled(true));
-        assertThat(activateResult, hasFinishedSuccessfully());
-        assertThat(activateResult, hasValueOf(true));
-        assertThat(activateResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
-    @Test
+    @Test(expected = UserNotFoundException.class)
     public void banUser_userDoesNotExist() {
         when(userDao.findOne(anyLong())).thenReturn(null);
-        Result<Boolean> userResult = userService.banUser(1L, DateTime.now().toDate());
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
+        userService.banUser(TestUtil.ID_ONE, DateTime.now().toDate());
     }
 
-    @Test
+    @Test(expected = TwitterDateException.class)
     public void banUser_invalidDate() {
         User user = a(user());
+        when(userDao.exists(anyLong())).thenReturn(true);
         when(userDao.findOne(anyLong())).thenReturn(user);
-        Result<Boolean> userResult = userService.banUser(user.getId(), null);
+        userService.banUser(user.getId(), null);
         assertThat(user, isBanned(false));
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.DATE_IS_NOT_SET));
     }
 
-    @Test
+    @Test(expected = TwitterDateException.class)
     public void banUser_dateBeforeNow() {
         User user = a(user());
+        when(userDao.exists(anyLong())).thenReturn(true);
         when(userDao.findOne(anyLong())).thenReturn(user);
-        Result<Boolean> userResult = userService.banUser(user.getId(), TestUtil.DATE_2003);
+        userService.banUser(user.getId(), TestUtil.DATE_2003);
         assertThat(user, isBanned(false));
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.REPORT_DATE_IS_INVALID_ERROR_MSG));
     }
 
     @Test
     public void banUser_userExist() {
         User user = a(user());
-        when(userDao.findOne(anyLong())).thenReturn(user);
         Date futureDate = DateTime.now().plusDays(10).toDate();
-        Result<Boolean> userResult = userService.banUser(user.getId(), futureDate);
+        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userDao.findOne(anyLong())).thenReturn(user);
+        userService.banUser(user.getId(), futureDate);
         assertThat(user, isBanned(true));
-        assertThat(userResult, hasFinishedSuccessfully());
-        assertThat(userResult, hasValueOf(true));
-        assertThat(userResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
-    @Test
+    @Test(expected = UserNotFoundException.class)
     public void unbanUser_userDoesNotExist() {
         when(userDao.findOne(anyLong())).thenReturn(null);
-        Result<Boolean> userResult = userService.unbanUser(1L);
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
+        userService.unbanUser(TestUtil.ID_ONE);
     }
 
     @Test
     public void unbanUser_userExist() {
         User user = a(user());
+        when(userDao.exists(anyLong())).thenReturn(true);
         when(userDao.findOne(anyLong())).thenReturn(user);
-        Result<Boolean> userResult = userService.unbanUser(user.getId());
+        userService.unbanUser(user.getId());
         assertThat(user, isBanned(false));
-        assertThat(userResult, hasFinishedSuccessfully());
-        assertThat(userResult, hasValueOf(true));
-        assertThat(userResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
-    @Test
+    @Test(expected = UserNotFoundException.class)
     public void changeUserRole_userDoesNotExist() {
         when(userDao.findOne(anyLong())).thenReturn(null);
-        Result<Boolean> userResult = userService.changeUserRole(1L, Role.MOD);
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
+        userService.changeUserRole(1L, Role.MOD);
     }
 
     @Test
     public void changeUserRole_userExists() {
         User user = a(user().withRole(Role.USER));
+        when(userDao.exists(anyLong())).thenReturn(true);
         when(userDao.findOne(anyLong())).thenReturn(user);
-        Result<Boolean> userResult = userService.changeUserRole(user.getId(), Role.MOD);
+        userService.changeUserRole(user.getId(), Role.MOD);
         assertThat(user.getRole(), is(Role.MOD));
-        assertThat(userResult, hasFinishedSuccessfully());
-        assertThat(userResult, hasValueOf(true));
-        assertThat(userResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
-    @Test
+    @Test(expected = UserNotFoundException.class)
     public void changeUserPasswordById_userDoesNotExist() {
         when(userDao.findOne(anyLong())).thenReturn(null);
-        Result<Boolean> userResult = userService.changeUserPasswordById(1L, "NewPass");
-        assertThat(userResult, hasFailed());
-        assertThat(userResult, hasMessageOf(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG));
+        userService.changeUserPasswordById(1L, "NewPass");
     }
 
     @Test
     public void changeUserPasswordById_userExists() {
         User user = a(user());
+        when(userDao.exists(anyLong())).thenReturn(true);
         when(userDao.findOne(anyLong())).thenReturn(user);
-        Result<Boolean> userResult = userService.changeUserPasswordById(user.getId(), "newPassword");
+        userService.changeUserPasswordById(user.getId(), "newPassword");
         assertThat(user.getPassword(), is("newPassword"));
-        assertThat(userResult, hasFinishedSuccessfully());
-        assertThat(userResult, hasValueOf(true));
-        assertThat(userResult, hasMessageOf(MessageUtil.RESULT_SUCCESS_MESSAGE));
     }
 
     @Test
