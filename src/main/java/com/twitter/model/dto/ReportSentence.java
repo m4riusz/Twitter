@@ -1,6 +1,7 @@
-package com.twitter.model;
+package com.twitter.model.dto;
 
 import com.sun.istack.internal.Nullable;
+import com.twitter.model.ReportStatus;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
