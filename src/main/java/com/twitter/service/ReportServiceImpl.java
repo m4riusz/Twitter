@@ -1,7 +1,6 @@
 package com.twitter.service;
 
 import com.twitter.dao.ReportDao;
-import com.twitter.exception.ReportException;
 import com.twitter.exception.ReportNotFoundException;
 import com.twitter.exception.TwitterDateException;
 import com.twitter.model.Report;
