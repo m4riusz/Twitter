@@ -2,6 +2,7 @@ package com.twitter.security;
 
 import com.twitter.config.Profiles;
 import com.twitter.model.Comment;
+import com.twitter.model.Vote;
 import com.twitter.service.CommentService;
 import com.twitter.util.TestUtil;
 import org.junit.Test;
@@ -10,14 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static com.twitter.builders.CommentBuilder.comment;
+import static com.twitter.builders.PostVoteBuilder.postVote;
 import static com.twitter.builders.TweetBuilder.tweet;
 import static com.twitter.builders.UserBuilder.user;
-import static com.twitter.builders.UserVoteBuilder.userVote;
 import static com.twitter.util.Util.a;
 
 /**
@@ -65,12 +65,6 @@ public class CommentServiceSecurityTest {
         commentService.delete(TestUtil.ID_ONE);
     }
 
-    @WithMockUser(authorities = TestUtil.USER)
-    @Test(expected = AccessDeniedException.class)
-    public void delete_userAccessDenied() {
-        commentService.delete(TestUtil.ID_ONE);
-    }
-
     @WithAnonymousUser
     @Test(expected = AccessDeniedException.class)
     public void exists_anonymousAccessDenied() {
@@ -83,54 +77,12 @@ public class CommentServiceSecurityTest {
         commentService.getById(TestUtil.ID_ONE);
     }
 
-    @WithCustomMockUser(authorities = TestUtil.ANONYMOUS)
+    @WithAnonymousUser
     @Test(expected = AccessDeniedException.class)
     public void vote_anonymousAccessDenied() {
-        commentService.vote(a(userVote()
-                        .withUser(
-                                a(user()
-                                        .withId(TestUtil.ID_ONE)
-                                )
-                        )
-                )
-        );
-    }
-
-    @WithCustomMockUser(id = TestUtil.ID_TWO, authorities = TestUtil.USER)
-    @Test(expected = AccessDeniedException.class)
-    public void vote_wrongUserAccessDenied() {
-        commentService.vote(a(userVote()
-                        .withUser(
-                                a(user()
-                                        .withId(TestUtil.ID_ONE)
-                                )
-                        )
-                )
-        );
-    }
-
-    @WithCustomMockUser(authorities = TestUtil.ANONYMOUS)
-    @Test(expected = AccessDeniedException.class)
-    public void changeVote_anonymousAccessDenied() {
-        commentService.changeVote(a(userVote()
-                        .withUser(
-                                a(user()
-                                        .withId(TestUtil.ID_ONE)
-                                )
-                        )
-                )
-        );
-    }
-
-    @WithCustomMockUser(id = TestUtil.ID_TWO, authorities = TestUtil.USER)
-    @Test(expected = AccessDeniedException.class)
-    public void changeVote_wrongUserAccessDenied() {
-        commentService.changeVote(a(userVote()
-                        .withUser(
-                                a(user()
-                                        .withId(TestUtil.ID_ONE)
-                                )
-                        )
+        commentService.vote(a(postVote()
+                        .withVote(Vote.UP)
+                        .withPostId(TestUtil.ID_ONE)
                 )
         );
     }
