@@ -40,8 +40,6 @@ import static org.mockito.Mockito.when;
  * Created by mariusz on 03.08.16.
  */
 
-//// TODO: 13.08.16 add test for already deleted comment
-
 @SpringBootTest
 @ActiveProfiles(Profiles.DEV)
 @RunWith(MockitoJUnitRunner.class)
@@ -89,11 +87,25 @@ public class CommentServiceTest {
         commentService.delete(comment.getId());
     }
 
+    @Test(expected = PostDeleteException.class)
+    public void deleteCommentById_postAlreadyDeleted() {
+        User user = a(user());
+        Comment comment = a(comment()
+                .withOwner(user)
+                .withBanned(true)
+        );
+        when(commentDao.exists(anyLong())).thenReturn(true);
+        when(commentDao.findOne(anyLong())).thenReturn(comment);
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
+        commentService.delete(comment.getId());
+    }
+
     @Test
     public void deleteCommentById_tweetExistsUserIsPostOwner() {
         User user = a(user());
         Comment comment = a(comment()
                 .withOwner(user)
+                .withBanned(false)
         );
         when(commentDao.exists(anyLong())).thenReturn(true);
         when(commentDao.findOne(anyLong())).thenReturn(comment);

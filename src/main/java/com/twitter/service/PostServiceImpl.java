@@ -38,7 +38,9 @@ abstract class PostServiceImpl<T extends AbstractPost, TRepository extends CrudR
         checkIfPostExists(postId);
         T post = getById(postId);
         User currentLoggedUser = userService.getCurrentLoggedUser();
-        if (post.getOwner().equals(currentLoggedUser)) {
+        if (post.isBanned()) {
+            throw new PostDeleteException(MessageUtil.POST_ALREADY_DELETED);
+        } else if (post.getOwner().equals(currentLoggedUser)) {
             post.setContent(MessageUtil.DELETE_BY_OWNED_ABSTRACT_POST_CONTENT);
             post.setBanned(true);
             return;

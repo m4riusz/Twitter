@@ -28,4 +28,5 @@ public final class MessageUtil {
     public static final String VOTE_DOES_NOT_EXIST_ERROR_MSG = "Vote does not exist!";
     public static final String VOTE_DELETE_ERROR_MSG = "You cant delete not yours vote!";
     public static final String DELETE_NOT_OWN_POST = "You cant delete not yours posts!";
+    public static final String POST_ALREADY_DELETED = "Post is already deleted!";
 }
