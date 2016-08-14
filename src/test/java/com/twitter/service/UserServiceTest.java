@@ -48,8 +48,6 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Created by mariusz on 14.07.16.
  */
 
-// TODO: 13.08.16 add test for ban method (ban already banned user)
-
 @SpringBootTest
 @ActiveProfiles(Profiles.DEV)
 @RunWith(PowerMockRunner.class)
@@ -235,6 +233,7 @@ public class  UserServiceTest {
     public void deleteUserById_userExists() {
         when(userDao.exists(anyLong())).thenReturn(true);
         userService.deleteUserById(TestUtil.ID_ONE);
+        verify(userDao, times(1)).delete(TestUtil.ID_ONE);
     }
 
     @Test
@@ -272,7 +271,6 @@ public class  UserServiceTest {
         when(userDao.findFollowersCountByUserId(TestUtil.ID_ONE)).thenReturn(0L);
         Long userFollowersCountById = userService.getUserFollowersCountById(TestUtil.ID_ONE);
         assertThat(userFollowersCountById, is(equalTo(0L)));
-        ;
     }
 
     @Test

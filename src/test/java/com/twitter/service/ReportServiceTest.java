@@ -20,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.Date;
 import java.util.List;
 
+import static com.twitter.builders.AccountStatusBuilder.accountStatus;
 import static com.twitter.builders.ReportBuilder.report;
 import static com.twitter.builders.ReportSentenceBuilder.reportSentence;
 import static com.twitter.builders.TweetBuilder.tweet;
@@ -38,7 +39,6 @@ import static org.mockito.Mockito.when;
  * Created by mariusz on 01.08.16.
  */
 
-// TODO: 13.08.16 add test for sentence already banned post 
 @SpringBootTest
 @ActiveProfiles(Profiles.DEV)
 @RunWith(MockitoJUnitRunner.class)
@@ -132,6 +132,84 @@ public class ReportServiceTest {
         when(reportDao.exists(anyLong())).thenReturn(true);
         when(reportDao.findOne(anyLong())).thenReturn(report);
         reportService.judgeReport(reportSentence);
+    }
+
+    @Test
+    public void judgeReport_bannedUserIsBannedAgainWithShortBanDate_banDateShouldNotBeShorten() {
+        Date newDateToBlock = DateTime.now().plusDays(7).toDate();
+        Date oldBanDate = DateTime.now().plusDays(10).toDate();
+
+        User tweetOwner = a(user()
+                .withAccountStatus(a(accountStatus()
+                                .withBannedUntil(oldBanDate)
+                        )
+                )
+
+        );
+        User accuser = a(user());
+        User judge = a(user());
+        Tweet tweet = a(tweet()
+                .withOwner(tweetOwner)
+        );
+        Report report = a(report()
+                .withUser(accuser)
+                .withAbstractPost(tweet)
+        );
+        ReportSentence reportSentence = a(reportSentence()
+                .withReportId(report.getId())
+                .withReportStatus(ReportStatus.GUILTY)
+                .withDateToBlock(newDateToBlock)
+        );
+        when(reportDao.exists(anyLong())).thenReturn(true);
+        when(reportDao.findOne(anyLong())).thenReturn(report);
+        when(userService.getCurrentLoggedUser()).thenReturn(judge);
+
+        reportService.judgeReport(reportSentence);
+        assertThat(tweetOwner, isBanned(true));
+        assertThat(tweet.isBanned(), is(true));
+        assertThat(tweetOwner.getAccountStatus().getBannedUntil(), is(oldBanDate));
+        assertThat(tweet.getContent(), is(MessageUtil.DELETE_ABSTRACT_POST_CONTENT));
+        assertThat(report.getJudge(), is(judge));
+        assertThat(report.getStatus(), is(ReportStatus.GUILTY));
+    }
+
+    @Test
+    public void judgeReport_bannedUserIsBannedAgainWithLongerBanDate_banDateShouldBeLonger() {
+        Date dateBeforeNewBanDate = DateTime.now().plusDays(7).toDate();
+        Date newLongerBanDate = DateTime.now().plusDays(10).toDate();
+
+        User tweetOwner = a(user()
+                .withAccountStatus(a(accountStatus()
+                                .withBannedUntil(dateBeforeNewBanDate)
+                        )
+                )
+
+        );
+        User accuser = a(user());
+        User judge = a(user());
+        Tweet tweet = a(tweet()
+                .withOwner(tweetOwner)
+        );
+        Report report = a(report()
+                .withUser(accuser)
+                .withAbstractPost(tweet)
+        );
+        ReportSentence reportSentence = a(reportSentence()
+                .withReportId(report.getId())
+                .withReportStatus(ReportStatus.GUILTY)
+                .withDateToBlock(newLongerBanDate)
+        );
+        when(reportDao.exists(anyLong())).thenReturn(true);
+        when(reportDao.findOne(anyLong())).thenReturn(report);
+        when(userService.getCurrentLoggedUser()).thenReturn(judge);
+
+        reportService.judgeReport(reportSentence);
+        assertThat(tweetOwner, isBanned(true));
+        assertThat(tweet.isBanned(), is(true));
+        assertThat(tweetOwner.getAccountStatus().getBannedUntil(), is(newLongerBanDate));
+        assertThat(tweet.getContent(), is(MessageUtil.DELETE_ABSTRACT_POST_CONTENT));
+        assertThat(report.getJudge(), is(judge));
+        assertThat(report.getStatus(), is(ReportStatus.GUILTY));
     }
 
     @Test

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -57,9 +58,14 @@ public class ReportServiceImpl implements ReportService {
             throw new TwitterDateException(MessageUtil.DATE_IS_NOT_SET);
         } else if (isGuiltyAndDateIsInvalid(reportSentence)) {
             throw new TwitterDateException(MessageUtil.REPORT_DATE_IS_INVALID_ERROR_MSG);
-        } else if (isGuilty(reportSentence)) {
+        } else if (isGuilty(reportSentence) && postOwnerIsNotBanned(reportFromDb)) {
             banPostAndPostOwner(reportSentence, reportFromDb);
+        } else if (isGuilty(reportSentence) && newBanDateLastsLongerThanActualBanDate(reportSentence, reportFromDb)) {
+            banPostAndPostOwner(reportSentence, reportFromDb);
+        } else if (isGuilty(reportSentence) && !newBanDateLastsLongerThanActualBanDate(reportSentence, reportFromDb)) {
+            banPost(reportFromDb);
         }
+        setReportJudge(reportFromDb);
         updateReportStatus(reportSentence, reportFromDb);
         return reportFromDb;
     }
@@ -100,11 +106,30 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private void banPostAndPostOwner(ReportSentence reportSentence, Report reportFromDb) {
+        setUserBanDate(reportSentence.getDateToBlock(), reportFromDb);
+        banPost(reportFromDb);
+    }
+
+    private void setUserBanDate(Date date, Report reportFromDb) {
+        reportFromDb.getAbstractPost().getOwner().getAccountStatus().setBannedUntil(date);
+    }
+
+    private void setReportJudge(Report reportFromDb) {
         User judge = userService.getCurrentLoggedUser();
         reportFromDb.setJudge(judge);
-        reportFromDb.getAbstractPost().getOwner().getAccountStatus().setBannedUntil(reportSentence.getDateToBlock());
-        reportFromDb.getAbstractPost().setBanned(true);
-        reportFromDb.getAbstractPost().setContent(MessageUtil.DELETE_ABSTRACT_POST_CONTENT);
+    }
+
+    private void banPost(Report report) {
+        report.getAbstractPost().setBanned(true);
+        report.getAbstractPost().setContent(MessageUtil.DELETE_ABSTRACT_POST_CONTENT);
+    }
+
+    private boolean newBanDateLastsLongerThanActualBanDate(ReportSentence reportSentence, Report reportFromDb) {
+        return reportFromDb.getAbstractPost().getOwner().getAccountStatus().getBannedUntil().before(reportSentence.getDateToBlock());
+    }
+
+    private boolean postOwnerIsNotBanned(Report reportFromDb) {
+        return reportFromDb.getAbstractPost().getOwner().getAccountStatus().getBannedUntil() == null;
     }
 
 }
