@@ -7,7 +7,7 @@ import com.twitter.model.Report;
 import com.twitter.model.ReportCategory;
 import com.twitter.model.ReportStatus;
 import com.twitter.model.User;
-import com.twitter.model.dto.ReportSentence;
+import com.twitter.dto.ReportSentence;
 import com.twitter.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;

@@ -3,7 +3,7 @@ package com.twitter.controller;
 import com.twitter.model.Report;
 import com.twitter.model.ReportCategory;
 import com.twitter.model.ReportStatus;
-import com.twitter.model.dto.ReportSentence;
+import com.twitter.dto.ReportSentence;
 import com.twitter.route.Route;
 import com.twitter.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;

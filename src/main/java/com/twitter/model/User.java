@@ -72,7 +72,7 @@ public class User extends AbstractEntity implements UserDetails {
         super();
         this.accountStatus = new AccountStatus();
         this.role = Role.USER;
-        this.avatar = new Avatar("undef", new byte[100]); // FIXME: 14.07.16 fix
+        this.avatar = new Avatar();
     }
 
     public User(String email, String username, String password, Gender gender) {
@@ -214,9 +214,7 @@ public class User extends AbstractEntity implements UserDetails {
 
         User user = (User) o;
 
-        if (username != null ? !username.equals(user.username) : user.username != null) return false;
-
-        return true;
+        return username != null ? username.equals(user.username) : user.username == null;
     }
 
     @Override

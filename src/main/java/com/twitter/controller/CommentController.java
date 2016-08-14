@@ -2,7 +2,7 @@ package com.twitter.controller;
 
 import com.twitter.model.Comment;
 import com.twitter.model.UserVote;
-import com.twitter.model.dto.PostVote;
+import com.twitter.dto.PostVote;
 import com.twitter.route.Route;
 import com.twitter.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;

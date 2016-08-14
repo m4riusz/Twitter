@@ -43,7 +43,6 @@ import static org.mockito.Mockito.when;
  * Created by mariusz on 29.07.16.
  */
 
-// TODO: 13.08.16 add test for already deleted tweet
 @SpringBootTest
 @ActiveProfiles(Profiles.DEV)
 @RunWith(MockitoJUnitRunner.class)
@@ -122,6 +121,19 @@ public class TweetServiceTest {
         tweetService.delete(tweet.getId());
         assertThat(tweet.getContent(), is(MessageUtil.DELETE_BY_OWNED_ABSTRACT_POST_CONTENT));
         assertThat(tweet.isBanned(), is(true));
+    }
+
+    @Test(expected = PostDeleteException.class)
+    public void deleteCommentById_commentAlreadyDeleted() {
+        User user = a(user());
+        Tweet tweet = a(tweet()
+                .withOwner(user)
+                .withBanned(true)
+        );
+        when(tweetDao.exists(anyLong())).thenReturn(true);
+        when(tweetDao.findOne(anyLong())).thenReturn(tweet);
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
+        tweetService.delete(tweet.getId());
     }
 
     @Test

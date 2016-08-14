@@ -88,7 +88,7 @@ public class CommentServiceTest {
     }
 
     @Test(expected = PostDeleteException.class)
-    public void deleteCommentById_postAlreadyDeleted() {
+    public void deleteCommentById_commentAlreadyDeleted() {
         User user = a(user());
         Comment comment = a(comment()
                 .withOwner(user)
@@ -133,7 +133,7 @@ public class CommentServiceTest {
     @Test(expected = PostNotFoundException.class)
     public void getTweetCommentsById_tweetDoesNotExist() {
         when(tweetService.exists(anyLong())).thenReturn(false);
-        List<Comment> tweetComments = commentService.getTweetCommentsById(
+        commentService.getTweetCommentsById(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
         );
@@ -174,7 +174,7 @@ public class CommentServiceTest {
     @Test(expected = PostNotFoundException.class)
     public void getLatestCommentsById_tweetDoesNotExist() {
         when(tweetService.exists(anyLong())).thenReturn(false);
-        List<Comment> tweetComments = commentService.getLatestCommentsById(
+        commentService.getLatestCommentsById(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
         );
@@ -221,7 +221,7 @@ public class CommentServiceTest {
     @Test(expected = PostNotFoundException.class)
     public void getOldestCommentsById_tweetDoesNotExist() {
         when(tweetService.exists(anyLong())).thenReturn(false);
-        List<Comment> tweetCommentsResult = commentService.getOldestCommentsById(
+        commentService.getOldestCommentsById(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
         );
@@ -267,7 +267,7 @@ public class CommentServiceTest {
     @Test(expected = PostNotFoundException.class)
     public void getMostVotedComments_tweetDoesNotExist() {
         when(tweetService.exists(anyLong())).thenReturn(false);
-        List<Comment> tweetCommentsResult = commentService.getMostVotedComments(
+        commentService.getMostVotedComments(
                 TestUtil.ID_ONE,
                 TestUtil.ALL_IN_ONE_PAGE
         );

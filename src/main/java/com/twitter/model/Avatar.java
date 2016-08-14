@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -26,6 +27,8 @@ public class Avatar extends AbstractEntity{
 
     public Avatar() {
         super();
+        this.fileName = "avatar.jpg";
+        this.bytes = new byte[100]; //// TODO: 14.08.16 fix? 
     }
 
     public Avatar(String fileName, byte[] bytes) {

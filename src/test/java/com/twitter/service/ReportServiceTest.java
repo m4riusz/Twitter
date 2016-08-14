@@ -5,7 +5,7 @@ import com.twitter.dao.ReportDao;
 import com.twitter.exception.ReportNotFoundException;
 import com.twitter.exception.TwitterDateException;
 import com.twitter.model.*;
-import com.twitter.model.dto.ReportSentence;
+import com.twitter.dto.ReportSentence;
 import com.twitter.util.MessageUtil;
 import com.twitter.util.TestUtil;
 import org.joda.time.DateTime;

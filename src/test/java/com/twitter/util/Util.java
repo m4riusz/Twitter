@@ -9,6 +9,7 @@ import java.util.List;
  */
 public class Util {
 
+    @SafeVarargs
     public static <T> List<T> aListWith(T... ts) {
         return new ArrayList<>(Arrays.asList(ts));
     }

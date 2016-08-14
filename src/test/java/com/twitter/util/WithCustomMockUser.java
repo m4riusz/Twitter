@@ -1,4 +1,4 @@
-package com.twitter.security;
+package com.twitter.util;
 
 import org.springframework.security.test.context.support.WithSecurityContext;
 

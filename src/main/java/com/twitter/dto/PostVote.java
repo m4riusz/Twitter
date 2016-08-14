@@ -1,4 +1,4 @@
-package com.twitter.model.dto;
+package com.twitter.dto;
 
 import com.twitter.model.Vote;
 

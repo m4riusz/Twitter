@@ -108,8 +108,7 @@ public abstract class AbstractPost extends AbstractEntity {
 
         AbstractPost that = (AbstractPost) o;
 
-        if (!content.equals(that.content)) return false;
-        return owner.equals(that.owner);
+        return content.equals(that.content) && owner.equals(that.owner);
 
     }
 

@@ -1,7 +1,7 @@
 package com.twitter.builders;
 
 import com.twitter.util.Builder;
-import com.twitter.model.dto.ReportSentence;
+import com.twitter.dto.ReportSentence;
 import com.twitter.model.ReportStatus;
 
 import java.util.Calendar;

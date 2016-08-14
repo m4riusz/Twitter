@@ -4,6 +4,7 @@ import com.twitter.config.Profiles;
 import com.twitter.model.Role;
 import com.twitter.service.UserService;
 import com.twitter.util.TestUtil;
+import com.twitter.util.WithCustomMockUser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;

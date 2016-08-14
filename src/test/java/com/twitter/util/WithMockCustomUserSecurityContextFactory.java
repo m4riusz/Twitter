@@ -1,4 +1,4 @@
-package com.twitter.security;
+package com.twitter.util;
 
 import com.twitter.model.Password;
 import com.twitter.model.Role;

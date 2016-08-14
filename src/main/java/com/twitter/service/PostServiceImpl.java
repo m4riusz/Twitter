@@ -7,7 +7,7 @@ import com.twitter.exception.UserVoteException;
 import com.twitter.model.AbstractPost;
 import com.twitter.model.User;
 import com.twitter.model.UserVote;
-import com.twitter.model.dto.PostVote;
+import com.twitter.dto.PostVote;
 import com.twitter.util.MessageUtil;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;

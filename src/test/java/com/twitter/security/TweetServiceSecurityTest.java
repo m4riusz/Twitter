@@ -5,6 +5,7 @@ import com.twitter.model.Tweet;
 import com.twitter.model.Vote;
 import com.twitter.service.TweetService;
 import com.twitter.util.TestUtil;
+import com.twitter.util.WithCustomMockUser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

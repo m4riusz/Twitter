@@ -1,7 +1,7 @@
 package com.twitter.builders;
 
 import com.twitter.model.Vote;
-import com.twitter.model.dto.PostVote;
+import com.twitter.dto.PostVote;
 import com.twitter.util.Builder;
 
 /**
@@ -26,7 +26,6 @@ public final class PostVoteBuilder implements Builder<PostVote> {
     }
 
     public PostVote build() {
-        PostVote postVote = new PostVote(postId, vote);
-        return postVote;
+        return new PostVote(postId, vote);
     }
 }
