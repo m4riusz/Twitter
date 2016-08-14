@@ -1,7 +1,6 @@
 package com.twitter.dao;
 
 import com.twitter.config.Profiles;
-import com.twitter.model.AccountStatus;
 import com.twitter.model.User;
 import com.twitter.util.TestUtil;
 import org.junit.Test;
@@ -14,6 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
+import static com.twitter.builders.AccountStatusBuilder.accountStatus;
 import static com.twitter.builders.UserBuilder.user;
 import static com.twitter.util.Util.a;
 import static com.twitter.util.Util.aListWith;
@@ -358,7 +358,10 @@ public class UserDaoTest {
 
         User userOne = a(user()
                 .withAccountStatus(
-                        new AccountStatus(false, "someKey")
+                        a(accountStatus()
+                                .withEnable(false)
+                                .withVerifyKey("someKey")
+                        )
                 )
         );
         userDao.save(userOne);
