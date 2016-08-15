@@ -31,6 +31,7 @@ public final class Route {
     private static final String CATEGORY = "/category";
     private static final String REPORT_STATUS = "/{reportStatus}";
     private static final String REPORT_CATEGORY = "/{reportCategory}";
+    private static final String AVATAR = "/avatar";
 
     public static final String LOGIN_URL = API + "/login";
     public static final String LOGOUT_URL = API + "/logout";
@@ -75,4 +76,5 @@ public final class Route {
     public static final String REPORT_GET_ALL_BY_CATEGORY = REPORT_URL + CATEGORY + REPORT_CATEGORY + PAGE + SIZE;
     public static final String REPORT_GET_ALL_BY_STATUS_AND_CATEGORY = REPORT_URL + STATUS + REPORT_STATUS +
             CATEGORY + REPORT_CATEGORY + PAGE + SIZE;
+    public static final String USER_AVATAR = USER_BY_ID + AVATAR;
 }

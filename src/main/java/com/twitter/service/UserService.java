@@ -1,5 +1,6 @@
 package com.twitter.service;
 
+import com.twitter.model.Avatar;
 import com.twitter.model.Role;
 import com.twitter.model.User;
 import com.twitter.util.SecurityUtil;
@@ -10,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -19,7 +21,7 @@ import java.util.List;
 @Service
 public interface UserService extends UserDetailsService {
 
-    User create(User user);
+    User create(User user) throws IOException;
 
     User loadUserByUsername(String username) throws UsernameNotFoundException;
 
@@ -73,4 +75,9 @@ public interface UserService extends UserDetailsService {
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     List<User> getUserFollowingsById(long userId, Pageable pageable);
 
+    @PreAuthorize(SecurityUtil.AUTHENTICATED)
+    Avatar getUserAvatar(long userId); // TODO: 15.08.16 add tests
+
+    @PreAuthorize(SecurityUtil.PERSONAL_USAGE)
+    Avatar changeUserAvatar(long userId, Avatar avatar) throws IOException; // TODO: 15.08.16 add tests
 }

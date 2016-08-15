@@ -1,5 +1,6 @@
 package com.twitter.controller;
 
+import com.twitter.model.Avatar;
 import com.twitter.model.Password;
 import com.twitter.model.Role;
 import com.twitter.model.User;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -28,8 +30,18 @@ public class UserController {
     }
 
     @RequestMapping(value = Route.REGISTER_USER, method = RequestMethod.POST)
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) throws IOException {
         return new ResponseEntity<>(userService.create(user), HttpStatus.CREATED);
+    }
+
+    @RequestMapping(value = Route.USER_AVATAR, method = RequestMethod.GET)
+    public ResponseEntity<Avatar> getUserAvatar(@PathVariable long userId) {
+        return new ResponseEntity<>(userService.getUserAvatar(userId), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = Route.USER_AVATAR, method = RequestMethod.PUT)
+    public ResponseEntity<Avatar> changeUserAvatar(@PathVariable long userId, @RequestBody @Valid Avatar avatar) throws IOException {
+        return new ResponseEntity<>(userService.changeUserAvatar(userId, avatar), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.VERIFY_USER_URL, method = RequestMethod.GET)

@@ -6,6 +6,7 @@ import com.twitter.exception.*;
 import com.twitter.model.AccountStatus;
 import com.twitter.model.Role;
 import com.twitter.model.User;
+import com.twitter.util.AvatarUtil;
 import com.twitter.util.TestUtil;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -25,6 +26,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -56,6 +58,8 @@ public class  UserServiceTest {
     private UserDao userDao;
     @Mock
     private JavaMailSender javaMailSender;
+    @Mock
+    private AvatarUtil avatarUtil;
 
     private UserService userService;
 
@@ -63,7 +67,7 @@ public class  UserServiceTest {
 
     @Before
     public void setUp() {
-        userService = new UserServiceImpl(userDao, javaMailSender);
+        userService = new UserServiceImpl(userDao, javaMailSender, avatarUtil);
         authentication = mock(Authentication.class);
         mockStatic(SecurityContextHolder.class);
         SecurityContext securityContext = mock(SecurityContext.class);
@@ -104,7 +108,7 @@ public class  UserServiceTest {
     }
 
     @Test
-    public void create_userCreateTest() {
+    public void create_userCreateTest() throws IOException {
         User user = a(user());
         when(userDao.findByUsername(anyString())).thenReturn(null);
         when(userDao.findByEmail(anyString())).thenReturn(null);
@@ -115,13 +119,13 @@ public class  UserServiceTest {
     }
 
     @Test(expected = UserAlreadyExistsException.class)
-    public void create_usernameAlreadyExist() {
+    public void create_usernameAlreadyExist() throws IOException {
         when(userDao.findByUsername(anyString())).thenReturn(a(user()));
         userService.create(a(user()));
     }
 
     @Test(expected = UserAlreadyExistsException.class)
-    public void create_emailAlreadyExist() {
+    public void create_emailAlreadyExist() throws IOException {
         User user = a(user());
         when(userDao.findByUsername(anyString())).thenReturn(null);
         when(userDao.findByEmail(anyString())).thenReturn(user);

@@ -15,6 +15,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.IOException;
 import java.util.Date;
 
 import static com.twitter.builders.UserBuilder.user;
@@ -269,7 +270,7 @@ public class UserServiceSecurityTest {
 
     @WithAnonymousUser
     @Test
-    public void create_anonymousAccessDenied() {
+    public void create_anonymousAccessDenied() throws IOException {
         userService.create(a(user()));
     }
 }

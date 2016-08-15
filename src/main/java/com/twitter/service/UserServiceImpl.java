@@ -2,9 +2,11 @@ package com.twitter.service;
 
 import com.twitter.dao.UserDao;
 import com.twitter.exception.*;
+import com.twitter.model.Avatar;
 import com.twitter.model.Password;
 import com.twitter.model.Role;
 import com.twitter.model.User;
+import com.twitter.util.AvatarUtil;
 import com.twitter.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -29,11 +32,13 @@ public class UserServiceImpl implements UserService {
 
     private UserDao userDao;
     private JavaMailSender javaMailSender;
+    private AvatarUtil avatarUtil;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao, JavaMailSender javaMailSender) {
+    public UserServiceImpl(UserDao userDao, JavaMailSender javaMailSender, AvatarUtil avatarUtil) {
         this.userDao = userDao;
         this.javaMailSender = javaMailSender;
+        this.avatarUtil = avatarUtil;
     }
 
     @Override
@@ -62,7 +67,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User create(User user) {
+    public User create(User user) throws IOException {
         if (userWithUsernameExists(user.getUsername())) {
             throw new UserAlreadyExistsException(MessageUtil.USER_ALREADY_EXISTS_USERNAME_ERROR_MSG);
         } else if (userWithEmailExists(user.getEmail())) {
@@ -75,6 +80,7 @@ public class UserServiceImpl implements UserService {
                 MessageUtil.EMAIL_CONTENT + "\n" + MessageUtil.EMAIL_VERIFY_LINK + verifyKey
         );
         user.getAccountStatus().setVerifyKey(verifyKey);
+        user.setAvatar(avatarUtil.getDefaultAvatar());
         return userDao.save(user);
     }
 
@@ -171,6 +177,18 @@ public class UserServiceImpl implements UserService {
     public List<User> getUserFollowingsById(long userId, Pageable pageable) {
         checkIfUserExist(userId);
         return userDao.findFollowingByUserId(userId, pageable);
+    }
+
+    @Override
+    public Avatar getUserAvatar(long userId) {
+        return getUserById(userId).getAvatar();
+    }
+
+    @Override
+    public Avatar changeUserAvatar(long userId, Avatar avatar) throws IOException {
+        User user = getUserById(userId);
+        user.setAvatar(avatarUtil.resizeToStandardSize(avatar));
+        return user.getAvatar();
     }
 
     @Override
