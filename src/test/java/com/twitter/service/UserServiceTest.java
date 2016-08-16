@@ -4,6 +4,7 @@ import com.twitter.config.Profiles;
 import com.twitter.dao.UserDao;
 import com.twitter.exception.*;
 import com.twitter.model.AccountStatus;
+import com.twitter.model.Avatar;
 import com.twitter.model.Role;
 import com.twitter.model.User;
 import com.twitter.util.AvatarUtil;
@@ -34,6 +35,7 @@ import static com.twitter.builders.UserBuilder.user;
 import static com.twitter.matchers.UserFollowerMatcher.hasFollowers;
 import static com.twitter.matchers.UserIsBanned.isBanned;
 import static com.twitter.matchers.UserIsEnabled.isEnabled;
+import static com.twitter.builders.AvatarBuilder.avatar;
 import static com.twitter.util.Util.a;
 import static com.twitter.util.Util.aListWith;
 import static java.util.Collections.emptyList;
@@ -482,6 +484,44 @@ public class  UserServiceTest {
         when(userDao.exists(anyLong())).thenReturn(true);
         boolean userExist = userService.exists(TestUtil.ID_ONE);
         assertThat(userExist, is(true));
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void getUserAvatar_userDoesNotExist() {
+        when(userDao.exists(anyLong())).thenReturn(false);
+        userService.getUserAvatar(TestUtil.ID_ONE);
+    }
+
+    @Test
+    public void getUserAvatar_userExists() {
+        User user = a(user());
+        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userDao.findOne(anyLong())).thenReturn(user);
+        Avatar userAvatar = userService.getUserAvatar(TestUtil.ID_ONE);
+        assertThat(userAvatar, is(user.getAvatar()));
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void changeUserAvatar_userDoesNotExist() throws IOException {
+        when(userDao.exists(anyLong())).thenReturn(false);
+        userService.changeUserAvatar(TestUtil.ID_ONE, a(avatar()));
+    }
+
+    @Test
+    public void changeUserAvatar_userExists() throws IOException {
+        String newFileName = "file.jpg";
+        int avatarSize = 100;
+        Avatar newAvatar = a(avatar()
+                .withFileName(newFileName)
+                .withBytes(new byte[avatarSize])
+        );
+        User user = a(user());
+        when(userDao.exists(anyLong())).thenReturn(true);
+        when(userDao.findOne(anyLong())).thenReturn(user);
+        when(avatarUtil.resizeToStandardSize(any(Avatar.class))).thenReturn(newAvatar);
+        Avatar changedUserAvatar = userService.changeUserAvatar(TestUtil.ID_ONE, user.getAvatar());
+        assertThat(changedUserAvatar.getFileName(), is(newFileName));
+        assertThat(changedUserAvatar.getBytes().length, is(avatarSize));
     }
 
 }

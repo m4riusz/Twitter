@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Date;
 
 import static com.twitter.builders.UserBuilder.user;
+import static com.twitter.builders.AvatarBuilder.avatar;
 import static com.twitter.util.Util.a;
 
 /**
@@ -257,20 +258,38 @@ public class UserServiceSecurityTest {
 
     @WithAnonymousUser
     @Test
-    public void activateAccount_anonymousAccessDenied() {
+    public void activateAccount_anonymousAccess() {
         userService.activateAccount("secret_activation_key");
     }
 
 
     @WithAnonymousUser
     @Test
-    public void loadUserByUsername_anonymousAccessDenied() {
+    public void loadUserByUsername_anonymousAccess() {
         userService.loadUserByUsername("username");
     }
 
     @WithAnonymousUser
     @Test
-    public void create_anonymousAccessDenied() throws IOException {
+    public void create_anonymousAccess() throws IOException {
         userService.create(a(user()));
+    }
+
+    @WithAnonymousUser
+    @Test(expected = AccessDeniedException.class)
+    public void getUserAvatar_anonymousAccessDenied() throws IOException {
+        userService.getUserAvatar(TestUtil.ID_ONE);
+    }
+
+    @WithCustomMockUser(authorities = TestUtil.ANONYMOUS)
+    @Test(expected = AccessDeniedException.class)
+    public void changeUserAvatar_anonymousAccessDenied() throws IOException {
+        userService.changeUserAvatar(TestUtil.ID_ONE, a(avatar()));
+    }
+
+    @WithCustomMockUser(id = TestUtil.ID_TWO)
+    @Test(expected = AccessDeniedException.class)
+    public void changeUserAvatar_wrongUser() throws IOException {
+        userService.changeUserAvatar(TestUtil.ID_ONE, a(avatar()));
     }
 }

@@ -76,8 +76,8 @@ public interface UserService extends UserDetailsService {
     List<User> getUserFollowingsById(long userId, Pageable pageable);
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
-    Avatar getUserAvatar(long userId); // TODO: 15.08.16 add tests
+    Avatar getUserAvatar(long userId);
 
     @PreAuthorize(SecurityUtil.PERSONAL_USAGE)
-    Avatar changeUserAvatar(long userId, Avatar avatar) throws IOException; // TODO: 15.08.16 add tests
+    Avatar changeUserAvatar(long userId, Avatar avatar) throws IOException;
 }
