@@ -17,10 +17,12 @@ import org.springframework.stereotype.Service;
 public class UserVoteServiceImpl implements UserVoteService {
 
     private UserVoteDao userVoteDao;
+    private UserService userService;
 
     @Autowired
-    public UserVoteServiceImpl(UserVoteDao userVoteDao) {
+    public UserVoteServiceImpl(UserVoteDao userVoteDao, UserService userService) {
         this.userVoteDao = userVoteDao;
+        this.userService = userService;
     }
 
     @Override
@@ -48,6 +50,11 @@ public class UserVoteServiceImpl implements UserVoteService {
 
     @Override
     public void delete(long userVoteId) {
-        userVoteDao.delete(getById(userVoteId));
+        UserVote userVote = getById(userVoteId);
+        User currentLoggedUser = userService.getCurrentLoggedUser();
+        if (!userVote.getUser().equals(currentLoggedUser)) {
+            throw new UserVoteException(MessageUtil.VOTE_DELETE_ERROR_MSG);
+        }
+        userVoteDao.delete(userVote);
     }
 }
