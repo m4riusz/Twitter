@@ -1,6 +1,9 @@
 package com.twitter.model;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
@@ -26,6 +29,9 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 public abstract class AbstractPost extends AbstractEntity {
     @NotNull
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private boolean deleted;
+    @NotNull
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private boolean banned;
     @NotNull
     @Length(
@@ -49,6 +55,7 @@ public abstract class AbstractPost extends AbstractEntity {
 
     public AbstractPost() {
         super();
+        this.deleted = false;
         this.banned = false;
         this.votes = new ArrayList<>();
         this.reports = new ArrayList<>();
@@ -58,6 +65,14 @@ public abstract class AbstractPost extends AbstractEntity {
         this();
         this.content = content;
         this.owner = owner;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public boolean isBanned() {

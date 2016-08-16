@@ -1,16 +1,16 @@
 package com.twitter.builders;
 
-import com.twitter.util.Builder;
 import com.twitter.model.*;
+import com.twitter.util.Builder;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import static com.twitter.util.Util.a;
 import static com.twitter.builders.UserBuilder.user;
 import static com.twitter.builders.UserVoteBuilder.userVote;
+import static com.twitter.util.Util.a;
 
 /**
  * Created by mariusz on 21.07.16.
@@ -18,6 +18,7 @@ import static com.twitter.builders.UserVoteBuilder.userVote;
 public final class CommentBuilder implements Builder<Comment> {
     private static long counter = 0L;
     private boolean banned = false;
+    private boolean deleted = false;
     private String content = "comment content nr " + counter;
     private Tweet tweet;
     private User owner;
@@ -34,6 +35,11 @@ public final class CommentBuilder implements Builder<Comment> {
 
     public CommentBuilder withBanned(boolean banned) {
         this.banned = banned;
+        return this;
+    }
+
+    public CommentBuilder withDeleted(boolean deleted) {
+        this.deleted = deleted;
         return this;
     }
 
@@ -94,6 +100,7 @@ public final class CommentBuilder implements Builder<Comment> {
         comment.setVotes(votes);
         comment.setReports(reports);
         comment.setId(id);
+        comment.setDeleted(deleted);
         comment.setCreateDate(createDate);
         return comment;
     }

@@ -20,8 +20,11 @@ public class AccountStatus extends AbstractEntity {
     private Date bannedUntil;
     @NotNull
     private String verifyKey;
+    @NotNull
+    private boolean deleted;
 
     public AccountStatus(boolean enable, String verifyKey) {
+        this();
         this.enable = enable;
         this.verifyKey = verifyKey;
     }
@@ -29,6 +32,7 @@ public class AccountStatus extends AbstractEntity {
     public AccountStatus() {
         this.enable = false;
         this.verifyKey = "";
+        this.deleted = false;
     }
 
     public boolean isEnable() {
@@ -61,5 +65,13 @@ public class AccountStatus extends AbstractEntity {
 
     public void setVerifyKey(String verifyKey) {
         this.verifyKey = verifyKey;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }

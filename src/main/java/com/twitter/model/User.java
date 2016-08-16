@@ -188,7 +188,7 @@ public class User extends AbstractEntity implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return !accountStatus.isDeleted();
     }
 
     @Override
