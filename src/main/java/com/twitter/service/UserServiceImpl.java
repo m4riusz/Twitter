@@ -134,8 +134,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserById(long userId) {
-        checkIfUserExist(userId);
-        userDao.delete(userId);
+        User user = getUserById(userId);
+        user.getAccountStatus().setDeleted(true);
     }
 
     @Override

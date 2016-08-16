@@ -23,8 +23,8 @@ public class CommentServiceImpl extends PostServiceImpl<Comment, CommentDao> imp
     private TweetService tweetService;
 
     @Autowired
-    public CommentServiceImpl(CommentDao commentDao, TweetService tweetService, UserVoteDao userVoteDao, UserService userService) {
-        super(commentDao, userService, userVoteDao);
+    public CommentServiceImpl(CommentDao commentDao, TweetService tweetService, UserVoteService userVoteService, UserService userService) {
+        super(commentDao, userService, userVoteService);
         this.tweetService = tweetService;
     }
 

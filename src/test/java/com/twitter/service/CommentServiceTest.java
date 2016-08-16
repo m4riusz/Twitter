@@ -2,14 +2,13 @@ package com.twitter.service;
 
 import com.twitter.config.Profiles;
 import com.twitter.dao.CommentDao;
-import com.twitter.dao.UserVoteDao;
+import com.twitter.dto.PostVote;
 import com.twitter.exception.PostDeleteException;
 import com.twitter.exception.PostNotFoundException;
 import com.twitter.exception.UserNotFoundException;
 import com.twitter.model.*;
 import com.twitter.util.MessageUtil;
 import com.twitter.util.TestUtil;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,13 +50,13 @@ public class CommentServiceTest {
     @Mock
     private UserService userService;
     @Mock
-    private UserVoteDao userVoteDao;
+    private UserVoteService userVoteService;
 
     private CommentService commentService;
 
     @Before
     public void setUp() {
-        commentService = new CommentServiceImpl(commentDao, tweetService, userVoteDao, userService);
+        commentService = new CommentServiceImpl(commentDao, tweetService, userVoteService, userService);
     }
 
     @Test
@@ -92,7 +91,7 @@ public class CommentServiceTest {
         User user = a(user());
         Comment comment = a(comment()
                 .withOwner(user)
-                .withBanned(true)
+                .withDeleted(true)
         );
         when(commentDao.exists(anyLong())).thenReturn(true);
         when(commentDao.findOne(anyLong())).thenReturn(comment);
@@ -105,14 +104,14 @@ public class CommentServiceTest {
         User user = a(user());
         Comment comment = a(comment()
                 .withOwner(user)
-                .withBanned(false)
+                .withDeleted(false)
         );
         when(commentDao.exists(anyLong())).thenReturn(true);
         when(commentDao.findOne(anyLong())).thenReturn(comment);
         when(userService.getCurrentLoggedUser()).thenReturn(user);
         commentService.delete(comment.getId());
         assertThat(comment.getContent(), is(MessageUtil.DELETE_BY_OWNED_ABSTRACT_POST_CONTENT));
-        assertThat(comment.isBanned(), is(true));
+        assertThat(comment.isDeleted(), is(true));
     }
 
     @Test(expected = PostNotFoundException.class)
@@ -332,19 +331,21 @@ public class CommentServiceTest {
     public void vote_successVoteCreate() {
         User user = a(user());
         Comment comment = a(comment());
+        PostVote postVote = a(postVote()
+                .withPostId(comment.getId())
+                .withVote(Vote.UP)
+        );
         when(commentDao.exists(anyLong())).thenReturn(true);
         when(commentDao.findOne(anyLong())).thenReturn(comment);
         when(userService.getCurrentLoggedUser()).thenReturn(user);
-        when(userVoteDao.findByUserAndAbstractPost(any(User.class), any(AbstractPost.class))).thenReturn(null);
+        when(userVoteService.findUserVoteForPost(any(User.class), any(AbstractPost.class))).thenReturn(null);
+        when(userVoteService.save(any(UserVote.class))).thenReturn(new UserVote(postVote.getVote(), user, comment));
         UserVote userVote = commentService.vote(
-                a(postVote()
-                        .withPostId(comment.getId())
-                        .withVote(Vote.UP)
-                )
+                postVote
         );
-        assertThat(userVote.getVote(), Matchers.is(Vote.UP));
-        assertThat(userVote.getAbstractPost(), Matchers.is(comment));
-        assertThat(userVote.getUser(), Matchers.is(user));
+        assertThat(userVote.getVote(), is(Vote.UP));
+        assertThat(userVote.getAbstractPost(), is(comment));
+        assertThat(userVote.getUser(), is(user));
     }
 
     @Test
@@ -360,7 +361,7 @@ public class CommentServiceTest {
                 .withAbstractPost(comment)
                 .withVote(Vote.UP)
         );
-        when(userVoteDao.findByUserAndAbstractPost(any(User.class), any(AbstractPost.class))).thenReturn(vote);
+        when(userVoteService.findUserVoteForPost(any(User.class), any(AbstractPost.class))).thenReturn(vote);
         UserVote userVote = commentService.vote(
                 a(postVote()
                         .withPostId(comment.getId())

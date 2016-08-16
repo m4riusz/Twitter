@@ -2,7 +2,7 @@ package com.twitter.service;
 
 import com.twitter.config.Profiles;
 import com.twitter.dao.TweetDao;
-import com.twitter.dao.UserVoteDao;
+import com.twitter.dto.PostVote;
 import com.twitter.exception.PostDeleteException;
 import com.twitter.exception.PostNotFoundException;
 import com.twitter.exception.TwitterGetException;
@@ -58,13 +58,13 @@ public class TweetServiceTest {
     private TagExtractor tagExtractor;
 
     @Mock
-    private UserVoteDao userVoteDao;
+    private UserVoteService userVoteService;
 
     private TweetService tweetService;
 
     @Before
     public void setUp() {
-        tweetService = new TweetServiceImpl(tweetDao, userService, userVoteDao, tagExtractor);
+        tweetService = new TweetServiceImpl(tweetDao, userService, userVoteService, tagExtractor);
     }
 
     @Test(expected = PostNotFoundException.class)
@@ -114,13 +114,14 @@ public class TweetServiceTest {
         User user = a(user());
         Tweet tweet = a(tweet()
                 .withOwner(user)
+                .withDeleted(false)
         );
         when(tweetDao.exists(anyLong())).thenReturn(true);
         when(tweetDao.findOne(anyLong())).thenReturn(tweet);
         when(userService.getCurrentLoggedUser()).thenReturn(user);
         tweetService.delete(tweet.getId());
         assertThat(tweet.getContent(), is(MessageUtil.DELETE_BY_OWNED_ABSTRACT_POST_CONTENT));
-        assertThat(tweet.isBanned(), is(true));
+        assertThat(tweet.isDeleted(), is(true));
     }
 
     @Test(expected = PostDeleteException.class)
@@ -128,7 +129,7 @@ public class TweetServiceTest {
         User user = a(user());
         Tweet tweet = a(tweet()
                 .withOwner(user)
-                .withBanned(true)
+                .withDeleted(true)
         );
         when(tweetDao.exists(anyLong())).thenReturn(true);
         when(tweetDao.findOne(anyLong())).thenReturn(tweet);
@@ -334,15 +335,17 @@ public class TweetServiceTest {
     public void vote_successVoteCreate() {
         User user = a(user());
         Tweet tweet = a(tweet());
+        PostVote postVote = a(postVote()
+                .withPostId(tweet.getId())
+                .withVote(Vote.UP)
+        );
         when(tweetDao.exists(anyLong())).thenReturn(true);
         when(tweetDao.findOne(anyLong())).thenReturn(tweet);
         when(userService.getCurrentLoggedUser()).thenReturn(user);
-        when(userVoteDao.findByUserAndAbstractPost(any(User.class), any(AbstractPost.class))).thenReturn(null);
+        when(userVoteService.findUserVoteForPost(any(User.class), any(AbstractPost.class))).thenReturn(null);
+        when(userVoteService.save(any(UserVote.class))).thenReturn(new UserVote(postVote.getVote(), user, tweet));
         UserVote userVote = tweetService.vote(
-                a(postVote()
-                        .withPostId(tweet.getId())
-                        .withVote(Vote.UP)
-                )
+                postVote
         );
         assertThat(userVote.getVote(), is(Vote.UP));
         assertThat(userVote.getAbstractPost(), is(tweet));
@@ -362,7 +365,7 @@ public class TweetServiceTest {
                 .withAbstractPost(tweet)
                 .withVote(Vote.UP)
         );
-        when(userVoteDao.findByUserAndAbstractPost(any(User.class), any(AbstractPost.class))).thenReturn(vote);
+        when(userVoteService.findUserVoteForPost(any(User.class), any(AbstractPost.class))).thenReturn(vote);
         UserVote userVote = tweetService.vote(
                 a(postVote()
                         .withPostId(tweet.getId())

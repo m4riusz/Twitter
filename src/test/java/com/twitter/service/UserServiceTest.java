@@ -31,11 +31,11 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
+import static com.twitter.builders.AvatarBuilder.avatar;
 import static com.twitter.builders.UserBuilder.user;
 import static com.twitter.matchers.UserFollowerMatcher.hasFollowers;
 import static com.twitter.matchers.UserIsBanned.isBanned;
 import static com.twitter.matchers.UserIsEnabled.isEnabled;
-import static com.twitter.builders.AvatarBuilder.avatar;
 import static com.twitter.util.Util.a;
 import static com.twitter.util.Util.aListWith;
 import static java.util.Collections.emptyList;
@@ -235,9 +235,11 @@ public class  UserServiceTest {
 
     @Test
     public void deleteUserById_userExists() {
+        User user = a(user());
         when(userDao.exists(anyLong())).thenReturn(true);
+        when(userDao.findOne(anyLong())).thenReturn(user);
         userService.deleteUserById(TestUtil.ID_ONE);
-        verify(userDao, times(1)).delete(TestUtil.ID_ONE);
+        assertThat(user.getAccountStatus().isDeleted(), is(true));
     }
 
     @Test

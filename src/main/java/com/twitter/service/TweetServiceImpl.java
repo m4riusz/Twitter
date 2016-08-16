@@ -1,7 +1,6 @@
 package com.twitter.service;
 
 import com.twitter.dao.TweetDao;
-import com.twitter.dao.UserVoteDao;
 import com.twitter.exception.TwitterGetException;
 import com.twitter.exception.UserNotFoundException;
 import com.twitter.model.Tag;
@@ -28,8 +27,8 @@ public class TweetServiceImpl extends PostServiceImpl<Tweet, TweetDao> implement
     private final TagExtractor tagExtractor;
 
     @Autowired
-    public TweetServiceImpl(TweetDao tweetDao, UserService userService, UserVoteDao userVoteDao, TagExtractor tagExtractor) {
-        super(tweetDao, userService, userVoteDao);
+    public TweetServiceImpl(TweetDao tweetDao, UserService userService, UserVoteService userVoteService, TagExtractor tagExtractor) {
+        super(tweetDao, userService, userVoteService);
         this.tagExtractor = tagExtractor;
     }
 
