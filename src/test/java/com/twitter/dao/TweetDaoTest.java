@@ -454,5 +454,74 @@ public class TweetDaoTest {
         assertThat(tweetsFromFollowingUsersPageTwo, contains(tweetTwo, tweetOne));
     }
 
+    @Test
+    public void getFavouriteTweetsFromUser_oneUserSomeTweets() {
+        User postOwner = a(user());
 
+        Tweet tweetOne = a(tweet()
+                .withOwner(postOwner)
+        );
+        Tweet tweetTwo = a(tweet()
+                .withOwner(postOwner)
+        );
+        User user = a(user()
+                .withFavouriteTweets(
+                        aListWith(
+                                tweetOne,
+                                tweetTwo
+                        )
+                )
+        );
+        userDao.save(aListWith(postOwner, user));
+        List<Tweet> userFavouriteTweets = tweetDao.findFavouriteTweetsFromUser(user.getId(), TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(userFavouriteTweets, hasItems(tweetOne, tweetTwo));
+    }
+
+
+    @Test
+    public void getFavouriteTweetsFromUser_someUserSomeTweets() {
+        User postOwner = a(user());
+
+        Tweet tweetOne = a(tweet()
+                .withOwner(postOwner)
+        );
+        Tweet tweetTwo = a(tweet()
+                .withOwner(postOwner)
+        );
+        Tweet tweetThree = a(tweet()
+                .withOwner(postOwner)
+        );
+        Tweet tweetFour = a(tweet()
+                .withOwner(postOwner)
+        );
+
+        User userOne = a(user()
+                .withFavouriteTweets(
+                        aListWith(
+                                tweetOne,
+                                tweetTwo,
+                                tweetThree,
+                                tweetFour
+                        )
+                )
+        );
+
+        User userTwo = a(user()
+                .withFavouriteTweets(
+                        aListWith(
+                                tweetOne,
+                                tweetTwo
+                        )
+                )
+        );
+        userDao.save(aListWith(postOwner, userOne, userTwo));
+
+        List<Tweet> userOneFavouriteTweets = tweetDao.findFavouriteTweetsFromUser(userOne.getId(), TestUtil.ALL_IN_ONE_PAGE);
+        List<Tweet> userTwoFavouriteTweets = tweetDao.findFavouriteTweetsFromUser(userTwo.getId(), TestUtil.ALL_IN_ONE_PAGE);
+
+        assertThat(userOneFavouriteTweets, hasItems(tweetOne, tweetTwo, tweetThree, tweetFour));
+        assertThat(userTwoFavouriteTweets, hasItems(tweetOne, tweetTwo));
+        assertThat(userOneFavouriteTweets, hasSize(4));
+        assertThat(userTwoFavouriteTweets, hasSize(2));
+    }
 }

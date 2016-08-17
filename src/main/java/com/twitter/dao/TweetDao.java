@@ -9,8 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.twitter.dao.Query.SELECT_MOST_POPULAR_TWEETS_BY_TIME;
-import static com.twitter.dao.Query.SELECT_NEWEST_TWEETS_FROM_FOLLOWERS;
+import static com.twitter.dao.Query.*;
 
 /**
  * Created by mariusz on 19.07.16.
@@ -27,5 +26,8 @@ public interface TweetDao extends JpaRepository<Tweet, Long> {
 
     @Query(value = SELECT_NEWEST_TWEETS_FROM_FOLLOWERS)
     public List<Tweet> findTweetsFromFollowingUsers(long userId, Pageable pageable);
+
+    @Query(value = SELECT_FAVOURITE_TWEETS_FROM_USER)
+    public List<Tweet> findFavouriteTweetsFromUser(long userId, Pageable pageable);
 }
 

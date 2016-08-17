@@ -25,4 +25,6 @@ public interface TweetService extends PostService<Tweet> {
     List<Tweet> getMostVotedTweets(int hours, Pageable pageable);
 
     List<Tweet> getTweetsByTagsOrderedByNewest(List<Tag> tagList, Pageable pageable);
+
+    List<Tweet> getFavouriteTweetsFromUser(long userId, Pageable pageable);
 }

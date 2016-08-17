@@ -34,8 +34,9 @@ import static com.twitter.util.Util.aListWith;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 
@@ -376,5 +377,30 @@ public class TweetServiceTest {
         assertThat(userVote.getVote(), is(Vote.DOWN));
         assertThat(userVote.getAbstractPost(), is(tweet));
         assertThat(userVote.getUser(), is(user));
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void getFavouriteTweetsFromUser_userDoesNotExist() {
+        when(userService.exists(anyLong())).thenReturn(false);
+        tweetService.getFavouriteTweetsFromUser(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
+    }
+
+    @Test
+    public void getFavouriteTweetsFromUser_userExistSomeTweets() {
+        User user = a(user());
+        Tweet tweetOne = a(tweet());
+        Tweet tweetTwo = a(tweet());
+        Tweet tweetThree = a(tweet());
+        when(userService.exists(anyLong())).thenReturn(true);
+        when(tweetDao.findFavouriteTweetsFromUser(anyLong(), any(Pageable.class))).thenReturn(
+                aListWith(
+                        tweetOne,
+                        tweetTwo,
+                        tweetThree
+                )
+        );
+        List<Tweet> favouriteTweetsFromUser = tweetService.getFavouriteTweetsFromUser(user.getId(), TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(favouriteTweetsFromUser, hasItems(tweetOne, tweetTwo, tweetThree));
+        assertThat(favouriteTweetsFromUser, hasSize(3));
     }
 }

@@ -32,6 +32,7 @@ public final class Route {
     private static final String REPORT_STATUS = "/{reportStatus}";
     private static final String REPORT_CATEGORY = "/{reportCategory}";
     private static final String AVATAR = "/avatar";
+    private static final String FAVOURITES = "/favourites";
 
     public static final String LOGIN_URL = API + "/login";
     public static final String LOGOUT_URL = API + "/logout";
@@ -59,6 +60,7 @@ public final class Route {
     public static final String TWEET_VOTE = TWEET_URL + VOTE;
     public static final String TWEET_VOTE_BY_ID = TWEET_VOTE + VOTE_ID;
     public static final String TWEETS_WITH_TAGS = TWEET_URL + "/tags" + PAGE + SIZE;
+    public static final String TWEETS_FROM_USER_FAVOURITES = TWEETS_FROM_USER + FAVOURITES;
 
     public static final String COMMENT_URL = API + COMMENT;
     public static final String COMMENTS_FROM_TWEET = TWEET_BY_ID + COMMENT + PAGE + SIZE;

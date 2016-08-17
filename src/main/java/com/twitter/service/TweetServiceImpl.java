@@ -74,4 +74,12 @@ public class TweetServiceImpl extends PostServiceImpl<Tweet, TweetDao> implement
         return repository.findDistinctByTagsInOrderByCreateDateDesc(tagList, pageable);
     }
 
+    @Override
+    public List<Tweet> getFavouriteTweetsFromUser(long userId, Pageable pageable) {
+        if (doesUserExist(userId)) {
+            return repository.findFavouriteTweetsFromUser(userId, pageable);
+        }
+        throw new UserNotFoundException(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+    }
+
 }

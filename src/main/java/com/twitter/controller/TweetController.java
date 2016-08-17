@@ -1,9 +1,9 @@
 package com.twitter.controller;
 
+import com.twitter.dto.PostVote;
 import com.twitter.model.Tag;
 import com.twitter.model.Tweet;
 import com.twitter.model.UserVote;
-import com.twitter.dto.PostVote;
 import com.twitter.route.Route;
 import com.twitter.service.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +84,11 @@ public class TweetController {
     @RequestMapping(value = Route.TWEETS_WITH_TAGS, method = RequestMethod.GET)
     public ResponseEntity<List<Tweet>> getTweetsByTags(@RequestBody @Valid Tag[] tags, @PathVariable int page, @PathVariable int size) {
         return new ResponseEntity<>(tweetService.getTweetsByTagsOrderedByNewest(Arrays.asList(tags), new PageRequest(page, size)), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = Route.TWEETS_FROM_USER_FAVOURITES, method = RequestMethod.GET)
+    public ResponseEntity<List<Tweet>> getFavouriteTweetsByUserId(@PathVariable long userId, @PathVariable int page, @PathVariable int size) {
+        return new ResponseEntity<>(tweetService.getFavouriteTweetsFromUser(userId, new PageRequest(page, size)), HttpStatus.OK);
     }
 
 }
