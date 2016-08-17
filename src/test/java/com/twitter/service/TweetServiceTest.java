@@ -3,10 +3,7 @@ package com.twitter.service;
 import com.twitter.config.Profiles;
 import com.twitter.dao.TweetDao;
 import com.twitter.dto.PostVote;
-import com.twitter.exception.PostDeleteException;
-import com.twitter.exception.PostNotFoundException;
-import com.twitter.exception.TwitterGetException;
-import com.twitter.exception.UserNotFoundException;
+import com.twitter.exception.*;
 import com.twitter.model.*;
 import com.twitter.util.MessageUtil;
 import com.twitter.util.TagExtractor;
@@ -402,5 +399,35 @@ public class TweetServiceTest {
         List<Tweet> favouriteTweetsFromUser = tweetService.getFavouriteTweetsFromUser(user.getId(), TestUtil.ALL_IN_ONE_PAGE);
         assertThat(favouriteTweetsFromUser, hasItems(tweetOne, tweetTwo, tweetThree));
         assertThat(favouriteTweetsFromUser, hasSize(3));
+    }
+
+    @Test(expected = PostException.class)
+    public void addTweetToFavourites_tweetAlreadyInFavouritesTweets() {
+        Tweet tweet = a(tweet());
+        User user = a(user()
+                .withFavouriteTweets(
+                        aListWith(
+                                tweet
+                        )
+                )
+        );
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
+        when(tweetDao.doesTweetBelongToUserFavouritesTweets(anyLong(), anyLong())).thenReturn(true);
+        tweetService.addTweetToFavourites(tweet.getId());
+    }
+
+    @Test
+    public void addTweetToFavourites_tweetIsNotInUserFavouritesTweets() {
+        Tweet tweet = a(tweet());
+        User user = a(user());
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
+        when(userService.getUserById(anyLong())).thenReturn(user);
+        when(tweetDao.exists(anyLong())).thenReturn(true);
+        when(tweetDao.findOne(anyLong())).thenReturn(tweet);
+        when(tweetDao.doesTweetBelongToUserFavouritesTweets(anyLong(), anyLong())).thenReturn(false);
+
+        Tweet tweetFromDb = tweetService.addTweetToFavourites(tweet.getId());
+        assertThat(tweetFromDb, is(tweet));
+        assertThat(user.getFavouriteTweets(), hasItem(tweet));
     }
 }

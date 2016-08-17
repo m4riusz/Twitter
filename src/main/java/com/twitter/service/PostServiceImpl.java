@@ -18,7 +18,7 @@ import org.springframework.data.repository.query.Param;
 abstract class PostServiceImpl<T extends AbstractPost, TRepository extends CrudRepository<T, Long>> implements PostService<T> {
 
     protected final TRepository repository;
-    private final UserService userService;
+    protected final UserService userService;
     private final UserVoteService userVoteService;
 
     PostServiceImpl(TRepository repository, UserService userService, UserVoteService userVoteService) {
@@ -29,6 +29,7 @@ abstract class PostServiceImpl<T extends AbstractPost, TRepository extends CrudR
 
     @Override
     public T create(@Param("post") T post) {
+        post.setOwner(userService.getCurrentLoggedUser());
         return repository.save(post);
     }
 

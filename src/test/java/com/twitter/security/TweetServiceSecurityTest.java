@@ -124,4 +124,16 @@ public class TweetServiceSecurityTest {
     public void getTweetsByTagsOrderedByNewest_anonymousAccessDenied() {
         tweetService.getTweetsByTagsOrderedByNewest(emptyList(), TestUtil.ALL_IN_ONE_PAGE);
     }
+
+    @WithAnonymousUser
+    @Test(expected = AccessDeniedException.class)
+    public void getFavouriteTweetsFromUser_anonymousAccessDenied() {
+        tweetService.getFavouriteTweetsFromUser(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
+    }
+
+    @WithAnonymousUser
+    @Test(expected = AccessDeniedException.class)
+    public void addTweetToFavourites_anonymousAccessDenied() {
+        tweetService.addTweetToFavourites(TestUtil.ID_ONE);
+    }
 }

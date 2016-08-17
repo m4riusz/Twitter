@@ -60,7 +60,8 @@ public final class Route {
     public static final String TWEET_VOTE = TWEET_URL + VOTE;
     public static final String TWEET_VOTE_BY_ID = TWEET_VOTE + VOTE_ID;
     public static final String TWEETS_WITH_TAGS = TWEET_URL + "/tags" + PAGE + SIZE;
-    public static final String TWEETS_FROM_USER_FAVOURITES = TWEETS_FROM_USER + FAVOURITES;
+    public static final String TWEETS_FROM_USER_FAVOURITES = USER_BY_ID + FAVOURITES + PAGE + SIZE;
+    public static final String TWEET_TO_USER_FAVOURITES = USER_URL + FAVOURITES + TWEET_ID;
 
     public static final String COMMENT_URL = API + COMMENT;
     public static final String COMMENTS_FROM_TWEET = TWEET_BY_ID + COMMENT + PAGE + SIZE;

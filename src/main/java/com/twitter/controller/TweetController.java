@@ -91,4 +91,10 @@ public class TweetController {
         return new ResponseEntity<>(tweetService.getFavouriteTweetsFromUser(userId, new PageRequest(page, size)), HttpStatus.OK);
     }
 
+    @RequestMapping(value = Route.TWEET_TO_USER_FAVOURITES, method = RequestMethod.POST)
+    public ResponseEntity<Tweet> addTweetToUsersFavouriteTweets(@PathVariable long tweetId) {
+        return new ResponseEntity<>(tweetService.addTweetToFavourites(tweetId), HttpStatus.OK);
+    }
+
+
 }

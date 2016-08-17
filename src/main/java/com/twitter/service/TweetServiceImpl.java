@@ -1,10 +1,12 @@
 package com.twitter.service;
 
 import com.twitter.dao.TweetDao;
+import com.twitter.exception.PostException;
 import com.twitter.exception.TwitterGetException;
 import com.twitter.exception.UserNotFoundException;
 import com.twitter.model.Tag;
 import com.twitter.model.Tweet;
+import com.twitter.model.User;
 import com.twitter.util.MessageUtil;
 import com.twitter.util.SecurityUtil;
 import com.twitter.util.TagExtractor;
@@ -80,6 +82,17 @@ public class TweetServiceImpl extends PostServiceImpl<Tweet, TweetDao> implement
             return repository.findFavouriteTweetsFromUser(userId, pageable);
         }
         throw new UserNotFoundException(MessageUtil.USER_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
+    }
+
+    @Override
+    public Tweet addTweetToFavourites(long tweetId) {
+        User currentLoggedUser = userService.getCurrentLoggedUser();
+        Tweet tweet = getById(tweetId);
+        if (!repository.doesTweetBelongToUserFavouritesTweets(currentLoggedUser.getId(), tweet.getId())) {
+            userService.getUserById(currentLoggedUser.getId()).getFavouriteTweets().add(tweet);
+            return tweet;
+        }
+        throw new PostException(MessageUtil.POST_ALREADY_IN_FAVOURITES);
     }
 
 }
