@@ -1,8 +1,8 @@
 package com.twitter.builders;
 
 
-import com.twitter.util.Builder;
 import com.twitter.model.*;
+import com.twitter.util.Builder;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -25,6 +25,7 @@ public final class UserBuilder implements Builder<User> {
     private List<Report> reports = new ArrayList<>();
     private List<Tweet> tweets = new ArrayList<>();
     private List<Tag> favouriteTags = new ArrayList<>();
+    private List<Tweet> favouriteTweets = new ArrayList<>();
     private List<User> followers = new ArrayList<>();
     private Date createDate = Calendar.getInstance().getTime();
 
@@ -48,6 +49,10 @@ public final class UserBuilder implements Builder<User> {
         return this;
     }
 
+    public UserBuilder withFavouriteTweets(List<Tweet> tweets) {
+        this.favouriteTweets = tweets;
+        return this;
+    }
 
     public UserBuilder withAvatar(Avatar avatar) {
         this.avatar = avatar;
@@ -112,6 +117,7 @@ public final class UserBuilder implements Builder<User> {
         user.setFavouriteTags(favouriteTags);
         user.setReports(reports);
         user.setFollowers(followers);
+        user.setFavouriteTweets(favouriteTweets);
         user.setId(id);
         user.setCreateDate(createDate);
         return user;

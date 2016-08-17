@@ -64,7 +64,7 @@ public class User extends AbstractEntity implements UserDetails {
     @JsonIgnore
     private List<User> followers = new ArrayList<>();
     @NotNull
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany(cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Tweet> favouriteTweets = new ArrayList<>();
 
