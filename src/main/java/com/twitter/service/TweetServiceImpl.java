@@ -88,11 +88,25 @@ public class TweetServiceImpl extends PostServiceImpl<Tweet, TweetDao> implement
     public Tweet addTweetToFavourites(long tweetId) {
         User currentLoggedUser = userService.getCurrentLoggedUser();
         Tweet tweet = getById(tweetId);
-        if (!repository.doesTweetBelongToUserFavouritesTweets(currentLoggedUser.getId(), tweet.getId())) {
+        if (!isTweetInFavouritesTweets(currentLoggedUser, tweet)) {
             userService.getUserById(currentLoggedUser.getId()).getFavouriteTweets().add(tweet);
             return tweet;
         }
-        throw new PostException(MessageUtil.POST_ALREADY_IN_FAVOURITES);
+        throw new PostException(MessageUtil.POST_ALREADY_IN_FAVOURITES_ERROR_MSG);
     }
 
+    @Override
+    public void deleteTweetFromFavourites(long tweetId) {
+        User currentUser = userService.getCurrentLoggedUser();
+        Tweet tweet = getById(tweetId);
+        if (isTweetInFavouritesTweets(currentUser, tweet)) {
+            userService.getUserById(currentUser.getId()).getFavouriteTweets().remove(tweet);
+            return;
+        }
+        throw new PostException(MessageUtil.POST_DOES_NOT_BELONG_TO_FAVOURITES_TWEETS_ERROR_MSG);
+    }
+
+    private boolean isTweetInFavouritesTweets(User currentLoggedUser, Tweet tweet) {
+        return repository.doesTweetBelongToUserFavouritesTweets(currentLoggedUser.getId(), tweet.getId());
+    }
 }

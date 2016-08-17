@@ -430,4 +430,44 @@ public class TweetServiceTest {
         assertThat(tweetFromDb, is(tweet));
         assertThat(user.getFavouriteTweets(), hasItem(tweet));
     }
+
+    @Test(expected = PostException.class)
+    public void deleteTweetFromFavourites_tweetIsNotInFavouritesTweets() {
+        Tweet tweet = a(tweet());
+        User user = a(user()
+                .withFavouriteTweets(
+                        aListWith(
+                                tweet
+                        )
+                )
+        );
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
+        when(tweetDao.doesTweetBelongToUserFavouritesTweets(anyLong(), anyLong())).thenReturn(false);
+        tweetService.deleteTweetFromFavourites(tweet.getId());
+    }
+
+    @Test
+    public void deleteTweetFromFavourites_tweetIsInUserFavouritesTweets() {
+        Tweet tweetOne = a(tweet());
+        Tweet tweetTwo = a(tweet());
+        Tweet tweetThree = a(tweet());
+        User user = a(user()
+                .withFavouriteTweets(
+                        aListWith(
+                                tweetOne,
+                                tweetTwo,
+                                tweetThree
+                        )
+                )
+        );
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
+        when(userService.getUserById(anyLong())).thenReturn(user);
+        when(tweetDao.exists(anyLong())).thenReturn(true);
+        when(tweetDao.findOne(anyLong())).thenReturn(tweetOne);
+        when(tweetDao.doesTweetBelongToUserFavouritesTweets(anyLong(), anyLong())).thenReturn(true);
+
+        tweetService.deleteTweetFromFavourites(tweetOne.getId());
+        assertThat(user.getFavouriteTweets(), not(hasItem(tweetOne)));
+        assertThat(user.getFavouriteTweets(), hasItems(tweetTwo, tweetThree));
+    }
 }

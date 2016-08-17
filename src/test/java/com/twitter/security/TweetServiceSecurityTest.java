@@ -136,4 +136,10 @@ public class TweetServiceSecurityTest {
     public void addTweetToFavourites_anonymousAccessDenied() {
         tweetService.addTweetToFavourites(TestUtil.ID_ONE);
     }
+
+    @WithAnonymousUser
+    @Test(expected = AccessDeniedException.class)
+    public void deleteTweetFromFavourites_anonymousAccessDenied() {
+        tweetService.deleteTweetFromFavourites(TestUtil.ID_ONE);
+    }
 }

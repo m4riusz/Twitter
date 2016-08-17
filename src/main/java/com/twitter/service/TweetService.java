@@ -29,4 +29,6 @@ public interface TweetService extends PostService<Tweet> {
     List<Tweet> getFavouriteTweetsFromUser(long userId, Pageable pageable);
 
     Tweet addTweetToFavourites(long tweetId);
+
+    void deleteTweetFromFavourites(long tweetId);
 }
