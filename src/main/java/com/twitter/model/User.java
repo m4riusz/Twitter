@@ -32,7 +32,7 @@ public class User extends AbstractEntity implements UserDetails {
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private String email;
     @NotNull
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Password password;
     @NotNull
@@ -193,7 +193,7 @@ public class User extends AbstractEntity implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return !(accountStatus.getBannedUntil() != null);
+        return (accountStatus.getBannedUntil() == null || accountStatus.getBannedUntil().before(Calendar.getInstance().getTime()));
     }
 
     @Override
