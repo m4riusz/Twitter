@@ -524,4 +524,41 @@ public class TweetDaoTest {
         assertThat(userOneFavouriteTweets, hasSize(4));
         assertThat(userTwoFavouriteTweets, hasSize(2));
     }
+
+    @Test
+    public void findUserFavouritePost_postIsNotInFavourites() {
+        User user = a(user());
+
+        User tweetOwner = a(user());
+        userDao.save(aListWith(tweetOwner, user));
+
+        Tweet tweet = a(tweet()
+                .withOwner(tweetOwner)
+        );
+        tweetDao.save(tweet);
+
+        boolean tweetInFavouritesTweets = tweetDao.doesTweetBelongToUserFavouritesTweets(user.getId(), tweet.getId());
+        assertThat(tweetInFavouritesTweets, is(false));
+    }
+
+    @Test
+    public void findUserFavouritePost_postIsInFavourites() {
+        User tweetOwner = a(user());
+
+        Tweet tweet = a(tweet()
+                .withOwner(tweetOwner)
+        );
+
+        User user = a(user()
+                .withFavouriteTweets(
+                        aListWith(
+                                tweet
+                        )
+                )
+        );
+        userDao.save(aListWith(tweetOwner, user));
+
+        boolean tweetInFavouritesTweets = tweetDao.doesTweetBelongToUserFavouritesTweets(user.getId(), tweet.getId());
+        assertThat(tweetInFavouritesTweets, is(true));
+    }
 }

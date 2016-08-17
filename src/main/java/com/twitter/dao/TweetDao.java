@@ -17,17 +17,20 @@ import static com.twitter.dao.Query.*;
 @Repository
 public interface TweetDao extends JpaRepository<Tweet, Long> {
 
-    public List<Tweet> findByOwnerId(long userId, Pageable pageable);
+    List<Tweet> findByOwnerId(long userId, Pageable pageable);
 
     @Query(value = SELECT_MOST_POPULAR_TWEETS_BY_TIME)
-    public List<Tweet> findMostPopularByVotes(int hours, Pageable pageable);
+    List<Tweet> findMostPopularByVotes(int hours, Pageable pageable);
 
-    public List<Tweet> findDistinctByTagsInOrderByCreateDateDesc(List<Tag> tagList, Pageable pageable);
+    List<Tweet> findDistinctByTagsInOrderByCreateDateDesc(List<Tag> tagList, Pageable pageable);
 
     @Query(value = SELECT_NEWEST_TWEETS_FROM_FOLLOWERS)
-    public List<Tweet> findTweetsFromFollowingUsers(long userId, Pageable pageable);
+    List<Tweet> findTweetsFromFollowingUsers(long userId, Pageable pageable);
 
     @Query(value = SELECT_FAVOURITE_TWEETS_FROM_USER)
-    public List<Tweet> findFavouriteTweetsFromUser(long userId, Pageable pageable);
+    List<Tweet> findFavouriteTweetsFromUser(long userId, Pageable pageable);
+
+    @Query(value = TWEET_EXISTS_IN_USER_FAVOURITES_TWEETS)
+    boolean doesTweetBelongToUserFavouritesTweets(long userId, long postId);
 }
 

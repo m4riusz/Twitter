@@ -15,4 +15,5 @@ public final class Query {
     public static final String SELECT_MOST_POPULAR_COMMENTS_FROM_TWEET = "SELECT comment FROM Comment comment WHERE comment.tweet.id = ?1 ORDER BY comment.votes.size DESC";
 
     public static final String SELECT_FAVOURITE_TWEETS_FROM_USER = "SELECT user.favouriteTweets FROM User user WHERE user.id = ?1";
+    public static final String TWEET_EXISTS_IN_USER_FAVOURITES_TWEETS = "SELECT count(user) > 0 FROM User user JOIN user.favouriteTweets favTweets WHERE user.id = ?1 AND favTweets.id = ?2";
 }
