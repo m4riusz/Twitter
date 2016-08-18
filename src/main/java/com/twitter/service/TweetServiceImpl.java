@@ -27,18 +27,20 @@ import java.util.List;
 public class TweetServiceImpl extends PostServiceImpl<Tweet, TweetDao> implements TweetService {
 
     private final TagExtractor tagExtractor;
+    private final TagService tagService;
 
     @Autowired
-    public TweetServiceImpl(TweetDao tweetDao, UserService userService, UserVoteService userVoteService, TagExtractor tagExtractor) {
+    public TweetServiceImpl(TweetDao tweetDao, UserService userService, UserVoteService userVoteService, TagExtractor tagExtractor, TagService tagService) {
         super(tweetDao, userService, userVoteService);
         this.tagExtractor = tagExtractor;
+        this.tagService = tagService;
     }
 
     @Override
     @PreAuthorize(SecurityUtil.POST_PERSONAL)
     public Tweet create(@Param("post") Tweet post) {
-        List<Tag> tagList = tagExtractor.extract(post.getContent());
-        post.setTags(tagList);
+        List<Tag> rawTags = tagService.extract(post.getContent());
+        post.setTags(rawTags);
         return super.create(post);
     }
 

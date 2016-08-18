@@ -33,6 +33,7 @@ public final class Route {
     private static final String REPORT_CATEGORY = "/{reportCategory}";
     private static final String AVATAR = "/avatar";
     private static final String FAVOURITES = "/favourites";
+    private static final String TAGS = "/tags";
 
     public static final String LOGIN_URL = API + "/login";
     public static final String LOGOUT_URL = API + "/logout";
@@ -50,6 +51,8 @@ public final class Route {
     public static final String USER_COUNT_GET_FOLLOWERS = USER_BY_ID + FOLLOWERS + COUNT;
     public static final String USER_GET_FOLLOWING = USER_BY_ID + FOLLOWING + PAGE + SIZE;
     public static final String USER_COUNT_GET_FOLLOWING = USER_BY_ID + FOLLOWING + COUNT;
+    public static final String USER_AVATAR = USER_BY_ID + AVATAR;
+    public static final String USER_FAVOURITE_TAGS = USER_BY_ID + TAGS;
 
     public static final String TWEET_URL = API + TWEET;
     public static final String TWEET_BY_ID = TWEET_URL + TWEET_ID;
@@ -79,5 +82,5 @@ public final class Route {
     public static final String REPORT_GET_ALL_BY_CATEGORY = REPORT_URL + CATEGORY + REPORT_CATEGORY + PAGE + SIZE;
     public static final String REPORT_GET_ALL_BY_STATUS_AND_CATEGORY = REPORT_URL + STATUS + REPORT_STATUS +
             CATEGORY + REPORT_CATEGORY + PAGE + SIZE;
-    public static final String USER_AVATAR = USER_BY_ID + AVATAR;
+
 }

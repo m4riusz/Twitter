@@ -1,10 +1,8 @@
 package com.twitter.controller;
 
-import com.twitter.model.Avatar;
-import com.twitter.model.Password;
-import com.twitter.model.Role;
-import com.twitter.model.User;
+import com.twitter.model.*;
 import com.twitter.route.Route;
+import com.twitter.service.TagService;
 import com.twitter.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -23,10 +21,12 @@ import java.util.List;
 public class UserController {
 
     private UserService userService;
+    private TagService tagService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, TagService tagService) {
         this.userService = userService;
+        this.tagService = tagService;
     }
 
     @RequestMapping(value = Route.REGISTER_USER, method = RequestMethod.POST)
@@ -111,5 +111,15 @@ public class UserController {
     public ResponseEntity unfollowUser(@PathVariable long userId) {
         userService.unfollow(userId);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = Route.USER_FAVOURITE_TAGS, method = RequestMethod.GET)
+    public ResponseEntity<List<Tag>> getUserFavouriteTagsByUserId(@PathVariable long userId) {
+        return new ResponseEntity<>(tagService.getUserFavouriteTags(userId), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = Route.USER_FAVOURITE_TAGS, method = RequestMethod.POST)
+    public ResponseEntity<Tag> addTagToUserFavouritesTags(@PathVariable long userId, @RequestBody @Valid Tag tag) {
+        return new ResponseEntity<>(tagService.addFavouriteTag(userId, tag), HttpStatus.OK);
     }
 }
