@@ -2,6 +2,7 @@ package com.twitter.model;
 
 import org.hibernate.validator.constraints.Length;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
 
@@ -17,6 +18,7 @@ public class Tag extends AbstractEntity {
             max = 30,
             message = "Tag length should be between {min} and {max}!"
     )
+    @Column(unique = true)
     private String text;
 
     public Tag() {
