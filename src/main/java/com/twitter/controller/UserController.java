@@ -122,4 +122,10 @@ public class UserController {
     public ResponseEntity<Tag> addTagToUserFavouritesTags(@PathVariable long userId, @RequestBody @Valid Tag tag) {
         return new ResponseEntity<>(tagService.addFavouriteTag(userId, tag), HttpStatus.OK);
     }
+
+    @RequestMapping(value = Route.USER_FAVOURITE_TAGS, method = RequestMethod.DELETE)
+    public ResponseEntity removeTagFromUserFavouritesTags(@PathVariable long userId, @RequestBody @Valid Tag tag) {
+        tagService.removeTagFromFavouriteTags(userId, tag);
+        return new ResponseEntity(HttpStatus.OK);
+    }
 }
