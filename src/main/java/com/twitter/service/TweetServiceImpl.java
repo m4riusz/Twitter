@@ -9,7 +9,6 @@ import com.twitter.model.Tweet;
 import com.twitter.model.User;
 import com.twitter.util.MessageUtil;
 import com.twitter.util.SecurityUtil;
-import com.twitter.util.TagExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
@@ -26,20 +25,18 @@ import java.util.List;
 @Transactional
 public class TweetServiceImpl extends PostServiceImpl<Tweet, TweetDao> implements TweetService {
 
-    private final TagExtractor tagExtractor;
     private final TagService tagService;
 
     @Autowired
-    public TweetServiceImpl(TweetDao tweetDao, UserService userService, UserVoteService userVoteService, TagExtractor tagExtractor, TagService tagService) {
+    public TweetServiceImpl(TweetDao tweetDao, UserService userService, UserVoteService userVoteService, TagService tagService) {
         super(tweetDao, userService, userVoteService);
-        this.tagExtractor = tagExtractor;
         this.tagService = tagService;
     }
 
     @Override
     @PreAuthorize(SecurityUtil.POST_PERSONAL)
     public Tweet create(@Param("post") Tweet post) {
-        List<Tag> rawTags = tagService.extract(post.getContent());
+        List<Tag> rawTags = tagService.getTagsFromText(post.getContent());
         post.setTags(rawTags);
         return super.create(post);
     }

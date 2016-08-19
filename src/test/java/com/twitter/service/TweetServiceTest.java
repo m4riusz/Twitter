@@ -6,7 +6,6 @@ import com.twitter.dto.PostVote;
 import com.twitter.exception.*;
 import com.twitter.model.*;
 import com.twitter.util.MessageUtil;
-import com.twitter.util.TagExtractor;
 import com.twitter.util.TestUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,16 +52,16 @@ public class TweetServiceTest {
     private TweetDao tweetDao;
 
     @Mock
-    private TagExtractor tagExtractor;
+    private UserVoteService userVoteService;
 
     @Mock
-    private UserVoteService userVoteService;
+    private TagService tagService;
 
     private TweetService tweetService;
 
     @Before
     public void setUp() {
-        tweetService = new TweetServiceImpl(tweetDao, userService, userVoteService, tagExtractor);
+        tweetService = new TweetServiceImpl(tweetDao, userService, userVoteService, tagService);
     }
 
     @Test(expected = PostNotFoundException.class)

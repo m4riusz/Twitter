@@ -14,13 +14,14 @@ import java.util.List;
 @PreAuthorize(SecurityUtil.AUTHENTICATED)
 public interface TagService {
 
-    boolean exists(String text); // TODO: 18.08.16 add tests
-
-    List<Tag> getUserFavouriteTags(long userId); // TODO: 18.08.16 add tests
+    List<Tag> getUserFavouriteTags(long userId);
 
     @PreAuthorize(SecurityUtil.PERSONAL_USAGE)
-    Tag addFavouriteTag(long userId, Tag tag); // TODO: 18.08.16 add tests
+    Tag addFavouriteTag(long userId, Tag tag);
 
-    List<Tag> extract(String string); // TODO: 18.08.16 add tests
+    @PreAuthorize(SecurityUtil.PERSONAL_USAGE)
+    void removeTagFromFavouriteTags(long userId, Tag tag);
+
+    List<Tag> getTagsFromText(String string);
 
 }
