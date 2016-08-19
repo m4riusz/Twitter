@@ -16,5 +16,4 @@ public final class Query {
 
     public static final String SELECT_FAVOURITE_TWEETS_FROM_USER = "SELECT user.favouriteTweets FROM User user WHERE user.id = ?1";
     public static final String TWEET_EXISTS_IN_USER_FAVOURITES_TWEETS = "SELECT count(user) > 0 FROM User user JOIN user.favouriteTweets favTweets WHERE user.id = ?1 AND favTweets.id = ?2";
-    public static final String TAG_ALREADY_IN_FAVOURITES_ERROR_MSG = "You already have this tag in yours favourite tags!";
 }

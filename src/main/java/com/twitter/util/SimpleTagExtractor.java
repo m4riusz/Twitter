@@ -22,10 +22,10 @@ public class SimpleTagExtractor implements TagExtractor {
         List<Tag> tagList = new ArrayList<>();
 
         for (String word : words) {
-            if (isBeginsWithHash(word) &&
-                    hasEnoughtLength(word) &&
+            if (beginsWithHash(word) &&
+                    hasEnoughLength(word) &&
                     containsOnlyOneHash(word) &&
-                    firstOccurt(tags, word) &&
+                    firstOccurrence(tags, word) &&
                     containsOnlyDigsAndLetters(word.substring(1))
                     ) {
                 String wordWithoutHash = word.substring(1);
@@ -45,7 +45,7 @@ public class SimpleTagExtractor implements TagExtractor {
         return true;
     }
 
-    private boolean firstOccurt(List<String> tags, String word) {
+    private boolean firstOccurrence(List<String> tags, String word) {
         return !tags.contains(word.substring(1));
     }
 
@@ -53,11 +53,11 @@ public class SimpleTagExtractor implements TagExtractor {
         return !word.substring(1).contains(HASH);
     }
 
-    private boolean hasEnoughtLength(String word) {
+    private boolean hasEnoughLength(String word) {
         return word.length() > 1;
     }
 
-    private boolean isBeginsWithHash(String word) {
+    private boolean beginsWithHash(String word) {
         return word.startsWith(HASH);
     }
 }

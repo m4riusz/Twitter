@@ -31,4 +31,7 @@ public final class MessageUtil {
     public static final String POST_ALREADY_DELETED = "Post is already deleted!";
     public static final String POST_ALREADY_IN_FAVOURITES_ERROR_MSG = "Post is already in favourites!";
     public static final String POST_DOES_NOT_BELONG_TO_FAVOURITES_TWEETS_ERROR_MSG = "Post does not belong to yours favourite tweets!";
+
+    public static final String TAG_ALREADY_IN_FAVOURITES_ERROR_MSG = "You already have this tag in yours favourite tags!";
+    public static final String TAG_NOT_IN_FAVOURITES_DELETE_ERROR_MSG = "You cant remove tag, because it is not in your favourite tags!";
 }
