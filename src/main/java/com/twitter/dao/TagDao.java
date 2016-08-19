@@ -9,5 +9,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface TagDao extends JpaRepository<Tag, Long> {
-    Tag findByText(String text); // TODO: 18.08.16 add tests
+
+    Tag findByText(String text);
+
 }

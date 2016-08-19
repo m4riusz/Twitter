@@ -1,7 +1,7 @@
 package com.twitter.builders;
 
-import com.twitter.util.Builder;
 import com.twitter.model.Tag;
+import com.twitter.util.Builder;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -10,11 +10,13 @@ import java.util.Date;
  * Created by mariusz on 21.07.16.
  */
 public final class TagBuilder implements Builder<Tag> {
-    private String text = "";
+    private static long counter = 0L;
+    private String text = "tagNumber" + counter;
     private long id;
     private Date createDate = Calendar.getInstance().getTime();
 
     public static TagBuilder tag() {
+        counter++;
         return new TagBuilder();
     }
 
