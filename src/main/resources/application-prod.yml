@@ -17,7 +17,7 @@ spring:
     properties:
       mail.smtp.starttls.enable: true
       smtp.auth: true;
-    host: poczta.o2.pl
-    username: marr994
-    password: ean38c2tm
-    port: 587
+    host: *****
+    username: *****
+    password: *****
+    port: ***
