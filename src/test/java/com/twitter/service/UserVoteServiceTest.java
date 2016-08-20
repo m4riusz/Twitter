@@ -3,6 +3,7 @@ package com.twitter.service;
 import com.twitter.config.Profiles;
 import com.twitter.dao.UserVoteDao;
 import com.twitter.exception.UserVoteException;
+import com.twitter.exception.UserVoteNotFoundException;
 import com.twitter.model.AbstractPost;
 import com.twitter.model.Tweet;
 import com.twitter.model.User;
@@ -107,7 +108,7 @@ public class UserVoteServiceTest {
         assertThat(userVoteFromDb, is(userVote));
     }
 
-    @Test(expected = UserVoteException.class)
+    @Test(expected = UserVoteNotFoundException.class)
     public void getById_userVoteDoesNotExist() {
         UserVote userVote = a(userVote());
         when(userVoteDao.exists(anyLong())).thenReturn(false);
