@@ -2,18 +2,21 @@ package com.twitter.service;
 
 import com.twitter.dao.UserVoteDao;
 import com.twitter.exception.UserVoteException;
+import com.twitter.exception.UserVoteNotFoundException;
 import com.twitter.model.AbstractPost;
 import com.twitter.model.User;
 import com.twitter.model.UserVote;
 import com.twitter.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by mariusz on 16.08.16.
  */
 
 @Service
+@Transactional
 public class UserVoteServiceImpl implements UserVoteService {
 
     private UserVoteDao userVoteDao;
@@ -30,7 +33,7 @@ public class UserVoteServiceImpl implements UserVoteService {
         if (exists(userVoteId)) {
             return userVoteDao.findOne(userVoteId);
         }
-        throw new UserVoteException(MessageUtil.VOTE_DOES_NOT_EXIST_ERROR_MSG);
+        throw new UserVoteNotFoundException(MessageUtil.VOTE_DOES_NOT_EXIST_ERROR_MSG);
     }
 
     @Override

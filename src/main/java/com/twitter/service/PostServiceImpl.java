@@ -82,7 +82,7 @@ abstract class PostServiceImpl<T extends AbstractPost, TRepository extends CrudR
         userVoteService.delete(userVote.getId());
     }
 
-    private void checkIfPostExists(long postId) {
+    protected void checkIfPostExists(long postId) {
         if (!repository.exists(postId)) {
             throw new PostNotFoundException(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
         }
