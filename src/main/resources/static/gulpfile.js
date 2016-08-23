@@ -19,8 +19,10 @@ const compilation = {
     "sourceMap": true,
     "noImplicitAny": false,
     "removeComments": false,
-    "preserveConstEnums": false
+    "preserveConstEnums": false,
+    "experimentalDecorators": true
 };
+
 
 gulp.task('compile', () => {
     return gulp.src(src.ts)
