@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
@@ -27,21 +26,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public TokenInfo authenticate(String login, String password) {
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(login, password);
-        try {
-            authentication = authenticationManager.authenticate(authentication);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            if (authentication.getPrincipal() != null) {
-                UserDetails userContext = (UserDetails) authentication.getPrincipal();
-                TokenInfo newToken = tokenManager.createNewToken(userContext);
-                if (newToken == null) {
-                    return null;
-                }
-                return newToken;
-            }
-        } catch (AuthenticationException e) {
-            System.out.println(e.toString());
+        authentication = authenticationManager.authenticate(authentication);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        UserDetails userContext = (UserDetails) authentication.getPrincipal();
+        TokenInfo newToken = tokenManager.createNewToken(userContext);
+        if (newToken == null) {
+            return null;
         }
-        return null;
+        return newToken;
     }
 
     @Override
