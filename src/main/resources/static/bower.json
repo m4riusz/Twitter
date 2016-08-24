@@ -1,0 +1,20 @@
+{
+  "name": "static",
+  "description": "",
+  "main": "app.js",
+  "authors": [
+    "msut <marr994@o2.pl>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/m4riusz/Twitter",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7"
+  }
+}
