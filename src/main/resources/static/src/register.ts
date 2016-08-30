@@ -1,5 +1,6 @@
 import {inject} from "aurelia-dependency-injection";
 import {AuthServiceImpl, AuthService} from "./authService";
+import {Const} from "./const";
 
 /**
  * Created by mariusz on 24.08.16.
@@ -25,9 +26,21 @@ export class Register {
             alert('Passwords arent equal!');
         } else if (this.email !== this.emailConfirm) {
             alert('Emails arent equal!');
+        } else if (!this.usernameHasValidLength()) {
+            alert('Wrong username length!');
+        } else if (!this.passwordHasValidLength()) {
+            alert('Wrong password length!');
         } else {
             this.authService.register(this.username, this.password, this.email, this.gender);
         }
+    }
+
+    public usernameHasValidLength():boolean {
+        return this.username.length >= Const.LOGIN_LENGTH.MIN && this.username.length <= Const.LOGIN_LENGTH.MAX;
+    }
+
+    public passwordHasValidLength():boolean {
+        return this.password.length >= Const.PASSWORD_LENGTH.MIN && this.password.length <= Const.PASSWORD_LENGTH.MAX;
     }
 
 }
