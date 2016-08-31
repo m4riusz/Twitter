@@ -1,8 +1,8 @@
 import {Const} from "./const";
 import {Aurelia} from "aurelia-framework";
-import {HttpClient, json} from "aurelia-fetch-client";
+import {HttpClient} from "aurelia-fetch-client";
 import {inject} from "aurelia-dependency-injection";
-import {BASE_URL, LOGIN, REGISTER} from "./route";
+import {BASE_URL, LOGIN, REGISTER, CURRENT_USER} from "./route";
 
 /**
  * Created by mariusz on 23.08.16.
@@ -28,7 +28,6 @@ export class AuthServiceImpl implements AuthService {
     }
 
     public login(username:string, password:string):void {
-        let authToken = '';
         this.httpClient
             .fetch(BASE_URL + LOGIN, {
                 method: 'post',
@@ -38,20 +37,18 @@ export class AuthServiceImpl implements AuthService {
                 }
             })
             .then(response => {
-                authToken = response.headers.get(Const.TOKEN_HEADER);
-                return response.json();
-            })
-            .then(data => {
-                let statusCode = data.status;
+                let authToken = response.headers.get(Const.TOKEN_HEADER);
+                let statusCode = response.status;
                 if (this.isStatusCodeOk(statusCode)) {
                     localStorage[Const.TOKEN_HEADER] = authToken;
                     this.token = authToken;
                     this.aurelia.setRoot(Const.APP_ROOT);
-                } else {
-                    alert(data.message);
+                    return;
                 }
+                response.json().then(data => {
+                    alert(data.message);
+                });
             });
-
     }
 
     register(username:string, password:string, email:string, gender:Twitter.Models.Gender) {
@@ -80,13 +77,23 @@ export class AuthServiceImpl implements AuthService {
 
     }
 
-
     public isAuthenticated():boolean {
-        return !(this.token == null);
+        return this.token != null && this.isTokenNotExpired();
     }
 
     private isStatusCodeOk(statusCode:number | string):boolean {
-        return statusCode > 200 && statusCode < 300;
+        return statusCode >= 200 && statusCode < 300;
+    }
+
+    private isTokenNotExpired() {
+        this.httpClient
+            .fetch(BASE_URL + CURRENT_USER, {
+                'method': 'get',
+                'Auth-Token': this.token
+            })
+            .then(response => {
+                return this.isStatusCodeOk(response.status);
+            });
     }
 
 }
