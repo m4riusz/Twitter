@@ -36,11 +36,11 @@ export class Register {
     }
 
     public usernameHasValidLength():boolean {
-        return this.username.length >= Const.LOGIN_LENGTH.MIN && this.username.length <= Const.LOGIN_LENGTH.MAX;
+        return this.username !== undefined && this.username.length >= Const.LOGIN_LENGTH.MIN && this.username.length <= Const.LOGIN_LENGTH.MAX;
     }
 
     public passwordHasValidLength():boolean {
-        return this.password.length >= Const.PASSWORD_LENGTH.MIN && this.password.length <= Const.PASSWORD_LENGTH.MAX;
+        return this.password !== undefined && this.password.length >= Const.PASSWORD_LENGTH.MIN && this.password.length <= Const.PASSWORD_LENGTH.MAX;
     }
 
 }
