@@ -50,6 +50,11 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @RequestMapping(value = Route.USER_URL, method = RequestMethod.GET)
+    public ResponseEntity<User> getCurrentLoggedUser() {
+        return new ResponseEntity<>(userService.getCurrentLoggedUser(), HttpStatus.OK);
+    }
+
     @RequestMapping(value = Route.USER_BY_ID, method = RequestMethod.GET)
     public ResponseEntity<User> getUserById(@PathVariable long userId) {
         return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
