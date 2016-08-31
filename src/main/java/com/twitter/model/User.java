@@ -2,6 +2,7 @@ package com.twitter.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -27,6 +28,7 @@ public class User extends AbstractEntity implements UserDetails {
             message = "Username length should be between {min} and {max}!"
     )
     private String username;
+    @Email(message = "Wrong email format!")
     @NotNull(message = "Email is required!")
     @Column(unique = true)
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
@@ -72,6 +74,7 @@ public class User extends AbstractEntity implements UserDetails {
         super();
         this.accountStatus = new AccountStatus();
         this.role = Role.USER;
+        this.gender = Gender.UNDEFINED;
         this.avatar = new Avatar();
     }
 
