@@ -1,0 +1,3 @@
+<template>
+    HOME PAGE
+</template>
