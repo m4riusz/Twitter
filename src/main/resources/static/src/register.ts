@@ -8,8 +8,9 @@ import {Const} from "./const";
 
 @inject(AuthServiceImpl)
 export class Register {
-
     authService:AuthService;
+    error:string;
+    success:string;
     username:string;
     password:string;
     passwordConfirm:string;
@@ -21,18 +22,57 @@ export class Register {
         this.authService = authService;
     }
 
-    register() {
+    activate() {
+        this.clearFields();
+    }
+
+    public register() {
         if (this.password !== this.passwordConfirm) {
-            alert('Passwords arent equal!');
+            this.setErrorMessage('Passwords are not equal!');
         } else if (this.email !== this.emailConfirm) {
-            alert('Emails arent equal!');
+            this.setErrorMessage('Emails are not equal!');
         } else if (!this.usernameHasValidLength()) {
-            alert('Wrong username length!');
+            this.setErrorMessage('Wrong username length!');
         } else if (!this.passwordHasValidLength()) {
-            alert('Wrong password length!');
+            this.setErrorMessage('Wrong password length!');
         } else {
-            this.authService.register(this.username, this.password, this.email, this.gender);
+            this.authService.register(this.username, this.password, this.email, this.gender)
+                .then(response => {
+                        if (response.ok) {
+                            this.clearFields();
+                            this.setSuccessMessage('Account has been created');
+                            return;
+                        }
+                        response.json().then(error => {
+                            if (response.status == 400) {
+                                this.setErrorMessage(error.errors[0].defaultMessage);
+                            } else {
+                                this.setErrorMessage(error.message);
+                            }
+                        });
+                    }
+                )
         }
+    }
+
+    private clearFields():void {
+        this.error = '';
+        this.success = '';
+        this.username = '';
+        this.password = '';
+        this.passwordConfirm = '';
+        this.email = '';
+        this.emailConfirm = '';
+    }
+
+    private setSuccessMessage(message:string):void {
+        this.error = '';
+        this.success = message;
+    }
+
+    private setErrorMessage(message:string):void {
+        this.success = '';
+        this.error = message;
     }
 
     public usernameHasValidLength():boolean {
