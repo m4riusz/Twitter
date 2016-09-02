@@ -1,6 +1,11 @@
 <template>
     <div class="wrapper col-md-2 col-md-offset-5">
         <h2 class="text-center">Login</h2>
+        <div if.bind = "error != ''">
+            <div class="alert alert-danger">
+                <strong>${error}</strong>
+            </div>
+        </div>
         <form class="form-signin" method="post">
             <input type="text" class="form-control" name="username" placeholder="Username" value.bind="username"/>
             <input type="password" class="form-control" name="password" placeholder="Password" value.bind="password"/>
