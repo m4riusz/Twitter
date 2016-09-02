@@ -10,6 +10,13 @@
                     <a href.bind="item.href">${item.title}</a>
                 </li>
             </ul>
+
+            <div class="navbar-right">
+                <img class="navbar-brand" src="data:image/jpg;base64, ${loggedUser.avatar.bytes}"
+                     alt="${loggedUser.avatar.fileName}">
+                <p class="navbar-text">${loggedUser.username}</p>
+            </div>
+
         </div>
     </nav>
     <router-view></router-view>
