@@ -27,7 +27,7 @@ public class AvatarUtilImpl implements AvatarUtil {
         Avatar avatar = new Avatar();
         avatar.setFileName(DatabaseConfig.DEFAULT_AVATAR_FILE_NAME);
         avatar.setBytes(getDefaultAvatarImageFileBytes());
-        return avatar;
+        return resizeToStandardSize(avatar);
     }
 
     @Override

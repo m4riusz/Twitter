@@ -22,7 +22,7 @@ public class User extends AbstractEntity implements UserDetails {
     private Avatar avatar;
     @NotNull
     @Column(unique = true)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     @Length(
             min = 3, max = 10,
             message = "Username length should be between {min} and {max}!"
