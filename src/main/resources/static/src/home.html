@@ -1,3 +1,10 @@
 <template>
-    HOME PAGE
+    <require from='./tweet-template'></require>
+    <require from='./tweet-input.html'></require>
+    <tweet-input></tweet-input>
+    <hr>
+    <div repeat.for="tweet of tweets">
+        <tweet-template tweet.bind="tweet"></tweet-template>
+    </div>
+
 </template>
