@@ -7,5 +7,6 @@ export const REGISTER = `/api/user`;
 export const CURRENT_USER = `/api/user`;
 export const LOGIN = `/api/login`;
 export const TWEET_URL = `/api/tweet`;
+export const TWEET_GET_ALL = (page:number, size:number) => `${TWEET_URL}/${page}/${size}`;
 
 
