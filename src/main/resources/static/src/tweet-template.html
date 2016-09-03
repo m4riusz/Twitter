@@ -1,0 +1,19 @@
+<template>
+    <div class="well">
+        <a class="glyphicon glyphicon-remove btn btn-default pull-right">Delete</a>
+        <p>
+            <i class="glyphicon glyphicon-user"></i>
+            ${tweet.owner.username}
+            <br/>
+            <i class="glyphicon glyphicon-envelope"></i>
+            ${tweet.owner.email}
+            <br/>
+            <i class="glyphicon glyphicon-calendar"></i>
+            ${tweet.createDate}
+            <br/>
+            <label>${tweet.content}</label>
+            <br/>
+            <a class="btn btn-default">Comments</a>
+        </p>
+    </div>
+</template>
