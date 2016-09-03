@@ -16,6 +16,7 @@ module Twitter.Models {
     }
 
     export interface AbstractPost extends AbstractEntity {
+        type:string;
         deleted:boolean;
         banned:boolean;
         content:string;
