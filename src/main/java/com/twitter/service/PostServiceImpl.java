@@ -10,11 +10,12 @@ import com.twitter.model.UserVote;
 import com.twitter.util.MessageUtil;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by mariusz on 08.08.16.
  */
-
+@Transactional
 abstract class PostServiceImpl<T extends AbstractPost, TRepository extends CrudRepository<T, Long>> implements PostService<T> {
 
     protected final TRepository repository;
