@@ -4,7 +4,7 @@
     <tweet-input></tweet-input>
     <hr>
     <div repeat.for="tweet of tweets">
-        <tweet-template tweet.bind="tweet"></tweet-template>
+        <tweet-template tweet.bind="tweet" parent.bind="viewModel"></tweet-template>
     </div>
 
 </template>

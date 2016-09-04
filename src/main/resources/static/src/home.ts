@@ -9,10 +9,12 @@ export class Home{
     pageNumber:number;
     tweets:Tweet[];
     tweetService:TweetService;
+    viewModel:Home;
     
     constructor(tweetService:TweetService) {
         this.pageNumber = 0;
         this.tweetService = tweetService;
+        this.viewModel = this;
     }
 
     activate() {
@@ -20,5 +22,12 @@ export class Home{
             .then(data => {
                 this.tweets = data;
             })
+    }
+
+    deleteTweet(tweetId:number) {
+        this.tweetService.deleteTweet(tweetId)
+            .then(() => {
+                //todo refresh deleted item
+            });
     }
 }
