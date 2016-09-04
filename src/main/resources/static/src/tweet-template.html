@@ -1,6 +1,13 @@
 <template>
     <div class="well">
-        <a class="glyphicon glyphicon-remove btn btn-default pull-right">Delete</a>
+        <div class="btn-group pull-right">
+            <button type=button class="btn btn-success">
+                <span class="glyphicon glyphicon-plus-sign"></span>
+            </button>
+            <button type=button class="btn btn-danger">
+                <span class="glyphicon glyphicon-minus-sign"></span>
+            </button>
+        </div>
         <p>
             <i class="glyphicon glyphicon-user"></i>
             ${tweet.owner.username}
@@ -13,7 +20,20 @@
             <br/>
             <label>${tweet.content}</label>
             <br/>
-            <a class="btn btn-default">Comments</a>
         </p>
+        <div class="btn-group">
+            <button class="btn btn-default">
+                <span class="glyphicon glyphicon-star"></span> Add to favourite
+            </button>
+            <button class="btn btn-default">
+                <span class="glyphicon glyphicon-comment"></span> Comments
+            </button>
+            <button class="btn btn-default">
+                <span class="glyphicon glyphicon-warning-sign"></span> Report
+            </button>
+        </div>
+        <a class="glyphicon glyphicon-remove btn btn-danger pull-right"
+           click.delegate='parent.deleteTweet(tweet.id)'> Delete</a>
+
     </div>
 </template>
