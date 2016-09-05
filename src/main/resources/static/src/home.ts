@@ -1,6 +1,7 @@
 import {TweetService, TweetServiceImpl} from "./tweetService";
 import {Const} from "./const";
 import {inject} from "aurelia-dependency-injection";
+import Tweet = Twitter.Models.Tweet;
 /**
  * Created by mariusz on 31.08.16.
  */
@@ -17,17 +18,21 @@ export class Home{
         this.viewModel = this;
     }
 
-    activate() {
-        this.tweetService.getAllTweets(this.pageNumber, Const.PAGE_SIZE)
-            .then(data => {
-                this.tweets = data;
-            })
+    async activate() {
+        this.tweets = await this.tweetService.getAllTweets(this.pageNumber, Const.PAGE_SIZE)
     }
 
     deleteTweet(tweetId:number) {
         this.tweetService.deleteTweet(tweetId)
-            .then(() => {
-                //todo refresh deleted item
+            .then(()=> {
+                this.updateTweet(tweetId);
             });
+
     }
+
+    async updateTweet(tweetId:number) {
+        let updated = await this.tweetService.getTweetById(tweetId);
+        this.tweets = this.tweets.map(tweet => tweet.id == tweetId ? tweet = updated : tweet);
+    }
+
 }

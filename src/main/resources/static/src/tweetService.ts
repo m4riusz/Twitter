@@ -62,7 +62,7 @@ export class TweetServiceImpl implements TweetService {
         });
     }
 
-    deleteTweet(tweetId:number):Promise<> {
+    deleteTweet(tweetId:number):Promise<void> {
         return new Promise((resolve, reject) => {
             this.httpClient.fetch(BASE_URL + TWEET_BY_ID(tweetId), {
                 method: 'delete',
@@ -88,6 +88,5 @@ export class TweetServiceImpl implements TweetService {
                     resolve(data);
                 })
         })
-
     }
 }

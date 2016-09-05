@@ -1,6 +1,8 @@
 import {RouterConfiguration, Router} from "aurelia-router";
 import {UserService, UserServiceImpl} from "./userService";
 import {inject} from "aurelia-dependency-injection";
+import User = Twitter.Models.User;
+
 /**
  * Created by mariusz on 22.08.16.
  */
@@ -16,13 +18,10 @@ export class App {
         this.userService = userService;
     }
 
-    activate() {
-        this.userService.getCurrentLoggedUser()
-            .then(response => response.json())
-            .then(data => {
-                this.loggedUser = data;
-            })
+    async activate() {
+        this.loggedUser = await this.userService.getCurrentLoggedUser();
     }
+
     configureRouter(config:RouterConfiguration, router:Router) {
 
         config.map([
