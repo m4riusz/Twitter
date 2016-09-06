@@ -16,6 +16,8 @@ import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.springframework.data.domain.Sort.Direction;
+
 /**
  * Created by mariusz on 03.08.16.
  */
@@ -66,9 +68,14 @@ public class TweetController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    @RequestMapping(value = Route.TWEET_USER_VOTE, method = RequestMethod.GET)
+    public ResponseEntity<UserVote> getUserTweetVote(@PathVariable long tweetId) {
+        return new ResponseEntity<>(tweetService.getPostVote(tweetId), HttpStatus.OK);
+    }
+
     @RequestMapping(value = Route.TWEET_GET_ALL, method = RequestMethod.GET)
     public ResponseEntity<List<Tweet>> getAllTweets(@PathVariable int page, @PathVariable int size) {
-        return new ResponseEntity<>(tweetService.getAllTweets(new PageRequest(page, size)), HttpStatus.OK);
+        return new ResponseEntity<>(tweetService.getAllTweets(new PageRequest(page, size, Direction.DESC, "createDate")), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.TWEETS_FROM_FOLLOWINGS_USERS, method = RequestMethod.GET)

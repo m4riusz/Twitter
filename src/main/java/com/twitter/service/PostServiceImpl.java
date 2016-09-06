@@ -7,6 +7,7 @@ import com.twitter.exception.UserVoteException;
 import com.twitter.model.AbstractPost;
 import com.twitter.model.User;
 import com.twitter.model.UserVote;
+import com.twitter.model.Vote;
 import com.twitter.util.MessageUtil;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -81,6 +82,12 @@ abstract class PostServiceImpl<T extends AbstractPost, TRepository extends CrudR
             throw new UserVoteException(MessageUtil.VOTE_DELETE_ERROR_MSG);
         }
         userVoteService.delete(userVote.getId());
+    }
+
+    @Override
+    public UserVote getPostVote(long postId) {
+        User user = userService.getCurrentLoggedUser();
+        return userVoteService.findUserVoteForPost(user, repository.findOne(postId)) ;
     }
 
     protected void checkIfPostExists(long postId) {

@@ -63,6 +63,7 @@ public final class Route {
     public static final String TWEETS_MOST_VOTED = TWEET_URL + POPULAR + HOURS + PAGE + SIZE;
     public static final String TWEET_VOTE = TWEET_URL + VOTE;
     public static final String TWEET_VOTE_BY_ID = TWEET_VOTE + VOTE_ID;
+    public static final String TWEET_USER_VOTE = TWEET_BY_ID + VOTE;
     public static final String TWEETS_WITH_TAGS = TWEET_URL + TAGS + PAGE + SIZE;
     public static final String TWEETS_FROM_USER_FAVOURITES = USER_BY_ID + FAVOURITES + PAGE + SIZE;
     public static final String TWEET_TO_USER_FAVOURITES = USER_URL + FAVOURITES + TWEET_ID;
