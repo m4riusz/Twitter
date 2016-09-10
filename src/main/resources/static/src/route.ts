@@ -9,5 +9,6 @@ export const LOGIN = `/api/login`;
 export const TWEET_URL = `/api/tweet`;
 export const TWEET_BY_ID = (tweetId:number) => `${TWEET_URL}/${tweetId}`;
 export const TWEET_GET_ALL = (page:number, size:number) => `${TWEET_URL}/${page}/${size}`;
+export const TWEET_VOTE_GET_BY_ID = (tweetId:number) => `${TWEET_BY_ID(tweetId)}/vote`;
 
 
