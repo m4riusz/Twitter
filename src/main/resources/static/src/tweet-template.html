@@ -1,26 +1,38 @@
 <template>
     <div class="well">
-        <div class="btn-group pull-right">
-            <button type=button class="btn btn-success">
+
+        <div if.bind="tweet.deleted == false" class="btn-group pull-right">
+            <button if.bind="tweet.loggedUserVote == 'UP'" type=button class="btn btn-success">
                 <span class="glyphicon glyphicon-plus-sign"></span>
             </button>
-            <button type=button class="btn btn-danger">
+            <button if.bind="tweet.loggedUserVote != 'UP'" type=button class="btn btn-default">
+                <span class="glyphicon glyphicon-plus"></span>
+            </button>
+            <button if.bind="tweet.loggedUserVote == 'DOWN'" type=button class="btn btn-danger">
                 <span class="glyphicon glyphicon-minus-sign"></span>
             </button>
+            <button if.bind="tweet.loggedUserVote != 'DOWN'" type=button class="btn btn-default">
+                <span class="glyphicon glyphicon-minus"></span>
+            </button>
         </div>
-        <p>
-            <i class="glyphicon glyphicon-user"></i>
-            ${tweet.owner.username}
-            <br/>
-            <i class="glyphicon glyphicon-envelope"></i>
-            ${tweet.owner.email}
-            <br/>
-            <i class="glyphicon glyphicon-calendar"></i>
-            ${tweet.createDate}
-            <br/>
+        <div class="media">
+            <div class="media-left">
+                <img src="data:image/jpg;base64, ${tweet.owner.avatar.bytes}"
+                     alt="${tweet.owner.avatar.fileName}">
+            </div>
+            <div class="media-body">
+                <i class="glyphicon glyphicon-user"></i>
+                ${tweet.owner.username}
+                <br/>
+                <i class="glyphicon glyphicon-envelope"></i>
+                ${tweet.owner.email}
+                <br/>
+                <i class="glyphicon glyphicon-calendar"></i>
+                ${tweet.createDate}
+            </div>
             <label>${tweet.content}</label>
             <br/>
-        </p>
+        </div>
         <div class="btn-group">
             <button class="btn btn-default">
                 <span class="glyphicon glyphicon-star"></span> Add to favourite
@@ -32,7 +44,7 @@
                 <span class="glyphicon glyphicon-warning-sign"></span> Report
             </button>
         </div>
-        <a class="glyphicon glyphicon-remove btn btn-danger pull-right"
+        <a if.bind="tweet.deleted == false" class="glyphicon glyphicon-remove btn btn-danger pull-right"
            click.delegate='parent.deleteTweet(tweet.id)'> Delete</a>
 
     </div>

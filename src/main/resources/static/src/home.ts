@@ -2,6 +2,7 @@ import {TweetService, TweetServiceImpl} from "./tweetService";
 import {Const} from "./const";
 import {inject} from "aurelia-dependency-injection";
 import Tweet = Twitter.Models.Tweet;
+import Vote = Twitter.Models.Vote;
 /**
  * Created by mariusz on 31.08.16.
  */
@@ -19,7 +20,8 @@ export class Home{
     }
 
     async activate() {
-        this.tweets = await this.tweetService.getAllTweets(this.pageNumber, Const.PAGE_SIZE)
+        this.tweets = await this.tweetService.getAllTweets(this.pageNumber, Const.PAGE_SIZE);
+        this.tweets.forEach(tweet => this.getTweetVote(tweet));
     }
 
     deleteTweet(tweetId:number) {
@@ -27,7 +29,11 @@ export class Home{
             .then(()=> {
                 this.updateTweet(tweetId);
             });
+    }
 
+    async getTweetVote(tweet:Tweet) {
+        tweet.loggedUserVote = await this.tweetService.getCurrentUserTweetVote(tweet.id);
+        this.tweets = this.tweets.map(current => current.id == tweet.id ? current = tweet : current);
     }
 
     async updateTweet(tweetId:number) {
