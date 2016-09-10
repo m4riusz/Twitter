@@ -23,6 +23,7 @@ module Twitter.Models {
         owner:User;
         votes:UserVote[];
         reports:Report[];
+        loggedUserVote:Vote;
     }
 
     export interface AccountStatus extends AbstractEntity {
@@ -102,7 +103,8 @@ module Twitter.Models {
     }
 
     export enum Vote{
-        UP,
-        DOWN
+        "UP",
+        "DOWN",
+        "NONE"
     }
 }
