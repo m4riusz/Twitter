@@ -13,7 +13,7 @@ const build = {
 }
 
 const compilation = {
-    target: 'es5',
+    target: 'es6',
     module: 'commonjs',
     declaration: false,
     "sourceMap": true,
