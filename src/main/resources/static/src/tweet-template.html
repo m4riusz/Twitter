@@ -2,20 +2,24 @@
     <div class="well">
 
         <div if.bind="tweet.deleted == false" class="btn-group pull-right">
-            <button if.bind="tweet.loggedUserVote == 'UP'" type=button class="btn btn-success">
-                <span class="glyphicon glyphicon-plus-sign"></span>
-            </button>
-            <button if.bind="tweet.loggedUserVote != 'UP'" type=button class="btn btn-default">
-                <span class="glyphicon glyphicon-plus"></span>
-            </button>
-            <button if.bind="tweet.loggedUserVote == 'DOWN'" type=button class="btn btn-danger">
-                <span class="glyphicon glyphicon-minus-sign"></span>
-            </button>
-            <button if.bind="tweet.loggedUserVote != 'DOWN'" type=button class="btn btn-default">
-                <span class="glyphicon glyphicon-minus"></span>
-            </button>
+            <a if.bind="tweet.loggedUserVote == 'UP'" type=button class="btn btn-success"
+               click.delegate="parent.deleteTweetVote(tweet.id)">
+                <div class="glyphicon glyphicon-plus-sign"></div>
+            </a>
+            <a if.bind="tweet.loggedUserVote != 'UP'" type=button class="btn btn-default"
+               click.delegate="parent.voteOnTweet(tweet.id,'UP')">
+                <div class="glyphicon glyphicon-plus"></div>
+            </a>
+            <a if.bind="tweet.loggedUserVote == 'DOWN'" type=button class="btn btn-danger"
+               click.delegate="parent.deleteTweetVote(tweet.id)">
+                <div class="glyphicon glyphicon-minus-sign"></div>
+            </a>
+            <a if.bind="tweet.loggedUserVote != 'DOWN'" type=button class="btn btn-default"
+               click.delegate="parent.voteOnTweet(tweet.id,'DOWN')">
+                <div class="glyphicon glyphicon-minus"></div>
+            </a>
         </div>
-        <div class="media">
+        <div class=" media">
             <div class="media-left">
                 <img src="data:image/jpg;base64, ${tweet.owner.avatar.bytes}"
                      alt="${tweet.owner.avatar.fileName}">
@@ -34,15 +38,15 @@
             <br/>
         </div>
         <div class="btn-group">
-            <button class="btn btn-default">
+            <a class="btn btn-default">
                 <span class="glyphicon glyphicon-star"></span> Add to favourite
-            </button>
-            <button class="btn btn-default">
+            </a>
+            <a class="btn btn-default">
                 <span class="glyphicon glyphicon-comment"></span> Comments
-            </button>
-            <button class="btn btn-default">
+            </a>
+            <a class="btn btn-default">
                 <span class="glyphicon glyphicon-warning-sign"></span> Report
-            </button>
+            </a>
         </div>
         <a if.bind="tweet.deleted == false" class="glyphicon glyphicon-remove btn btn-danger pull-right"
            click.delegate='parent.deleteTweet(tweet.id)'> Delete</a>
