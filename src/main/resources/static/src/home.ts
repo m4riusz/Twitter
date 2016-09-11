@@ -21,7 +21,6 @@ export class Home{
 
     async activate() {
         this.tweets = await this.tweetService.getAllTweets(this.pageNumber, Const.PAGE_SIZE);
-        this.tweets.forEach(tweet => this.getTweetVote(tweet));
     }
 
     deleteTweet(tweetId:number) {
@@ -31,14 +30,27 @@ export class Home{
             });
     }
 
-    async getTweetVote(tweet:Tweet) {
-        tweet.loggedUserVote = await this.tweetService.getCurrentUserTweetVote(tweet.id);
-        this.tweets = this.tweets.map(current => current.id == tweet.id ? current = tweet : current);
+    voteOnTweet(tweetId:number, vote:Vote) {
+        this.tweetService.voteTweet(tweetId, vote).then((vote)=> this.updateTweetVote(tweetId, vote));
     }
 
-    async updateTweet(tweetId:number) {
+    deleteTweetVote(tweetId:number) {
+        this.tweetService.deleteVote(tweetId).then(()=> this.updateTweetVote(tweetId, 'NONE'));
+    }
+
+
+    private async updateTweet(tweetId:number) {
         let updated = await this.tweetService.getTweetById(tweetId);
         this.tweets = this.tweets.map(tweet => tweet.id == tweetId ? tweet = updated : tweet);
+    }
+
+    private updateTweetVote(tweetId:number, vote:Vote) {
+        this.tweets = this.tweets.map(current => {
+            if (current.id == tweetId) {
+                current.loggedUserVote = vote;
+            }
+            return current
+        });
     }
 
 }
