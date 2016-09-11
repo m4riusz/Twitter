@@ -1,6 +1,5 @@
 <template>
     <div class="well">
-
         <div if.bind="tweet.deleted == false" class="btn-group pull-right">
             <a if.bind="tweet.loggedUserVote == 'UP'" type=button class="btn btn-success"
                click.delegate="parent.deleteTweetVote(tweet.id)">
@@ -48,7 +47,8 @@
                 <span class="glyphicon glyphicon-warning-sign"></span> Report
             </a>
         </div>
-        <a if.bind="tweet.deleted == false" class="glyphicon glyphicon-remove btn btn-danger pull-right"
+        <a if.bind="tweet.deleted == false && tweet.owner.id == currentUser.id"
+           class="glyphicon glyphicon-remove btn btn-danger pull-right"
            click.delegate='parent.deleteTweet(tweet.id)'> Delete</a>
 
     </div>
