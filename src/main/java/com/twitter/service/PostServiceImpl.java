@@ -3,11 +3,9 @@ package com.twitter.service;
 import com.twitter.dto.PostVote;
 import com.twitter.exception.PostDeleteException;
 import com.twitter.exception.PostNotFoundException;
-import com.twitter.exception.UserVoteException;
 import com.twitter.model.AbstractPost;
 import com.twitter.model.User;
 import com.twitter.model.UserVote;
-import com.twitter.model.Vote;
 import com.twitter.util.MessageUtil;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -75,13 +73,13 @@ abstract class PostServiceImpl<T extends AbstractPost, TRepository extends CrudR
     }
 
     @Override
-    public void deleteVote(long voteId) {
+    public void deleteVote(long tweetId) {
         User user = userService.getCurrentLoggedUser();
-        UserVote userVote = userVoteService.getById(voteId);
-        if (userVote.getUser() != user) {
-            throw new UserVoteException(MessageUtil.VOTE_DELETE_ERROR_MSG);
-        }
-        userVoteService.delete(userVote.getId());
+        T post = getById(tweetId);
+        post.getVotes().stream()
+                .filter(userVote -> userVote.getUser().equals(user))
+                .findFirst()
+                .ifPresent(userVote -> post.getVotes().remove(userVote));
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.twitter.service;
 import com.twitter.dto.PostVote;
 import com.twitter.model.AbstractPost;
 import com.twitter.model.UserVote;
-import com.twitter.model.Vote;
 import com.twitter.util.SecurityUtil;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,6 +30,7 @@ public interface PostService<T extends AbstractPost> {
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     UserVote vote(PostVote postVote);
 
+    // TODO: 11.09.16 add tests
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     void deleteVote(long voteId);
 
