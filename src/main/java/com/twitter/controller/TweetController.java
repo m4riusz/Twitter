@@ -52,19 +52,14 @@ public class TweetController {
         return new ResponseEntity<>(tweetService.getAllFromUserById(userId, new PageRequest(page, size)), HttpStatus.OK);
     }
 
-    @RequestMapping(value = Route.TWEET_VOTE, method = RequestMethod.POST)
+    @RequestMapping(value = Route.TWEET_VOTE, method = {RequestMethod.POST, RequestMethod.PUT})
     public ResponseEntity<UserVote> voteTweet(@RequestBody @Valid PostVote postVote) {
-        return new ResponseEntity<>(tweetService.vote(postVote), HttpStatus.CREATED);
-    }
-
-    @RequestMapping(value = Route.TWEET_VOTE, method = RequestMethod.PUT)
-    public ResponseEntity<UserVote> changeVoteTweet(@RequestBody @Valid PostVote postVote) {
         return new ResponseEntity<>(tweetService.vote(postVote), HttpStatus.OK);
     }
 
-    @RequestMapping(value = Route.TWEET_VOTE_BY_ID, method = RequestMethod.DELETE)
-    public ResponseEntity deleteVoteTweet(@PathVariable long voteId) {
-        tweetService.deleteVote(voteId);
+    @RequestMapping(value = Route.TWEET_USER_VOTE, method = RequestMethod.DELETE)
+    public ResponseEntity deleteVoteTweet(@PathVariable long tweetId) {
+        tweetService.deleteVote(tweetId);
         return new ResponseEntity(HttpStatus.OK);
     }
 
