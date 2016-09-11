@@ -25,7 +25,14 @@ export class App {
     configureRouter(config:RouterConfiguration, router:Router) {
 
         config.map([
-            {route: ['', 'home'], name: 'home', moduleId: 'home', title: 'Home', nav: true},
+            {
+                route: ['', 'home'],
+                name: 'home',
+                moduleId: 'home',
+                title: 'Home',
+                nav: true,
+                settings: {currentUser: this.loggedUser}
+            },
             {route: ['tweets'], name: 'tweets', moduleId: 'tweets', title: 'Tweets', nav: true}
         ]);
         this.router = router;
