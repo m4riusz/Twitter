@@ -3,7 +3,16 @@ import UserVote = Twitter.Models.UserVote;
 import Vote = Twitter.Models.Vote;
 import {HttpClient, json} from "aurelia-fetch-client";
 import {inject} from "aurelia-dependency-injection";
-import {BASE_URL, TWEET_URL, TWEET_GET_ALL, TWEET_BY_ID, TWEET_VOTE_GET_BY_ID, TWEET_VOTE} from "./route";
+import {
+    BASE_URL,
+    TWEET_URL,
+    TWEET_GET_ALL,
+    TWEET_BY_ID,
+    TWEET_VOTE_GET_BY_ID,
+    TWEET_VOTE,
+    TWEET_FAVOURITE,
+    USER_FAVOURITE_TWEETS
+} from "./route";
 import {Const} from "./const";
 
 /**
@@ -19,6 +28,9 @@ export interface TweetService {
     getCurrentUserTweetVote(tweetId:number):Promise<Vote>;
     voteTweet(tweetId:number, vote:Vote):Promise<Vote>;
     deleteVote(tweetId:number):Promise<{}>;
+    addTweetToFavourites(tweetId:number):Promise<Tweet>;
+    removeTweetFromFavourites(tweetId:number):Promise<{}>;
+    getFavouriteTweetsFrom(userId:number, page:number, size:number):Promise<Tweet[]>;
 }
 
 @inject(HttpClient)
@@ -143,6 +155,49 @@ export class TweetServiceImpl implements TweetService {
                 }
             })
                 .then(()=> {
+                    resolve();
+                })
+        })
+    }
+
+    getFavouriteTweetsFrom(userId:number, page:number, size:number):Promise<Tweet[]> {
+        return new Promise<Tweet[]>((resolve, reject) => {
+            this.httpClient.fetch(BASE_URL + USER_FAVOURITE_TWEETS(userId, page, size), {
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => response.json())
+                .then((tweets:Tweet[])=> {
+                    resolve(tweets);
+                })
+        })
+    }
+
+    addTweetToFavourites(tweetId:number):Promise<Tweet> {
+        return new Promise<Tweet>((resolve, reject) => {
+            this.httpClient.fetch(BASE_URL + TWEET_FAVOURITE(tweetId), {
+                method: 'post',
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => response.json())
+                .then((tweet:Tweet)=> {
+                    resolve(tweet);
+                })
+        });
+    }
+
+    removeTweetFromFavourites(tweetId:number):Promise<{}> {
+        return new Promise<{}>((resolve, reject) => {
+            this.httpClient.fetch(BASE_URL + TWEET_FAVOURITE(tweetId), {
+                method: 'delete',
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => {
                     resolve();
                 })
         })
