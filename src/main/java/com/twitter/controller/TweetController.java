@@ -98,6 +98,11 @@ public class TweetController {
         return new ResponseEntity<>(tweetService.addTweetToFavourites(tweetId), HttpStatus.OK);
     }
 
+    @RequestMapping(value = Route.TWEET_TO_USER_FAVOURITES, method = RequestMethod.GET)
+    public ResponseEntity<Boolean> doesTweetBelongToUsersFavouriteTweets(@PathVariable long tweetId) {
+        return new ResponseEntity<>(tweetService.tweetBelongsToFavouriteTweets(tweetId), HttpStatus.OK);
+    }
+
     @RequestMapping(value = Route.TWEET_TO_USER_FAVOURITES, method = RequestMethod.DELETE)
     public ResponseEntity deleteTweetFromUsersFavouriteTweets(@PathVariable long tweetId) {
         tweetService.deleteTweetFromFavourites(tweetId);

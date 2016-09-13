@@ -105,6 +105,13 @@ public class TweetServiceImpl extends PostServiceImpl<Tweet, TweetDao> implement
         throw new PostException(MessageUtil.POST_DOES_NOT_BELONG_TO_FAVOURITES_TWEETS_ERROR_MSG);
     }
 
+    @Override
+    public boolean tweetBelongsToFavouriteTweets(long tweetId) {
+        User user = userService.getCurrentLoggedUser();
+        Tweet tweet = getById(tweetId);
+        return isTweetInFavouritesTweets(user, tweet);
+    }
+
     private boolean isTweetInFavouritesTweets(User currentLoggedUser, Tweet tweet) {
         return repository.doesTweetBelongToUserFavouritesTweets(currentLoggedUser.getId(), tweet.getId());
     }

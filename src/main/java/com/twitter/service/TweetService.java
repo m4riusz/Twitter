@@ -31,4 +31,7 @@ public interface TweetService extends PostService<Tweet> {
     Tweet addTweetToFavourites(long tweetId);
 
     void deleteTweetFromFavourites(long tweetId);
+
+    // TODO: 13.09.16 add tests
+    boolean tweetBelongsToFavouriteTweets(long tweetId);
 }
