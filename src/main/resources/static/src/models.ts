@@ -78,6 +78,7 @@ module Twitter.Models {
     }
 
     export interface Tweet extends AbstractPost {
+        favourite:boolean;
         tags:Tag[];
         comments:Comment[];
     }
