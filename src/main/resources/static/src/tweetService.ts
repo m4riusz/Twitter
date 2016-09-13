@@ -72,7 +72,7 @@ export class TweetServiceImpl implements TweetService {
                 .then(response => response.json())
                 .then((data:Tweet[]) => {
                     data.forEach(tweet => {
-                        this.getCurrentUserTweetVote(tweet.id).then((vote:Vote) => tweet.loggedUserVote = vote);
+                        this.getTweetCurrentUserData(tweet);
                     });
                     resolve(data);
                 })
@@ -104,12 +104,9 @@ export class TweetServiceImpl implements TweetService {
                 }
             })
                 .then(response => response.json())
-                .then((data:Tweet)=> {
-                    this.getCurrentUserTweetVote(tweetId)
-                        .then((vote:Vote) => {
-                            data.loggedUserVote = vote;
-                            resolve(data);
-                        });
+                .then((tweet:Tweet)=> {
+                    this.getTweetCurrentUserData(tweet);
+                    resolve(tweet);
                 })
         })
     }
@@ -201,5 +198,23 @@ export class TweetServiceImpl implements TweetService {
                     resolve();
                 })
         })
+    }
+
+    tweetBelongsToUsersFavourites(tweetId:number):Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            this.httpClient.fetch(BASE_URL + TWEET_FAVOURITE(tweetId), {
+                method: 'get',
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => response.json())
+                .then((belong:boolean)=> resolve(belong))
+        });
+    }
+
+    private getTweetCurrentUserData(tweet:Tweet) {
+        this.getCurrentUserTweetVote(tweet.id).then((vote:Vote) => tweet.loggedUserVote = vote);
+        this.tweetBelongsToUsersFavourites(tweet.id).then((favourite:boolean) => tweet.favourite = favourite);
     }
 }
