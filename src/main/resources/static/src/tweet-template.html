@@ -37,8 +37,13 @@
             <br/>
         </div>
         <div class="btn-group">
-            <a class="btn btn-default">
-                <span class="glyphicon glyphicon-star"></span> Add to favourite
+            <a if.bind="tweet.favourite == 0"
+               class="btn btn-default" click.delegate="parent.addTweetToFavourites(tweet.id)">
+                <span class="glyphicon glyphicon-heart"></span> Favourite
+            </a>
+            <a if.bind="tweet.favourite == 1"
+               class="btn btn-default" click.delegate="parent.deleteTweetFromFavourites(tweet.id)">
+                <span class="glyphicon glyphicon-trash"></span> Unfavourite
             </a>
             <a class="btn btn-default">
                 <span class="glyphicon glyphicon-comment"></span> Comments
@@ -50,6 +55,5 @@
         <a if.bind="tweet.deleted == false && tweet.owner.id == currentUser.id"
            class="glyphicon glyphicon-remove btn btn-danger pull-right"
            click.delegate='parent.deleteTweet(tweet.id)'> Delete</a>
-
     </div>
 </template>

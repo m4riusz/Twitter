@@ -25,14 +25,16 @@ export class Home{
 
     async activate(params, routeConfig:RouteConfig) {
         this.currentLoggedUser = routeConfig.settings.currentUser;
-        this.tweets = await this.tweetService.getAllTweets(this.pageNumber, Const.PAGE_SIZE);
+        [this.tweets, this.currentLoggedUser.favouriteTweets] = await Promise.all(
+            [
+                this.tweetService.getAllTweets(this.pageNumber, Const.PAGE_SIZE),
+                this.tweetService.getFavouriteTweetsFrom(this.currentLoggedUser.id, 0, 1000)
+            ]
+        );
     }
 
     deleteTweet(tweetId:number) {
-        this.tweetService.deleteTweet(tweetId)
-            .then(()=> {
-                this.updateTweet(tweetId);
-            });
+        this.tweetService.deleteTweet(tweetId).then(()=> this.updateTweet(tweetId));
     }
 
     voteOnTweet(tweetId:number, vote:Vote) {
@@ -43,6 +45,29 @@ export class Home{
         this.tweetService.deleteVote(tweetId).then(()=> this.updateTweetVote(tweetId, 'NONE'));
     }
 
+    addTweetToFavourites(tweetId:number) {
+        this.tweetService.addTweetToFavourites(tweetId).then(tweet =>this.addToFavourites(tweet));
+    }
+
+    deleteTweetFromFavourites(tweetId:number) {
+        this.tweetService.removeTweetFromFavourites(tweetId).then(()=>this.deleteFromFavourites(tweetId));
+    }
+
+    private addToFavourites(tweet:Tweet) {
+        this.currentLoggedUser.favouriteTweets.push(tweet);
+        this.updateTweetFavouriteChange();
+    }
+
+    private deleteFromFavourites(tweetId:number) {
+        this.currentLoggedUser.favouriteTweets = this.currentLoggedUser.favouriteTweets.filter(t => t.id != tweetId);
+        this.updateTweetFavouriteChange();
+    }
+
+    private updateTweetFavouriteChange() {
+        this.tweets.forEach(current =>
+            this.currentLoggedUser.favouriteTweets.find(t=> t.id == current.id ? current.favourite = true : current.favourite = false)
+        )
+    }
 
     private async updateTweet(tweetId:number) {
         let updated = await this.tweetService.getTweetById(tweetId);
