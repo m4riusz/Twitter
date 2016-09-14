@@ -33,7 +33,8 @@ export class App {
                 nav: true,
                 settings: {currentUser: this.loggedUser}
             },
-            {route: ['tweets'], name: 'tweets', moduleId: 'tweets', title: 'Tweets', nav: true}
+            {route: ['tweets'], name: 'tweets', moduleId: 'tweets', title: 'Tweets', nav: true},
+            {route: ['comment/:tweetId'], name: 'comment', moduleId: 'comment', title: 'Tweet comments', naw: true}
         ]);
         this.router = router;
     }
