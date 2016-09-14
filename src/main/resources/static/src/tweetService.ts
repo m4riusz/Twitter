@@ -11,6 +11,7 @@ import {
     TWEET_FAVOURITE,
     TWEET_VOTE
 } from "./route";
+import {BasicService} from "./basicService";
 import Tweet = Models.Tweet;
 import UserVote =Models.UserVote;
 import Vote = Models.Vote;
@@ -33,12 +34,12 @@ export interface ITweetService {
 }
 
 @inject(HttpClient)
-export class TweetService implements ITweetService {
-    private httpClient:HttpClient;
+export class TweetService extends BasicService implements ITweetService {
+
     private authToken:string;
 
     constructor(httpClient:HttpClient) {
-        this.httpClient = httpClient;
+        super(httpClient);
         this.authToken = localStorage[Const.TOKEN_HEADER];
     }
 

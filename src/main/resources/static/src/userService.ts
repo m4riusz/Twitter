@@ -2,6 +2,7 @@ import {inject} from "aurelia-dependency-injection";
 import {HttpClient} from "aurelia-fetch-client";
 import {Const} from "./const";
 import {BASE_URL, CURRENT_USER} from "./route";
+import {BasicService} from "./basicService";
 import User = Models.User;
 /**
  * Created by mariusz on 02.09.16.
@@ -13,13 +14,12 @@ export interface IUserService {
 }
 
 @inject(HttpClient)
-export class UserService implements IUserService {
+export class UserService extends BasicService implements IUserService {
 
-    private httpClient:HttpClient;
     private authToken:string;
 
     constructor(httpClient:HttpClient) {
-        this.httpClient = httpClient;
+        super(httpClient);
         this.authToken = localStorage[Const.TOKEN_HEADER];
     }
 

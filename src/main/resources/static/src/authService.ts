@@ -2,6 +2,7 @@ import {HttpClient, json} from "aurelia-fetch-client";
 import {inject} from "aurelia-dependency-injection";
 import {BASE_URL, LOGIN, REGISTER, CURRENT_USER} from "./route";
 import Response = Aurelia.Response;
+import {BasicService} from "./basicService";
 
 /**
  * Created by mariusz on 23.08.16.
@@ -14,11 +15,10 @@ export interface IAuthService {
 }
 
 @inject(HttpClient)
-export class AuthService implements IAuthService {
-    private httpClient:HttpClient;
-
+export class AuthService extends BasicService implements IAuthService {
+    
     constructor(httpClient:HttpClient) {
-        this.httpClient = httpClient;
+        super(httpClient);
     }
 
     public login(username:string, password:string):Promise<Response> {
