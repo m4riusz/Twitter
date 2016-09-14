@@ -1,15 +1,15 @@
-import {AuthService, AuthServiceImpl} from "./authService";
 import {inject} from "aurelia-dependency-injection";
 import {Const} from "./const";
 import {Aurelia} from "aurelia-framework";
+import {AuthService, IAuthService} from "./authService";
 
 /**
  * Created by mariusz on 23.08.16.
  */
 
-@inject(AuthServiceImpl, Aurelia)
+@inject(AuthService, Aurelia)
 export class Login {
-    private authService:AuthService;
+    private authService:IAuthService;
     private aurelia:Aurelia;
     private token:string;
 
@@ -17,7 +17,7 @@ export class Login {
     password:string;
     error:string;
 
-    constructor(authService:AuthService, aurelia:Aurelia) {
+    constructor(authService:IAuthService, aurelia:Aurelia) {
         this.authService = authService;
         this.aurelia = aurelia;
         this.token = localStorage[Const.TOKEN_HEADER];

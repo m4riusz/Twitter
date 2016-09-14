@@ -1,14 +1,15 @@
 import {inject} from "aurelia-dependency-injection";
-import {AuthServiceImpl, AuthService} from "./authService";
 import {Const} from "./const";
+import {IAuthService, AuthService} from "./authService";
+
 
 /**
  * Created by mariusz on 24.08.16.
  */
 
-@inject(AuthServiceImpl)
+@inject(AuthService)
 export class Register {
-    authService:AuthService;
+    authService:IAuthService;
     error:string;
     success:string;
     username:string;
@@ -16,9 +17,9 @@ export class Register {
     passwordConfirm:string;
     email:string;
     emailConfirm:string;
-    gender:Twitter.Models.Gender;
+    gender:Models.Gender;
 
-    constructor(authService:AuthService) {
+    constructor(authService:IAuthService) {
         this.authService = authService;
     }
 

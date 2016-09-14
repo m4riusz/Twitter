@@ -1,23 +1,26 @@
-import {TweetService, TweetServiceImpl} from "./tweetService";
 import {Const} from "./const";
 import {inject} from "aurelia-dependency-injection";
 import {Router, RouteConfig} from "aurelia-router";
-import Tweet = Twitter.Models.Tweet;
-import Vote = Twitter.Models.Vote;
-import User = Twitter.Models.User;
+import {TweetService, ITweetService} from "./tweetService";
+import Tweet = Models.Tweet;
+import Vote = Models.Vote;
+import User = Models.User;
+
 /**
  * Created by mariusz on 31.08.16.
  */
-@inject(TweetServiceImpl)
-export class Home{
+
+
+@inject(TweetService)
+export class Home {
     currentLoggedUser:User;
     pageNumber:number;
     tweets:Tweet[];
-    tweetService:TweetService;
+    tweetService:ITweetService;
     router:Router;
     viewModel:Home;
 
-    constructor(tweetService:TweetService) {
+    constructor(tweetService:ITweetService) {
         this.pageNumber = 0;
         this.tweetService = tweetService;
         this.viewModel = this;
@@ -82,5 +85,4 @@ export class Home{
             return current
         });
     }
-
 }

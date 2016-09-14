@@ -1,19 +1,19 @@
 import {inject} from "aurelia-dependency-injection";
 import {HttpClient} from "aurelia-fetch-client";
-import {BASE_URL, CURRENT_USER} from "./route";
 import {Const} from "./const";
-import User = Twitter.Models.User;
+import {BASE_URL, CURRENT_USER} from "./route";
+import User = Models.User;
 /**
  * Created by mariusz on 02.09.16.
  */
 
 
-export interface UserService {
+export interface IUserService {
     getCurrentLoggedUser():Promise<User>;
 }
 
 @inject(HttpClient)
-export class UserServiceImpl implements UserService {
+export class UserService implements IUserService {
 
     private httpClient:HttpClient;
     private authToken:string;
@@ -35,5 +35,4 @@ export class UserServiceImpl implements UserService {
                 .then(data => resolve(data))
         });
     }
-
 }

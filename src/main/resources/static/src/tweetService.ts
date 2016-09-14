@@ -1,26 +1,25 @@
-import Tweet = Twitter.Models.Tweet;
-import UserVote = Twitter.Models.UserVote;
-import Vote = Twitter.Models.Vote;
 import {HttpClient, json} from "aurelia-fetch-client";
 import {inject} from "aurelia-dependency-injection";
+import {Const} from "./const";
 import {
     BASE_URL,
     TWEET_URL,
     TWEET_GET_ALL,
     TWEET_BY_ID,
     TWEET_VOTE_GET_BY_ID,
-    TWEET_VOTE,
+    USER_FAVOURITE_TWEETS,
     TWEET_FAVOURITE,
-    USER_FAVOURITE_TWEETS
+    TWEET_VOTE
 } from "./route";
-import {Const} from "./const";
+import Tweet = Models.Tweet;
+import UserVote =Models.UserVote;
+import Vote = Models.Vote;
 
 /**
  * Created by mariusz on 01.09.16.
  */
 
-
-export interface TweetService {
+export interface ITweetService {
     create(tweet:Tweet):Promise<Tweet>;
     getAllTweets(page:number, size:number):Promise<Tweet[]>;
     deleteTweet(tweetId:number):Promise<{}>;
@@ -34,7 +33,7 @@ export interface TweetService {
 }
 
 @inject(HttpClient)
-export class TweetServiceImpl implements TweetService {
+export class TweetService implements ITweetService {
     private httpClient:HttpClient;
     private authToken:string;
 

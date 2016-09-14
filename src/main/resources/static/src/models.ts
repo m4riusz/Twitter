@@ -2,7 +2,7 @@
  * Created by mariusz on 30.08.16.
  */
 
-module Twitter.Models {
+module Models {
 
     export enum Gender{
         MALE,

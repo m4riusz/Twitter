@@ -2,19 +2,19 @@ import {HttpClient, json} from "aurelia-fetch-client";
 import {inject} from "aurelia-dependency-injection";
 import {BASE_URL, LOGIN, REGISTER, CURRENT_USER} from "./route";
 import Response = Aurelia.Response;
+
 /**
  * Created by mariusz on 23.08.16.
  */
 
-
-export interface AuthService {
+export interface IAuthService {
     isTokenValid(token:string):Promise<boolean>;
     login(username:string, password:string):Promise<Response>;
-    register(username:string, password:string, email:string, gender:Twitter.Models.Gender):Promise<Response>;
+    register(username:string, password:string, email:string, gender:Models.Gender):Promise<Response>;
 }
 
 @inject(HttpClient)
-export class AuthServiceImpl implements AuthService {
+export class AuthService implements IAuthService {
     private httpClient:HttpClient;
 
     constructor(httpClient:HttpClient) {
@@ -32,7 +32,7 @@ export class AuthServiceImpl implements AuthService {
             });
     }
 
-    public register(username:string, password:string, email:string, gender:Twitter.Models.Gender):Promise<Response> {
+    public register(username:string, password:string, email:string, gender:Models.Gender):Promise<Response> {
         return this.httpClient
             .fetch(BASE_URL + REGISTER, {
                 method: 'post',
@@ -58,5 +58,4 @@ export class AuthServiceImpl implements AuthService {
             })
             .then(response => response.ok);
     }
-
 }

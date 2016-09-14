@@ -1,20 +1,20 @@
+import {IUserService, UserService} from "./userService";
 import {RouterConfiguration, Router} from "aurelia-router";
-import {UserService, UserServiceImpl} from "./userService";
 import {inject} from "aurelia-dependency-injection";
-import User = Twitter.Models.User;
+import User = Models.User;
 
 /**
  * Created by mariusz on 22.08.16.
  */
 
-@inject(UserServiceImpl)
+@inject(UserService)
 export class App {
 
     public loggedUser:User;
     public router:Router;
-    private userService:UserService;
+    private userService:IUserService;
 
-    constructor(userService:UserService) {
+    constructor(userService:IUserService) {
         this.userService = userService;
     }
 
