@@ -11,7 +11,7 @@ import User = Models.User;
  */
 
 
-@inject(TweetService)
+@inject(TweetService, Router)
 export class Home {
     currentLoggedUser:User;
     pageNumber:number;
@@ -20,8 +20,9 @@ export class Home {
     router:Router;
     viewModel:Home;
 
-    constructor(tweetService:ITweetService) {
+    constructor(tweetService:ITweetService, router:Router) {
         this.pageNumber = 0;
+        this.router = router;
         this.tweetService = tweetService;
         this.viewModel = this;
     }
@@ -54,6 +55,10 @@ export class Home {
 
     deleteTweetFromFavourites(tweetId:number) {
         this.tweetService.removeTweetFromFavourites(tweetId).then(()=>this.deleteFromFavourites(tweetId));
+    }
+
+    showComments(tweet:Tweet) {
+        this.router.navigate(`comment/${tweet.id}`, {tweetRoot: tweet});
     }
 
     private addToFavourites(tweet:Tweet) {
