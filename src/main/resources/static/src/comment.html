@@ -1,3 +1,13 @@
 <template>
-    comments
+    <require from='./tweet-template'></require>
+    <require from='./comment-template'></require>
+
+    <tweet-template tweet.bind="tweet" tweet-container.bind="tweetContainer"
+                    current-user.bind="currentLoggedUser"></tweet-template>
+
+
+    <div repeat.for="comment of comments" class="col-sm-offset-1 col-xs-offset-1">
+        <comment-template comment.bind="comment" tweet.bind="tweet"
+                          current-user.bind="currentLoggedUser"></comment-template>
+    </div>
 </template>

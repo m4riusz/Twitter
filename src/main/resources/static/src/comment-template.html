@@ -1,0 +1,51 @@
+<template>
+    <div class="well">
+        <div if.bind="comment.deleted == false" class="btn-group pull-right">
+            <a if.bind="comment.loggedUserVote == 'UP'" type=button class="btn btn-success">
+                <div class="glyphicon glyphicon-plus-sign"></div>
+            </a>
+            <a if.bind="comment.loggedUserVote != 'UP'" type=button class="btn btn-default">
+                <div class="glyphicon glyphicon-plus"></div>
+            </a>
+            <a if.bind="comment.loggedUserVote == 'DOWN'" type=button class="btn btn-danger">
+                <div class="glyphicon glyphicon-minus-sign"></div>
+            </a>
+            <a if.bind="comment.loggedUserVote != 'DOWN'" type=button class="btn btn-default">
+                <div class="glyphicon glyphicon-minus"></div>
+            </a>
+        </div>
+        <div class=" media">
+            <div class="media-left">
+                <img src="data:image/jpg;base64, ${comment.owner.avatar.bytes}"
+                     alt="${comment.owner.avatar.fileName}">
+            </div>
+            <div class="media-body">
+                <i class="glyphicon glyphicon-user"></i>
+                ${comment.owner.username}
+                <br/>
+                <i class="glyphicon glyphicon-envelope"></i>
+                ${comment.owner.email}
+                <br/>
+                <i class="glyphicon glyphicon-calendar"></i>
+                ${comment.createDate}
+            </div>
+            <label>${comment.content}</label>
+            <br/>
+        </div>
+        <div class="btn-group">
+            <a if.bind="comment.favourite == 0"
+               class="btn btn-default">
+                <span class="glyphicon glyphicon-heart"></span> Favourite
+            </a>
+            <a if.bind="comment.favourite == 1"
+               class="btn btn-default">
+                <span class="glyphicon glyphicon-trash"></span> Unfavourite
+            </a>
+            <a class="btn btn-default">
+                <span class="glyphicon glyphicon-warning-sign"></span> Report
+            </a>
+        </div>
+        <a if.bind="comment.deleted == false && comment.owner.id == currentUser.id"
+           class="glyphicon glyphicon-remove btn btn-danger pull-right"> Delete</a>
+    </div>
+</template>
