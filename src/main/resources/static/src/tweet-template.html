@@ -2,19 +2,19 @@
     <div class="well">
         <div if.bind="tweet.deleted == false" class="btn-group pull-right">
             <a if.bind="tweet.loggedUserVote == 'UP'" type=button class="btn btn-success"
-               click.delegate="parent.deleteTweetVote(tweet.id)">
+               click.delegate="tweetContainer.deleteTweetVote(tweet.id)">
                 <div class="glyphicon glyphicon-plus-sign"></div>
             </a>
             <a if.bind="tweet.loggedUserVote != 'UP'" type=button class="btn btn-default"
-               click.delegate="parent.voteOnTweet(tweet.id,'UP')">
+               click.delegate="tweetContainer.voteOnTweet(tweet.id,'UP')">
                 <div class="glyphicon glyphicon-plus"></div>
             </a>
             <a if.bind="tweet.loggedUserVote == 'DOWN'" type=button class="btn btn-danger"
-               click.delegate="parent.deleteTweetVote(tweet.id)">
+               click.delegate="tweetContainer.deleteTweetVote(tweet.id)">
                 <div class="glyphicon glyphicon-minus-sign"></div>
             </a>
             <a if.bind="tweet.loggedUserVote != 'DOWN'" type=button class="btn btn-default"
-               click.delegate="parent.voteOnTweet(tweet.id,'DOWN')">
+               click.delegate="tweetContainer.voteOnTweet(tweet.id,'DOWN')">
                 <div class="glyphicon glyphicon-minus"></div>
             </a>
         </div>
@@ -38,14 +38,14 @@
         </div>
         <div class="btn-group">
             <a if.bind="tweet.favourite == 0"
-               class="btn btn-default" click.delegate="parent.addTweetToFavourites(tweet.id)">
+               class="btn btn-default" click.delegate="tweetContainer.addTweetToFavourites(tweet.id)">
                 <span class="glyphicon glyphicon-heart"></span> Favourite
             </a>
             <a if.bind="tweet.favourite == 1"
-               class="btn btn-default" click.delegate="parent.deleteTweetFromFavourites(tweet.id)">
+               class="btn btn-default" click.delegate="tweetContainer.deleteTweetFromFavourites(tweet.id)">
                 <span class="glyphicon glyphicon-trash"></span> Unfavourite
             </a>
-            <a class="btn btn-default" click.delegate="parent.showComments(tweet)">
+            <a class="btn btn-default" click.delegate="tweetContainer.showComments(tweet)">
                 <span class="glyphicon glyphicon-comment"></span> Comments
             </a>
             <a class="btn btn-default">
@@ -54,6 +54,6 @@
         </div>
         <a if.bind="tweet.deleted == false && tweet.owner.id == currentUser.id"
            class="glyphicon glyphicon-remove btn btn-danger pull-right"
-           click.delegate='parent.deleteTweet(tweet.id)'> Delete</a>
+           click.delegate='tweetContainer.deleteTweet(tweet.id)'> Delete</a>
     </div>
 </template>

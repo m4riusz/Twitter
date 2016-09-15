@@ -10,21 +10,30 @@ import User = Models.User;
  * Created by mariusz on 31.08.16.
  */
 
+export interface ITweetContainer {
+    deleteTweet(tweetId:number);
+    voteOnTweet(tweetId:number, vote:Vote);
+    deleteTweetVote(tweetId:number);
+    addTweetToFavourites(tweetId:number);
+    deleteTweetFromFavourites(tweetId:number);
+    showComments(tweet:Tweet);
+}
+
 
 @inject(TweetService, Router)
-export class Home {
+export class Home implements ITweetContainer {
     currentLoggedUser:User;
     pageNumber:number;
     tweets:Tweet[];
     tweetService:ITweetService;
     router:Router;
-    viewModel:Home;
+    tweetContainer:ITweetContainer;
 
     constructor(tweetService:ITweetService, router:Router) {
         this.pageNumber = 0;
         this.router = router;
         this.tweetService = tweetService;
-        this.viewModel = this;
+        this.tweetContainer = this;
     }
 
     async activate(params, routeConfig:RouteConfig) {
@@ -58,7 +67,11 @@ export class Home {
     }
 
     showComments(tweet:Tweet) {
-        this.router.navigate(`comment/${tweet.id}`, {tweetRoot: tweet});
+        this.router.navigate(`comment/${tweet.id}`, {
+            tweetId: tweet.id,
+            currentUser: this.currentLoggedUser,
+            currentTweet: tweet
+        });
     }
 
     private addToFavourites(tweet:Tweet) {

@@ -1,5 +1,5 @@
 import {bindable, customElement} from "aurelia-templating";
-import {Home} from "./home";
+import {ITweetContainer} from "./home";
 import User = Models.User;
 import Tweet = Models.Tweet;
 /**
@@ -9,6 +9,6 @@ import Tweet = Models.Tweet;
 @customElement('tweet-template')
 export class TweetTemplate {
     @bindable tweet:Tweet;
-    @bindable parent:Home;
+    @bindable tweetContainer:ITweetContainer;
     @bindable currentUser:User;
 }
