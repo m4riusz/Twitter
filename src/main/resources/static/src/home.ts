@@ -2,6 +2,7 @@ import {Const} from "./const";
 import {inject} from "aurelia-dependency-injection";
 import {Router, RouteConfig} from "aurelia-router";
 import {TweetService, ITweetService} from "./tweetService";
+import {ITweetContainer} from "./tweetContainer";
 import Tweet = Models.Tweet;
 import Vote = Models.Vote;
 import User = Models.User;
@@ -10,27 +11,17 @@ import User = Models.User;
  * Created by mariusz on 31.08.16.
  */
 
-export interface ITweetContainer {
-    deleteTweet(tweetId:number);
-    voteOnTweet(tweetId:number, vote:Vote);
-    deleteTweetVote(tweetId:number);
-    addTweetToFavourites(tweetId:number);
-    deleteTweetFromFavourites(tweetId:number);
-    showComments(tweet:Tweet);
-}
-
-
 @inject(TweetService, Router)
 export class Home implements ITweetContainer {
     currentLoggedUser:User;
-    pageNumber:number;
+    page:number;
     tweets:Tweet[];
-    tweetService:ITweetService;
-    router:Router;
     tweetContainer:ITweetContainer;
+    private router:Router;
+    private tweetService:ITweetService;
 
     constructor(tweetService:ITweetService, router:Router) {
-        this.pageNumber = 0;
+        this.page = 0;
         this.router = router;
         this.tweetService = tweetService;
         this.tweetContainer = this;
@@ -38,12 +29,7 @@ export class Home implements ITweetContainer {
 
     async activate(params, routeConfig:RouteConfig) {
         this.currentLoggedUser = routeConfig.settings.currentUser;
-        [this.tweets, this.currentLoggedUser.favouriteTweets] = await Promise.all(
-            [
-                this.tweetService.getAllTweets(this.pageNumber, Const.PAGE_SIZE),
-                this.tweetService.getFavouriteTweetsFrom(this.currentLoggedUser.id, 0, 1000)
-            ]
-        );
+        this.tweets = await this.tweetService.getAllTweets(this.page, Const.PAGE_SIZE);
     }
 
     deleteTweet(tweetId:number) {
@@ -51,43 +37,31 @@ export class Home implements ITweetContainer {
     }
 
     voteOnTweet(tweetId:number, vote:Vote) {
-        this.tweetService.voteTweet(tweetId, vote).then((vote)=> this.updateTweetVote(tweetId, vote));
+        this.tweetService.voteTweet(tweetId, vote).then((vote)=> this.setTweetVote(tweetId, vote));
     }
 
     deleteTweetVote(tweetId:number) {
-        this.tweetService.deleteVote(tweetId).then(()=> this.updateTweetVote(tweetId, 'NONE'));
+        this.tweetService.deleteVote(tweetId).then(()=> this.setTweetVote(tweetId, 'NONE'));
     }
 
     addTweetToFavourites(tweetId:number) {
-        this.tweetService.addTweetToFavourites(tweetId).then(tweet =>this.addToFavourites(tweet));
+        this.tweetService.addTweetToFavourites(tweetId).then(tweet =>this.setTweetFavourite(tweetId, true));
     }
 
     deleteTweetFromFavourites(tweetId:number) {
-        this.tweetService.removeTweetFromFavourites(tweetId).then(()=>this.deleteFromFavourites(tweetId));
+        this.tweetService.removeTweetFromFavourites(tweetId).then(()=>this.setTweetFavourite(tweetId, false));
     }
 
     showComments(tweet:Tweet) {
-        this.router.navigate(`comment/${tweet.id}`, {
-            tweetId: tweet.id,
-            currentUser: this.currentLoggedUser,
-            currentTweet: tweet
-        });
+        this.router.navigate(`comment/${tweet.id}`, {tweetId: tweet.id});
     }
 
-    private addToFavourites(tweet:Tweet) {
-        this.currentLoggedUser.favouriteTweets.push(tweet);
-        this.updateTweetFavouriteChange();
+    private setTweetFavourite(tweetId:number, favourite:boolean) {
+        this.tweets.forEach(current => current.id == tweetId ? current.favourite = favourite : current);
     }
 
-    private deleteFromFavourites(tweetId:number) {
-        this.currentLoggedUser.favouriteTweets = this.currentLoggedUser.favouriteTweets.filter(t => t.id != tweetId);
-        this.updateTweetFavouriteChange();
-    }
-
-    private updateTweetFavouriteChange() {
-        this.tweets.forEach(current =>
-            this.currentLoggedUser.favouriteTweets.find(t=> t.id == current.id ? current.favourite = true : current.favourite = false)
-        )
+    private setTweetVote(tweetId:number, vote:Vote) {
+        this.tweets.forEach(current => current.id == tweetId ? current.loggedUserVote = vote : current);
     }
 
     private async updateTweet(tweetId:number) {
@@ -95,12 +69,5 @@ export class Home implements ITweetContainer {
         this.tweets = this.tweets.map(tweet => tweet.id == tweetId ? tweet = updated : tweet);
     }
 
-    private updateTweetVote(tweetId:number, vote:Vote) {
-        this.tweets = this.tweets.map(current => {
-            if (current.id == tweetId) {
-                current.loggedUserVote = vote;
-            }
-            return current
-        });
-    }
+
 }

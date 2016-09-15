@@ -1,5 +1,5 @@
 import {bindable, customElement} from "aurelia-templating";
-import {ITweetContainer} from "./home";
+import {ITweetContainer} from "./tweetContainer";
 import User = Models.User;
 import Tweet = Models.Tweet;
 /**
