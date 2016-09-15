@@ -3,7 +3,7 @@ const tsc = require('gulp-typescript');
 const clean = require('gulp-clean');
 
 var src = {
-    ts: "./src/**/*.ts",
+    ts: ["./src/**/*.ts", "./typings/**/*.ts"],
     html: "./src/**/*.html"
 };
 
