@@ -1,8 +1,8 @@
 package com.twitter.controller;
 
+import com.twitter.dto.PostVote;
 import com.twitter.model.Comment;
 import com.twitter.model.UserVote;
-import com.twitter.dto.PostVote;
 import com.twitter.route.Route;
 import com.twitter.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,20 +48,21 @@ public class CommentController {
         return new ResponseEntity<>(commentService.getAllFromUserById(commentId, new PageRequest(page, size)), HttpStatus.OK);
     }
 
-    @RequestMapping(value = Route.COMMENT_VOTE, method = RequestMethod.POST)
+    @RequestMapping(value = Route.COMMENT_VOTE, method = {RequestMethod.POST, RequestMethod.PUT})
     public ResponseEntity<UserVote> voteComment(@RequestBody @Valid PostVote postVote) {
-        return new ResponseEntity<>(commentService.vote(postVote), HttpStatus.CREATED);
-    }
-
-    @RequestMapping(value = Route.COMMENT_VOTE, method = RequestMethod.PUT)
-    public ResponseEntity<UserVote> changeVoteComment(@RequestBody @Valid PostVote postVote) {
         return new ResponseEntity<>(commentService.vote(postVote), HttpStatus.OK);
     }
+
 
     @RequestMapping(value = Route.COMMENT_VOTE_BY_ID, method = RequestMethod.DELETE)
     public ResponseEntity deleteVoteComment(@PathVariable long voteId) {
         commentService.deleteVote(voteId);
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = Route.COMMENT_VOTE_BY_ID, method = RequestMethod.GET)
+    public ResponseEntity<UserVote> getUserCommentVote(@PathVariable long commentId) {
+        return new ResponseEntity<>(commentService.getPostVote(commentId), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.COMMENTS_FROM_TWEET, method = RequestMethod.GET)
