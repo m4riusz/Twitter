@@ -38,7 +38,7 @@ module Models {
         bytes:number[];
     }
 
-    export interface Comment extends AbstractEntity {
+    export interface Comment extends AbstractPost {
         tweet:Tweet;
     }
 

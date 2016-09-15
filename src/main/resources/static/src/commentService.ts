@@ -1,10 +1,11 @@
-import {HttpClient} from "aurelia-fetch-client";
+import {HttpClient, json} from "aurelia-fetch-client";
 import {inject} from "aurelia-dependency-injection";
 import {BasicService} from "./basicService";
 import {Const} from "./const";
 import {BASE_URL, COMMENTS_FROM_TWEET, COMMENT_VOTE_BY_ID, COMMENT_VOTE} from "./route";
 import Comment = Models.Comment;
 import Vote = Models.Vote;
+import UserVote = Models.UserVote;
 
 /**
  * Created by mariusz on 14.09.16.
