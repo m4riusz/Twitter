@@ -55,6 +55,7 @@ export class CommentService extends BasicService implements ICommentService {
             })
                 .then(response => response.json())
                 .then((data:UserVote)=> {
+                    console.log(data);
                     resolve(data.vote);
                 }, ()=> {
                     resolve("NONE");
