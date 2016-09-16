@@ -2,7 +2,7 @@ import {HttpClient, json} from "aurelia-fetch-client";
 import {inject} from "aurelia-dependency-injection";
 import {BasicService} from "./basicService";
 import {Const} from "../domain/const";
-import {BASE_URL, COMMENTS_FROM_TWEET, COMMENT_VOTE_BY_ID, COMMENT_VOTE} from "../domain/route";
+import {BASE_URL, COMMENTS_FROM_TWEET, COMMENT_VOTE_BY_ID, COMMENT_VOTE, COMMENT_BY_ID} from "../domain/route";
 import Comment = Models.Comment;
 import Vote = Models.Vote;
 import UserVote = Models.UserVote;
@@ -12,10 +12,12 @@ import UserVote = Models.UserVote;
  */
 
 export interface ICommentService {
+    deleteComment(tweetId:number):Promise<{}>;
     getTweetComments(tweetId:number, page:number, size:number):Promise<Comment[]>;
     getCurrentUserCommentVote(commentId:number):Promise<Vote>;
     voteComment(commentId:number, vote:Vote):Promise<Vote>;
     deleteCommentVote(commentId:number):Promise<{}>;
+    getCommentById(commentId:number):Promise<Comment>;
 }
 
 @inject(HttpClient)
@@ -26,6 +28,20 @@ export class CommentService extends BasicService implements ICommentService {
     constructor(httpClient:HttpClient) {
         super(httpClient);
         this.authToken = localStorage[Const.TOKEN_HEADER];
+    }
+
+    deleteComment(tweetId:number):Promise<{}> {
+        return new Promise<{}>((resolve, reject) => {
+            this.httpClient.fetch(BASE_URL + COMMENT_BY_ID(tweetId), {
+                method: 'delete',
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => {
+                    response.ok ? resolve() : reject();
+                })
+        });
     }
 
     getTweetComments(tweetId:number, page:number, size:number):Promise<Comment[]> {
@@ -88,6 +104,21 @@ export class CommentService extends BasicService implements ICommentService {
             })
                 .then(()=> {
                     resolve();
+                })
+        })
+    }
+
+    getCommentById(commentId:number):Promise<Comment> {
+        return new Promise<Comment>((resolve, reject) => {
+            this.httpClient.fetch(BASE_URL + COMMENT_BY_ID(commentId), {
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => response.json())
+                .then((comment:Comment) => {
+                    this.getCommentCurrentUserData(comment);
+                    resolve(comment);
                 })
         })
     }
