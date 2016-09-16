@@ -3,7 +3,7 @@ import {ICommentService, CommentService} from "./commentService";
 import {inject} from "aurelia-dependency-injection";
 import {Const} from "./const";
 import {ITweetService, TweetService} from "./tweetService";
-import {ITweetContainer} from "./tweetContainer";
+import {ITweetContainer, ICommentContainer} from "./containers";
 import User = Models.User;
 import Vote = Models.Vote;
 /**
@@ -11,11 +11,12 @@ import Vote = Models.Vote;
  */
 
 @inject(TweetService, CommentService)
-export class Comment implements ITweetContainer {
+export class Comment implements ITweetContainer,ICommentContainer {
     private page;
     tweet:Tweet;
     comments:Models.Comment[];
     tweetContainer:ITweetContainer;
+    commentContainer:ICommentContainer;
     currentLoggedUser:User;
     private commentService:ICommentService;
     private tweetService:ITweetService;
@@ -25,6 +26,7 @@ export class Comment implements ITweetContainer {
         this.tweetService = tweetService;
         this.commentService = commentService;
         this.tweetContainer = this;
+        this.commentContainer = this;
     }
 
     async activate(params, config) {
@@ -58,6 +60,20 @@ export class Comment implements ITweetContainer {
     }
 
     showComments(tweet:Tweet) {
+    }
+
+
+    deleteComment(commentId:number) {
+        console.log(commentId);
+    }
+
+    voteOnComment(commentId:number, vote:Vote) {
+        console.log(commentId);
+        console.log(vote);
+    }
+
+    deleteCommentVote(commentId:number) {
+        console.log(commentId);
     }
 
     private async updateTweet(tweetId:number) {

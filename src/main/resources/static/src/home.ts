@@ -2,7 +2,7 @@ import {Const} from "./const";
 import {inject} from "aurelia-dependency-injection";
 import {Router, RouteConfig} from "aurelia-router";
 import {TweetService, ITweetService} from "./tweetService";
-import {ITweetContainer} from "./tweetContainer";
+import {ITweetContainer} from "./containers";
 import Tweet = Models.Tweet;
 import Vote = Models.Vote;
 import User = Models.User;

@@ -1,16 +1,20 @@
 <template>
     <div class="well">
         <div if.bind="comment.deleted == false" class="btn-group pull-right">
-            <a if.bind="comment.loggedUserVote == 'UP'" type=button class="btn btn-success">
+            <a if.bind="comment.loggedUserVote == 'UP'" type=button class="btn btn-success"
+               click.delegate="commentContainer.deleteCommentVote(comment.id)">
                 <div class="glyphicon glyphicon-plus-sign"></div>
             </a>
-            <a if.bind="comment.loggedUserVote != 'UP'" type=button class="btn btn-default">
+            <a if.bind="comment.loggedUserVote != 'UP'" type=button class="btn btn-default"
+               click.delegate="commentContainer.voteOnComment(comment.id,'UP')">
                 <div class="glyphicon glyphicon-plus"></div>
             </a>
-            <a if.bind="comment.loggedUserVote == 'DOWN'" type=button class="btn btn-danger">
+            <a if.bind="comment.loggedUserVote == 'DOWN'" type=button class="btn btn-danger"
+               click.delegate="commentContainer.deleteCommentVote(comment.id)">
                 <div class="glyphicon glyphicon-minus-sign"></div>
             </a>
-            <a if.bind="comment.loggedUserVote != 'DOWN'" type=button class="btn btn-default">
+            <a if.bind="comment.loggedUserVote != 'DOWN'" type=button class="btn btn-default"
+               click.delegate="commentContainer.voteOnComment(comment.id,'DOWN')">
                 <div class="glyphicon glyphicon-minus"></div>
             </a>
         </div>
@@ -33,19 +37,12 @@
             <br/>
         </div>
         <div class="btn-group">
-            <a if.bind="comment.favourite == 0"
-               class="btn btn-default">
-                <span class="glyphicon glyphicon-heart"></span> Favourite
-            </a>
-            <a if.bind="comment.favourite == 1"
-               class="btn btn-default">
-                <span class="glyphicon glyphicon-trash"></span> Unfavourite
-            </a>
             <a class="btn btn-default">
                 <span class="glyphicon glyphicon-warning-sign"></span> Report
             </a>
         </div>
         <a if.bind="comment.deleted == false && comment.owner.id == currentUser.id"
-           class="glyphicon glyphicon-remove btn btn-danger pull-right"> Delete</a>
+           class="glyphicon glyphicon-remove btn btn-danger pull-right"
+           click.delegate="commentContainer.deleteComment(comment.id)"> Delete</a>
     </div>
 </template>

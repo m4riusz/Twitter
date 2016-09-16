@@ -1,4 +1,5 @@
 import {customElement, bindable} from "aurelia-templating";
+import {ICommentContainer} from "./containers";
 import Comment = Models.Comment;
 import Tweet = Models.Tweet;
 import User = Models.User;
@@ -8,7 +9,7 @@ import User = Models.User;
 
 @customElement('comment-template')
 export class CommentTemplate {
-    @bindable t*weet:Tweet;
     @bindable comment:Comment;
     @bindable currentUser:User;
+    @bindable commentContainer:ICommentContainer;
 }
