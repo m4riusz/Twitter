@@ -3,9 +3,9 @@ import {inject} from "aurelia-dependency-injection";
 import {TweetService, ITweetService} from "../../service/tweetService";
 import {CommentService, ICommentService} from "../../service/commentService";
 import {ITweetContainer, ICommentContainer} from "../../domain/containers";
+import {Const} from "../../domain/const";
 import User = Models.User;
 import Vote = Models.Vote;
-import {Const} from "../../domain/const";
 /**
  * Created by mariusz on 14.09.16.
  */
@@ -64,20 +64,28 @@ export class Comment implements ITweetContainer,ICommentContainer {
 
 
     deleteComment(commentId:number) {
-        console.log(commentId);
+        this.commentService.deleteComment(commentId).then(() => this.updateComment(commentId));
     }
 
     voteOnComment(commentId:number, vote:Vote) {
-        console.log(commentId);
-        console.log(vote);
+        this.commentService.voteComment(commentId, vote).then((vote:Vote) => this.setCommentVote(commentId, vote));
     }
 
     deleteCommentVote(commentId:number) {
-        console.log(commentId);
+        this.commentService.deleteCommentVote(commentId).then(() => this.setCommentVote(commentId, "NONE"));
+    }
+
+    private setCommentVote(commentId:number, vote:Vote) {
+        this.comments.forEach(current => current.id == commentId ? current.loggedUserVote = vote : current);
     }
 
     private async updateTweet(tweetId:number) {
         this.tweet = await this.tweetService.getTweetById(tweetId);
+    }
+
+    private async updateComment(commentId:number) {
+        let updated = await this.commentService.getCommentById(commentId);
+        this.comments = this.comments.map(current => current.id == commentId ? updated : current);
     }
 
 }
