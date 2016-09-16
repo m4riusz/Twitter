@@ -3,8 +3,8 @@
  */
 
 import {Aurelia} from "aurelia-framework";
-import {Const} from "./const";
-import {Login} from "./login";
+import {Const} from "./domain/const";
+import {Login} from "./pages/unauthorized/login/login";
 
 export function configure(aurelia :Aurelia) {
     aurelia.use.standardConfiguration();

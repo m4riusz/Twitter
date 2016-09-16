@@ -1,8 +1,8 @@
-import {Const} from "./const";
 import {inject} from "aurelia-dependency-injection";
 import {Router, RouteConfig} from "aurelia-router";
-import {TweetService, ITweetService} from "./tweetService";
-import {ITweetContainer} from "./containers";
+import {TweetService, ITweetService} from "../../service/tweetService";
+import {ITweetContainer} from "../../domain/containers";
+import {Const} from "../../domain/const";
 import Tweet = Models.Tweet;
 import Vote = Models.Vote;
 import User = Models.User;

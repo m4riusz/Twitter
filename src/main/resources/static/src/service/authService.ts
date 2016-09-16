@@ -1,8 +1,9 @@
 import {HttpClient, json} from "aurelia-fetch-client";
 import {inject} from "aurelia-dependency-injection";
-import {BASE_URL, LOGIN, REGISTER, CURRENT_USER} from "./route";
-import Response = Aurelia.Response;
+import {BASE_URL, LOGIN, REGISTER, CURRENT_USER} from "../domain/route";
 import {BasicService} from "./basicService";
+import {Const} from "../domain/const";
+import Response = Aurelia.Response;
 
 /**
  * Created by mariusz on 23.08.16.
@@ -53,7 +54,7 @@ export class AuthService extends BasicService implements IAuthService {
             .fetch(BASE_URL + CURRENT_USER, {
                 headers: {
                     'method': 'get',
-                    'Auth-Token': token
+                    [Const.TOKEN_HEADER]: token
                 }
             })
             .then(response => response.ok);

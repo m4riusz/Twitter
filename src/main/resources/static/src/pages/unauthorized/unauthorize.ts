@@ -12,8 +12,8 @@ export class Unauthorize {
         config.title = 'Welcome to twitter!';
         config.map(
             [
-                {route: ['', 'login'], name: 'login', moduleId: 'login'},
-                {route: 'register', name: 'register', moduleId: 'register'}
+                {route: ['', 'login'], name: 'login', moduleId: 'login/login'},
+                {route: 'register', name: 'register', moduleId: 'register/register'}
             ]
         );
 

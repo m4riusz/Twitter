@@ -1,7 +1,7 @@
 import {inject} from "aurelia-dependency-injection";
 import {HttpClient} from "aurelia-fetch-client";
-import {Const} from "./const";
-import {BASE_URL, CURRENT_USER} from "./route";
+import {Const} from "../domain/const";
+import {BASE_URL, CURRENT_USER} from "../domain/route";
 import {BasicService} from "./basicService";
 import User = Models.User;
 /**

@@ -1,11 +1,11 @@
 import Tweet = Models.Tweet;
-import {ICommentService, CommentService} from "./commentService";
 import {inject} from "aurelia-dependency-injection";
-import {Const} from "./const";
-import {ITweetService, TweetService} from "./tweetService";
-import {ITweetContainer, ICommentContainer} from "./containers";
+import {TweetService, ITweetService} from "../../service/tweetService";
+import {CommentService, ICommentService} from "../../service/commentService";
+import {ITweetContainer, ICommentContainer} from "../../domain/containers";
 import User = Models.User;
 import Vote = Models.Vote;
+import {Const} from "../../domain/const";
 /**
  * Created by mariusz on 14.09.16.
  */

@@ -1,7 +1,7 @@
 import {inject} from "aurelia-dependency-injection";
-import {Const} from "./const";
 import {Aurelia} from "aurelia-framework";
-import {AuthService, IAuthService} from "./authService";
+import {AuthService, IAuthService} from "../../../service/authService";
+import {Const} from "../../../domain/const";
 
 /**
  * Created by mariusz on 23.08.16.
@@ -24,8 +24,8 @@ export class Login {
     }
 
     activate() {
-        this.username = '';
-        this.password = '';
+        this.username = 'mariusz';
+        this.password = 'not2you';
         this.error = '';
     }
 

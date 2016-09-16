@@ -1,6 +1,6 @@
 import {HttpClient, json} from "aurelia-fetch-client";
 import {inject} from "aurelia-dependency-injection";
-import {Const} from "./const";
+import {Const} from "../domain/const";
 import {
     BASE_URL,
     TWEET_URL,
@@ -10,7 +10,7 @@ import {
     USER_FAVOURITE_TWEETS,
     TWEET_FAVOURITE,
     TWEET_VOTE
-} from "./route";
+} from "../domain/route";
 import {BasicService} from "./basicService";
 import Tweet = Models.Tweet;
 import UserVote =Models.UserVote;

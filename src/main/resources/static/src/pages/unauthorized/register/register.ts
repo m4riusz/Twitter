@@ -1,7 +1,6 @@
 import {inject} from "aurelia-dependency-injection";
-import {Const} from "./const";
-import {IAuthService, AuthService} from "./authService";
-
+import {AuthService, IAuthService} from "../../../service/authService";
+import {Const} from "../../../domain/const";
 
 /**
  * Created by mariusz on 24.08.16.

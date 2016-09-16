@@ -1,4 +1,4 @@
-import {IUserService, UserService} from "./userService";
+import {IUserService, UserService} from "./service/userService";
 import {RouterConfiguration, Router} from "aurelia-router";
 import {inject} from "aurelia-dependency-injection";
 import User = Models.User;
@@ -28,7 +28,7 @@ export class App {
             {
                 route: ['', 'home'],
                 name: 'home',
-                moduleId: 'home',
+                moduleId: 'pages/home/home',
                 title: 'Home',
                 nav: true,
                 settings: {currentUser: this.loggedUser}
@@ -36,7 +36,7 @@ export class App {
             {
                 route: ['tweets'],
                 name: 'tweets',
-                moduleId: 'tweets',
+                moduleId: 'pages/tweets/tweets',
                 title: 'Tweets',
                 nav: true,
                 settings: {currentUser: this.loggedUser}
@@ -44,7 +44,7 @@ export class App {
             {
                 route: ['comment/:tweetId'],
                 name: 'comment',
-                moduleId: 'comment',
+                moduleId: 'pages/comments/comment',
                 title: 'Tweet comments',
                 naw: true,
                 settings: {currentUser: this.loggedUser}

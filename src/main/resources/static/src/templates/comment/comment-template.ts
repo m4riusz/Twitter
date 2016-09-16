@@ -1,8 +1,8 @@
 import {customElement, bindable} from "aurelia-templating";
-import {ICommentContainer} from "./containers";
 import Comment = Models.Comment;
 import Tweet = Models.Tweet;
 import User = Models.User;
+import {ICommentContainer} from "../../domain/containers";
 /**
  * Created by mariusz on 15.09.16.
  */
