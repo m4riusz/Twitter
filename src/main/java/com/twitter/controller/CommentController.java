@@ -60,7 +60,7 @@ public class CommentController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @RequestMapping(value = Route.COMMENT_VOTE_BY_ID, method = RequestMethod.GET)
+    @RequestMapping(value = Route.COMMENT_VOTE_BY_COMMENT_ID, method = RequestMethod.GET)
     public ResponseEntity<UserVote> getUserCommentVote(@PathVariable long commentId) {
         return new ResponseEntity<>(commentService.getPostVote(commentId), HttpStatus.OK);
     }
