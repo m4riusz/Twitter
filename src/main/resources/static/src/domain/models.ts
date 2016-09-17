@@ -95,6 +95,7 @@ module Models {
         favouriteTags:Tag[];
         followers:User[];
         favouriteTweets:Tweet[];
+        authorities:any;
     }
 
     export interface UserVote extends AbstractEntity {

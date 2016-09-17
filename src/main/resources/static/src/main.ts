@@ -13,7 +13,7 @@ export function configure(aurelia :Aurelia) {
         let auth = aurelia.container.get(Login);
         auth.isAuthenticated()
             .then((authenticated) => {
-                let root = authenticated ? Const.APP_ROOT : Const.UNAUTHORIZE_ROOT;
+                let root = authenticated ? Const.APP_ROOT : `pages/unauthorized/${Const.UNAUTHORIZE_ROOT}`;
                 aurelia.setRoot(root);
             });
 
