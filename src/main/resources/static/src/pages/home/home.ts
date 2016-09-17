@@ -3,6 +3,7 @@ import {Router, RouteConfig} from "aurelia-router";
 import {TweetService, ITweetService} from "../../service/tweetService";
 import {ITweetContainer} from "../../domain/containers";
 import {Const} from "../../domain/const";
+import {ITweetSender} from "../../domain/senders";
 import Tweet = Models.Tweet;
 import Vote = Models.Vote;
 import User = Models.User;
@@ -12,11 +13,12 @@ import User = Models.User;
  */
 
 @inject(TweetService, Router)
-export class Home implements ITweetContainer {
+export class Home implements ITweetContainer, ITweetSender {
     currentLoggedUser:User;
     page:number;
     tweets:Tweet[];
     tweetContainer:ITweetContainer;
+    tweetSender:ITweetSender;
     private router:Router;
     private tweetService:ITweetService;
 
@@ -25,6 +27,8 @@ export class Home implements ITweetContainer {
         this.router = router;
         this.tweetService = tweetService;
         this.tweetContainer = this;
+        this.tweetSender = this;
+        console.log(this.tweetSender);
     }
 
     async activate(params, routeConfig:RouteConfig) {
@@ -54,6 +58,21 @@ export class Home implements ITweetContainer {
 
     showComments(tweet:Tweet) {
         this.router.navigate(`comment/${tweet.id}`, {tweetId: tweet.id});
+    }
+
+    send(message:string) {
+        try {
+            this.tweetService.send(<Tweet>{
+                type: "tweet",
+                content: message,
+                owner: this.currentLoggedUser,
+            })
+                .then(tweet => {
+                    this.tweets.unshift(tweet);
+                });
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     private setTweetFavourite(tweetId:number, favourite:boolean) {

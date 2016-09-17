@@ -31,6 +31,7 @@ export interface ITweetService {
     addTweetToFavourites(tweetId:number):Promise<Tweet>;
     removeTweetFromFavourites(tweetId:number):Promise<{}>;
     getFavouriteTweetsFrom(userId:number, page:number, size:number):Promise<Tweet[]>;
+    send(tweet:Tweet):Promise<Tweet>;
 }
 
 @inject(HttpClient)
@@ -210,6 +211,25 @@ export class TweetService extends BasicService implements ITweetService {
             })
                 .then(response => response.json())
                 .then((belong:boolean)=> resolve(belong))
+        });
+    }
+
+    send(tweet:Tweet):Promise<Tweet> {
+        tweet.owner.authorities = [];
+        return new Promise<Tweet>((resolve, reject)=> {
+            this.httpClient.fetch(BASE_URL + TWEET_URL, {
+                method: 'post',
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                },
+                body: json(tweet)
+            })
+                .then(response => {
+                    let data = response.json();
+                    if (response.ok) {
+                        data.then(data => resolve(data));
+                    }
+                });
         });
     }
 
