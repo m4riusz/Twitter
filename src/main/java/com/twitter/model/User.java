@@ -174,6 +174,7 @@ public class User extends AbstractEntity implements UserDetails {
         this.accountStatus = accountStatus;
     }
 
+    @JsonIgnore
     @Override
     public Collection<Role> getAuthorities() {
         return Arrays.asList(role);
@@ -189,21 +190,24 @@ public class User extends AbstractEntity implements UserDetails {
         return username;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return !accountStatus.isDeleted();
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return (accountStatus.getBannedUntil() == null || accountStatus.getBannedUntil().before(Calendar.getInstance().getTime()));
     }
-
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return password.getPasswordExpireDate().after(Calendar.getInstance().getTime());
     }
 
+    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return accountStatus.isEnable();

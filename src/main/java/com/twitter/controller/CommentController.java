@@ -7,6 +7,7 @@ import com.twitter.route.Route;
 import com.twitter.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -54,9 +55,9 @@ public class CommentController {
     }
 
 
-    @RequestMapping(value = Route.COMMENT_VOTE_BY_ID, method = RequestMethod.DELETE)
-    public ResponseEntity deleteVoteComment(@PathVariable long voteId) {
-        commentService.deleteVote(voteId);
+    @RequestMapping(value = Route.COMMENT_VOTE_BY_COMMENT_ID, method = RequestMethod.DELETE)
+    public ResponseEntity deleteVoteComment(@PathVariable long commentId) {
+        commentService.deleteVote(commentId);
         return new ResponseEntity(HttpStatus.OK);
     }
 
@@ -67,7 +68,7 @@ public class CommentController {
 
     @RequestMapping(value = Route.COMMENTS_FROM_TWEET, method = RequestMethod.GET)
     public ResponseEntity<List<Comment>> getCommentsFromTweetById(@PathVariable long tweetId, @PathVariable int page, @PathVariable int size) {
-        return new ResponseEntity<>(commentService.getTweetCommentsById(tweetId, new PageRequest(page, size)), HttpStatus.OK);
+        return new ResponseEntity<>(commentService.getTweetCommentsById(tweetId, new PageRequest(page, size, Sort.Direction.DESC, "createDate")), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.COMMENTS_LATEST, method = RequestMethod.GET)

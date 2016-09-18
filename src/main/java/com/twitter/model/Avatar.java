@@ -1,6 +1,5 @@
 package com.twitter.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.twitter.config.DatabaseConfig;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.Length;
@@ -21,7 +20,6 @@ public class Avatar extends AbstractEntity{
             min = 1, max = 100,
             message = "Avatar file name length should be between {min} and {max}!"
     )
-    @JsonIgnore
     private String fileName;
     @Lob
     @Type(type = "org.hibernate.type.BinaryType")
