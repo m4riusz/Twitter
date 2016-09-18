@@ -2,7 +2,14 @@ import {HttpClient, json} from "aurelia-fetch-client";
 import {inject} from "aurelia-dependency-injection";
 import {BasicService} from "./basicService";
 import {Const} from "../domain/const";
-import {BASE_URL, COMMENTS_FROM_TWEET, COMMENT_VOTE_BY_ID, COMMENT_VOTE, COMMENT_BY_ID} from "../domain/route";
+import {
+    BASE_URL,
+    COMMENTS_FROM_TWEET,
+    COMMENT_VOTE_BY_ID,
+    COMMENT_VOTE,
+    COMMENT_BY_ID,
+    COMMENT_URL
+} from "../domain/route";
 import Comment = Models.Comment;
 import Vote = Models.Vote;
 import UserVote = Models.UserVote;
@@ -18,6 +25,7 @@ export interface ICommentService {
     voteComment(commentId:number, vote:Vote):Promise<Vote>;
     deleteCommentVote(commentId:number):Promise<{}>;
     getCommentById(commentId:number):Promise<Comment>;
+    commentTweet(comment:Comment):Promise<Comment>;
 }
 
 @inject(HttpClient)
@@ -120,6 +128,26 @@ export class CommentService extends BasicService implements ICommentService {
                     this.getCommentCurrentUserData(comment);
                     resolve(comment);
                 })
+        })
+    }
+
+    commentTweet(comment:Comment):Promise<Comment> {
+        return new Promise<Comment>((resolve, reject) => {
+            this.httpClient.fetch(BASE_URL + COMMENT_URL, {
+                method: 'post',
+                body: json(comment),
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => {
+                    let data = response.json();
+                    if (response.ok) {
+                        data.then((data:Comment) => {
+                            resolve(data)
+                        });
+                    }
+                });
         })
     }
 

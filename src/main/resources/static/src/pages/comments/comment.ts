@@ -4,6 +4,7 @@ import {TweetService, ITweetService} from "../../service/tweetService";
 import {CommentService, ICommentService} from "../../service/commentService";
 import {ITweetContainer, ICommentContainer} from "../../domain/containers";
 import {Const} from "../../domain/const";
+import {ICommentSender} from "../../domain/senders";
 import User = Models.User;
 import Vote = Models.Vote;
 /**
@@ -11,13 +12,14 @@ import Vote = Models.Vote;
  */
 
 @inject(TweetService, CommentService)
-export class Comment implements ITweetContainer,ICommentContainer {
+export class Comment implements ITweetContainer,ICommentContainer,ICommentSender {
     private page;
     tweet:Tweet;
     comments:Models.Comment[];
     tweetContainer:ITweetContainer;
     commentContainer:ICommentContainer;
     currentLoggedUser:User;
+    commentSender:ICommentSender;
     private commentService:ICommentService;
     private tweetService:ITweetService;
 
@@ -27,6 +29,7 @@ export class Comment implements ITweetContainer,ICommentContainer {
         this.commentService = commentService;
         this.tweetContainer = this;
         this.commentContainer = this;
+        this.commentSender = this;
     }
 
     async activate(params, config) {
@@ -73,6 +76,22 @@ export class Comment implements ITweetContainer,ICommentContainer {
 
     deleteCommentVote(commentId:number) {
         this.commentService.deleteCommentVote(commentId).then(() => this.setCommentVote(commentId, "NONE"));
+    }
+
+    send(message:string) {
+        try {
+            this.commentService.commentTweet(<Models.Comment>{
+                type: "comment",
+                content: message,
+                owner: this.currentLoggedUser,
+                tweet: this.tweet
+            })
+                .then(comment => {
+                    this.comments.unshift(comment);
+                });
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     private setCommentVote(commentId:number, vote:Vote) {

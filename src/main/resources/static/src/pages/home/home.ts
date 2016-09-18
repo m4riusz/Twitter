@@ -28,7 +28,6 @@ export class Home implements ITweetContainer, ITweetSender {
         this.tweetService = tweetService;
         this.tweetContainer = this;
         this.tweetSender = this;
-        console.log(this.tweetSender);
     }
 
     async activate(params, routeConfig:RouteConfig) {
