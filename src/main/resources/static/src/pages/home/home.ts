@@ -4,6 +4,8 @@ import {TweetService, ITweetService} from "../../service/tweetService";
 import {ITweetContainer} from "../../domain/containers";
 import {Const} from "../../domain/const";
 import {ITweetSender} from "../../domain/senders";
+import {DialogService} from "aurelia-dialog";
+import {ReportModal} from "../../templates/report/report-modal";
 import Tweet = Models.Tweet;
 import Vote = Models.Vote;
 import User = Models.User;
@@ -12,7 +14,7 @@ import User = Models.User;
  * Created by mariusz on 31.08.16.
  */
 
-@inject(TweetService, Router)
+@inject(TweetService, Router, DialogService)
 export class Home implements ITweetContainer, ITweetSender {
     currentLoggedUser:User;
     page:number;
@@ -21,11 +23,13 @@ export class Home implements ITweetContainer, ITweetSender {
     tweetSender:ITweetSender;
     private router:Router;
     private tweetService:ITweetService;
+    private dialogService:DialogService;
 
-    constructor(tweetService:ITweetService, router:Router) {
+    constructor(tweetService:ITweetService, router:Router, dialogService:DialogService) {
         this.page = 0;
         this.router = router;
         this.tweetService = tweetService;
+        this.dialogService = dialogService;
         this.tweetContainer = this;
         this.tweetSender = this;
     }
@@ -57,6 +61,17 @@ export class Home implements ITweetContainer, ITweetSender {
 
     showComments(tweet:Tweet) {
         this.router.navigate(`comment/${tweet.id}`, {tweetId: tweet.id});
+    }
+
+    report(tweet:Tweet) {
+        this.dialogService.open({viewModel: ReportModal, model: "TEST?"}).then(response => {
+            if (!response.wasCancelled) {
+                console.log("OK");
+            } else {
+                console.log("CANCEL");
+            }
+            console.log(response.output);
+        })
     }
 
     send(message:string) {

@@ -63,6 +63,11 @@ export class Comment implements ITweetContainer,ICommentContainer,ICommentSender
     }
 
     showComments(tweet:Tweet) {
+        console.log("TODO");
+    }
+
+    report(tweet:Models.Tweet) {
+        console.log("TODO");
     }
 
 

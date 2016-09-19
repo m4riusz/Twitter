@@ -1,0 +1,13 @@
+<template>
+    <ai-dialog>
+        <ai-dialog-body>
+            <label class="label label-info">Report description</label>
+            <textarea value.bind="message"></textarea>
+        </ai-dialog-body>
+        <ai-dialog-footer>
+            <button click.trigger="dialogController.cancel()">Cancel</button>
+            <button click.trigger="dialogController.ok(message)">Ok</button>
+        </ai-dialog-footer>
+
+    </ai-dialog>
+</template>

@@ -215,7 +215,6 @@ export class TweetService extends BasicService implements ITweetService {
     }
 
     send(tweet:Tweet):Promise<Tweet> {
-        tweet.owner.authorities = [];
         return new Promise<Tweet>((resolve, reject)=> {
             this.httpClient.fetch(BASE_URL + TWEET_URL, {
                 method: 'post',
@@ -227,7 +226,10 @@ export class TweetService extends BasicService implements ITweetService {
                 .then(response => {
                     let data = response.json();
                     if (response.ok) {
-                        data.then(data => resolve(data));
+                        data.then((data:Tweet) => {
+                            data.favourite = false;
+                            resolve(data)
+                        });
                     }
                 });
         });

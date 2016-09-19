@@ -13,6 +13,7 @@ export interface ITweetContainer {
     addTweetToFavourites(tweetId:number);
     deleteTweetFromFavourites(tweetId:number);
     showComments(tweet:Tweet);
+    report(tweet:Tweet);
 }
 
 export interface ICommentContainer {
