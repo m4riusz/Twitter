@@ -8,7 +8,7 @@ import {Login} from "./pages/unauthorized/login/login";
 
 export function configure(aurelia :Aurelia) {
     aurelia.use.standardConfiguration();
-
+    aurelia.use.plugin('aurelia-dialog');
     aurelia.start().then(() => {
         let auth = aurelia.container.get(Login);
         auth.isAuthenticated()
