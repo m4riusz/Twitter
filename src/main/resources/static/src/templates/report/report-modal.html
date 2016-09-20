@@ -1,12 +1,29 @@
 <template>
     <ai-dialog>
         <ai-dialog-body>
-            <label class="label label-info">Report description</label>
-            <textarea value.bind="message"></textarea>
+            <div class="container-fluid">
+                <h2>Report form:</h2>
+                <textarea value.bind="message" placeholder="Description" style="min-width: 100%"></textarea>
+                <br/>
+                <small class="pull-right" if.bind="message.length <= maxLength"> Chars left
+                    ${maxLength-message.length}
+                </small>
+                <small class="pull-right text-danger" if.bind="message.length > maxLength">Too long description!</small>
+                <br/>
+                <div class="radio" repeat.for="category of categories">
+                    <label> <input type="radio" name="cat" model.bind="category"
+                                   checked.bind="$parent.selectedCategory"/>
+                        ${category.text}
+                    </label>
+                </div>
+
+            </div>
         </ai-dialog-body>
         <ai-dialog-footer>
             <button click.trigger="dialogController.cancel()">Cancel</button>
-            <button click.trigger="dialogController.ok(message)">Ok</button>
+            <button if.bind="message.length <= maxLength"
+                    click.trigger="dialogController.ok({cat:selectedCategory, msg: message})">Ok
+            </button>
         </ai-dialog-footer>
 
     </ai-dialog>
