@@ -1,17 +1,22 @@
-import Tweet = Models.Tweet;
-import {inject} from "aurelia-dependency-injection";
+import {inject} from "aurelia-framework";
 import {TweetService, ITweetService} from "../../service/tweetService";
 import {CommentService, ICommentService} from "../../service/commentService";
 import {ITweetContainer, ICommentContainer} from "../../domain/containers";
 import {Const} from "../../domain/const";
 import {ICommentSender} from "../../domain/senders";
+import {ReportService, IReportService} from "../../service/reportService";
+import {DialogService} from "aurelia-dialog";
+import {ReportModal} from "../../templates/report/report-modal";
 import User = Models.User;
 import Vote = Models.Vote;
+import Tweet = Models.Tweet;
+import AbstractPost = Models.AbstractPost;
+import Report = Models.Report;
 /**
  * Created by mariusz on 14.09.16.
  */
 
-@inject(TweetService, CommentService)
+@inject(TweetService, CommentService, ReportService, DialogService)
 export class Comment implements ITweetContainer,ICommentContainer,ICommentSender {
     private page;
     tweet:Tweet;
@@ -22,11 +27,15 @@ export class Comment implements ITweetContainer,ICommentContainer,ICommentSender
     commentSender:ICommentSender;
     private commentService:ICommentService;
     private tweetService:ITweetService;
+    private reportService:IReportService;
+    private dialogService:DialogService;
 
-    constructor(tweetService:ITweetService, commentService:ICommentService) {
+    constructor(tweetService:ITweetService, commentService:ICommentService, reportService:IReportService, dialogService:DialogService) {
         this.page = 0;
         this.tweetService = tweetService;
         this.commentService = commentService;
+        this.reportService = reportService;
+        this.dialogService = dialogService;
         this.tweetContainer = this;
         this.commentContainer = this;
         this.commentSender = this;
@@ -66,8 +75,12 @@ export class Comment implements ITweetContainer,ICommentContainer,ICommentSender
         console.log("TODO");
     }
 
-    report(tweet:Models.Tweet) {
-        console.log("TODO");
+    report(tweet:Tweet) {
+        this.reportPost(tweet);
+    }
+
+    reportComment(comment:Comment) {
+        this.reportPost(comment);
     }
 
 
@@ -97,6 +110,23 @@ export class Comment implements ITweetContainer,ICommentContainer,ICommentSender
         } catch (error) {
             console.log(error);
         }
+    }
+
+    private reportPost(post:AbstractPost) {
+        this.dialogService.open({viewModel: ReportModal}).then(response => {
+            if (!response.wasCancelled) {
+                let reportCategory = response.output.cat.id;
+                let reportMessage = response.output.msg;
+                this.reportService.send(<Models.Report>{
+                    category: reportCategory,
+                    message: reportMessage,
+                    user: this.currentLoggedUser,
+                    abstractPost: post
+                }).then((report:Report)=> {
+                    alert('Thank you for the report!');
+                })
+            }
+        })
     }
 
     private setCommentVote(commentId:number, vote:Vote) {

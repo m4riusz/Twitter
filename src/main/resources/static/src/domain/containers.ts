@@ -20,4 +20,5 @@ export interface ICommentContainer {
     deleteComment(commentId:number);
     voteOnComment(commentId:number, vote:Vote);
     deleteCommentVote(commentId:number);
+    reportComment(comment:Comment);
 }
