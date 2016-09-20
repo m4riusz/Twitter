@@ -9,6 +9,7 @@ export const CURRENT_USER = USER_URL;
 export const LOGIN = `/api/login`;
 export const TWEET_URL = `/api/tweet`;
 export const COMMENT_URL = `/api/comment`;
+export const REPORT_URL = `/api/report`;
 export const COMMENT_BY_ID = (commentId:number) => `${COMMENT_URL}/${commentId}`;
 export const TWEET_BY_ID = (tweetId:number) => `${TWEET_URL}/${tweetId}`;
 export const TWEET_GET_ALL = (page:number, size:number) => `${TWEET_URL}/${page}/${size}`;

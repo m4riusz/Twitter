@@ -1,4 +1,4 @@
-import {inject} from "aurelia-dependency-injection";
+import {inject} from "aurelia-framework";
 import {Router, RouteConfig} from "aurelia-router";
 import {TweetService, ITweetService} from "../../service/tweetService";
 import {ITweetContainer} from "../../domain/containers";
@@ -6,15 +6,17 @@ import {Const} from "../../domain/const";
 import {ITweetSender} from "../../domain/senders";
 import {DialogService} from "aurelia-dialog";
 import {ReportModal} from "../../templates/report/report-modal";
+import {IReportService, ReportService} from "../../service/reportService";
 import Tweet = Models.Tweet;
 import Vote = Models.Vote;
 import User = Models.User;
+import Report = Models.Report;
 
 /**
  * Created by mariusz on 31.08.16.
  */
 
-@inject(TweetService, Router, DialogService)
+@inject(TweetService, ReportService, Router, DialogService)
 export class Home implements ITweetContainer, ITweetSender {
     currentLoggedUser:User;
     page:number;
@@ -23,12 +25,14 @@ export class Home implements ITweetContainer, ITweetSender {
     tweetSender:ITweetSender;
     private router:Router;
     private tweetService:ITweetService;
+    private reportService:IReportService;
     private dialogService:DialogService;
 
-    constructor(tweetService:ITweetService, router:Router, dialogService:DialogService) {
+    constructor(tweetService:ITweetService, reportService:IReportService, router:Router, dialogService:DialogService) {
         this.page = 0;
         this.router = router;
         this.tweetService = tweetService;
+        this.reportService = reportService;
         this.dialogService = dialogService;
         this.tweetContainer = this;
         this.tweetSender = this;
@@ -64,13 +68,19 @@ export class Home implements ITweetContainer, ITweetSender {
     }
 
     report(tweet:Tweet) {
-        this.dialogService.open({viewModel: ReportModal, model: "TEST?"}).then(response => {
+        this.dialogService.open({viewModel: ReportModal}).then(response => {
             if (!response.wasCancelled) {
-                console.log("OK");
-            } else {
-                console.log("CANCEL");
+                let reportCategory = response.output.cat.id;
+                let reportMessage = response.output.msg;
+                this.reportService.send(<Models.Report>{
+                    category: reportCategory,
+                    message: reportMessage,
+                    user: this.currentLoggedUser,
+                    abstractPost: tweet
+                }).then((report:Report)=> {
+                    alert('Thank you for the report!');
+                })
             }
-            console.log(response.output);
         })
     }
 
