@@ -10,8 +10,15 @@
         <comment-input comment-sender.bind="commentSender"></comment-input>
     </div>
     <hr>
-    <div repeat.for="comment of comments" class="col-sm-offset-1 col-xs-offset-1">
-        <comment-template comment.bind="comment" comment-container.bind="commentContainer"
-                          current-user.bind="currentLoggedUser"></comment-template>
+    <div class="col-sm-offset-1 col-xs-offset-1">
+        <div repeat.for="comment of comments">
+            <comment-template comment.bind="comment" comment-container.bind="commentContainer"
+                              current-user.bind="currentLoggedUser"></comment-template>
+        </div>
+        <div class="well well-sm text-center" click.delegate="nextCommentPage()">
+            <h3 class="h3">More comments</h3>
+        </div>
     </div>
+
+
 </template>

@@ -112,6 +112,16 @@ export class Comment implements ITweetContainer,ICommentContainer,ICommentSender
         }
     }
 
+    async nextCommentPage() {
+        try {
+            this.page = ++this.page;
+            let nextCommentPage = await this.commentService.getTweetComments(this.tweet.id, this.page, Const.PAGE_SIZE);
+            this.comments = this.comments.concat(nextCommentPage);
+        } catch (error) {
+            this.page = --this.page;
+        }
+    }
+
     private reportPost(post:AbstractPost) {
         this.dialogService.open({viewModel: ReportModal}).then(response => {
             if (!response.wasCancelled) {
