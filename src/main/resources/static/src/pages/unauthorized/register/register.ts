@@ -26,7 +26,7 @@ export class Register {
         this.clearFields();
     }
 
-    public register() {
+    public async register() {
         if (this.password !== this.passwordConfirm) {
             this.setErrorMessage('Passwords are not equal!');
         } else if (this.email !== this.emailConfirm) {
@@ -36,22 +36,13 @@ export class Register {
         } else if (!this.passwordHasValidLength()) {
             this.setErrorMessage('Wrong password length!');
         } else {
-            this.authService.register(this.username, this.password, this.email, this.gender)
-                .then(response => {
-                        if (response.ok) {
-                            this.clearFields();
-                            this.setSuccessMessage('Account has been created');
-                            return;
-                        }
-                        response.json().then(error => {
-                            if (response.status == 400) {
-                                this.setErrorMessage(error.errors[0].defaultMessage);
-                            } else {
-                                this.setErrorMessage(error.message);
-                            }
-                        });
-                    }
-                )
+            try {
+                let response = await this.authService.register(this.username, this.password, this.email, this.gender);
+                this.clearFields();
+                this.setSuccessMessage(response);
+            } catch (error) {
+                this.setErrorMessage(error);
+            }
         }
     }
 

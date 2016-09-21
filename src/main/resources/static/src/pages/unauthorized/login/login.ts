@@ -1,5 +1,4 @@
-import {inject} from "aurelia-dependency-injection";
-import {Aurelia} from "aurelia-framework";
+import {inject, Aurelia} from "aurelia-framework";
 import {AuthService, IAuthService} from "../../../service/authService";
 import {Const} from "../../../domain/const";
 
@@ -9,13 +8,12 @@ import {Const} from "../../../domain/const";
 
 @inject(AuthService, Aurelia)
 export class Login {
-    private authService:IAuthService;
-    private aurelia:Aurelia;
-    private token:string;
-
     username:string;
     password:string;
     error:string;
+    private authService:IAuthService;
+    private aurelia:Aurelia;
+    private token:string;
 
     constructor(authService:IAuthService, aurelia:Aurelia) {
         this.authService = authService;
@@ -24,26 +22,19 @@ export class Login {
     }
 
     activate() {
-        this.username = 'mariusz';
-        this.password = 'not2you';
+        this.username = '';
+        this.password = '';
         this.error = '';
     }
 
-    public login():void {
-        this.authService.login(this.username, this.password)
-            .then(response => {
-                let authToken = response.headers.get(Const.TOKEN_HEADER);
-                if (response.ok) {
-                    localStorage[Const.TOKEN_HEADER] = authToken;
-                    this.token = authToken;
-                    this.aurelia.setRoot(Const.APP_ROOT);
-                    return;
-                }
-                response.json()
-                    .then(data => {
-                        this.error = data.message;
-                    })
-            })
+    public async login() {
+        try {
+            this.token = await this.authService.login(this.username, this.password);
+            localStorage[Const.TOKEN_HEADER] = this.token;
+            this.aurelia.setRoot(Const.APP_ROOT);
+        } catch (error) {
+            this.error = error;
+        }
     }
 
     public isAuthenticated():Promise<boolean> {
