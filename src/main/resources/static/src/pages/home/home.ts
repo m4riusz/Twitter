@@ -99,6 +99,16 @@ export class Home implements ITweetContainer, ITweetSender {
         }
     }
 
+    async nextPage() {
+        try {
+            this.page = ++this.page;
+            let nextTweetPage = await this.tweetService.getAllTweets(this.page, Const.PAGE_SIZE);
+            this.tweets = this.tweets.concat(nextTweetPage);
+        } catch (error) {
+            this.page = --this.page;
+        }
+    }
+
     private setTweetFavourite(tweetId:number, favourite:boolean) {
         this.tweets.forEach(current => current.id == tweetId ? current.favourite = favourite : current);
     }
