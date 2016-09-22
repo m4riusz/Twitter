@@ -123,7 +123,7 @@ export class TweetService extends BasicService implements ITweetService {
                 .then((data:UserVote)=> {
                     resolve(data.vote);
                 }, ()=> {
-                    resolve("NONE");
+                    resolve('NONE');
                 });
         })
     }
@@ -230,6 +230,16 @@ export class TweetService extends BasicService implements ITweetService {
                             data.favourite = false;
                             resolve(data)
                         });
+                    }
+                    else {
+                        data.then(res=> {
+                            if (response.status == 400) {
+                                console.log(res.errors[0].defaultMessage);
+                                reject(res.errors[0].defaultMessage);
+                            }else {
+                                reject(res.message)
+                            }
+                        })
                     }
                 });
         });

@@ -96,19 +96,17 @@ export class Comment implements ITweetContainer,ICommentContainer,ICommentSender
         this.commentService.deleteCommentVote(commentId).then(() => this.setCommentVote(commentId, "NONE"));
     }
 
-    send(message:string) {
+    async send(message:string) {
         try {
-            this.commentService.commentTweet(<Models.Comment>{
+            let newComment = await this.commentService.commentTweet(<Models.Comment>{
                 type: "comment",
                 content: message,
                 owner: this.currentLoggedUser,
                 tweet: this.tweet
-            })
-                .then(comment => {
-                    this.comments.unshift(comment);
-                });
+            });
+            this.comments.unshift(newComment);
         } catch (error) {
-            console.log(error);
+            alert(error);
         }
     }
 

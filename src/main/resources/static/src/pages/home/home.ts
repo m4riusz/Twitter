@@ -84,18 +84,16 @@ export class Home implements ITweetContainer, ITweetSender {
         })
     }
 
-    send(message:string) {
+    async send(message:string) {
         try {
-            this.tweetService.send(<Tweet>{
+            let newTweet = await this.tweetService.send(<Tweet>{
                 type: "tweet",
-                content: message,
+                content: message != null ? message : '',
                 owner: this.currentLoggedUser,
-            })
-                .then(tweet => {
-                    this.tweets.unshift(tweet);
-                });
+            });
+            this.tweets.unshift(newTweet);
         } catch (error) {
-            console.log(error);
+            alert(error);
         }
     }
 

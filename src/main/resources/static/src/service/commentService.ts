@@ -81,7 +81,7 @@ export class CommentService extends BasicService implements ICommentService {
                 .then((data:UserVote)=> {
                     resolve(data.vote);
                 }, ()=> {
-                    resolve("NONE");
+                    resolve('NONE');
                 });
         })
     }
@@ -146,6 +146,16 @@ export class CommentService extends BasicService implements ICommentService {
                         data.then((data:Comment) => {
                             resolve(data)
                         });
+                    }
+                    else {
+                        data.then(res=> {
+                            if (response.status == 400) {
+                                console.log(res.errors[0].defaultMessage);
+                                reject(res.errors[0].defaultMessage);
+                            } else {
+                                reject(res.message);
+                            }
+                        })
                     }
                 });
         })
