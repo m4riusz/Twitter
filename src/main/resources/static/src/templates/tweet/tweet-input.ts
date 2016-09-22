@@ -8,4 +8,8 @@ import {ITweetSender} from "../../domain/senders";
 export class TweetInput {
     @bindable tweetSender:ITweetSender;
     message:string;
+
+    constructor() {
+        this.message = '';
+    }
 }

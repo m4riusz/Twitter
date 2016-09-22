@@ -105,8 +105,8 @@ module Models {
     }
 
     export enum Vote{
-        "UP",
-        "DOWN",
-        "NONE"
+        UP,
+        DOWN,
+        NONE
     }
 }

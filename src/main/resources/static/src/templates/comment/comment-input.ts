@@ -8,4 +8,8 @@ import {ICommentSender} from "../../domain/senders";
 export class CommentInput {
     @bindable commentSender:ICommentSender;
     message:string;
+
+    constructor() {
+        this.message = '';
+    }
 }
