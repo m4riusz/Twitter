@@ -46,7 +46,13 @@ export class App {
                 name: 'comment',
                 moduleId: 'pages/comments/comment',
                 title: 'Tweet comments',
-                naw: true,
+                settings: {currentUser: this.loggedUser}
+            },
+            {
+                route: ['users/:userId'],
+                name: 'users',
+                moduleId: 'pages/users/user',
+                title: 'User',
                 settings: {currentUser: this.loggedUser}
             }
         ]);

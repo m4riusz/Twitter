@@ -1,7 +1,7 @@
 import {inject} from "aurelia-dependency-injection";
 import {HttpClient} from "aurelia-fetch-client";
 import {Const} from "../domain/const";
-import {BASE_URL, CURRENT_USER} from "../domain/route";
+import {BASE_URL, CURRENT_USER, USER_BY_ID} from "../domain/route";
 import {BasicService} from "./basicService";
 import User = Models.User;
 /**
@@ -11,6 +11,7 @@ import User = Models.User;
 
 export interface IUserService {
     getCurrentLoggedUser():Promise<User>;
+    getUserById(userId:number):Promise<User>;
 }
 
 @inject(HttpClient)
@@ -35,4 +36,19 @@ export class UserService extends BasicService implements IUserService {
                 .then(data => resolve(data))
         });
     }
+
+    getUserById(userId:number):Promise<User> {
+        return new Promise<User>((resolve, reject) => {
+            this.httpClient.fetch(BASE_URL + USER_BY_ID(userId), {
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => response.json())
+                .then((user:User) => {
+                    resolve(user);
+                });
+        });
+    }
+
 }

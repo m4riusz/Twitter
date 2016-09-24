@@ -1,6 +1,7 @@
 
 import Vote = Models.Vote;
 import Tweet = Models.Tweet;
+import {User} from "../pages/users/user";
 /**
  * Created by mariusz on 15.09.16.
  */
@@ -14,6 +15,7 @@ export interface ITweetContainer {
     deleteTweetFromFavourites(tweetId:number);
     showComments(tweet:Tweet);
     report(tweet:Tweet);
+    showUser(user:User);
 }
 
 export interface ICommentContainer {

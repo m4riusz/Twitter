@@ -67,6 +67,10 @@ export class Home implements ITweetContainer, ITweetSender {
         this.router.navigate(`comment/${tweet.id}`, {tweetId: tweet.id});
     }
 
+    showUser(user:User) {
+        this.router.navigate(`users/${user.id}`, {userId: user.id})
+    }
+
     report(tweet:Tweet) {
         this.dialogService.open({viewModel: ReportModal}).then(response => {
             if (!response.wasCancelled) {
