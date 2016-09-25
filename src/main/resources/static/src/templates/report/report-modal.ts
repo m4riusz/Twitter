@@ -29,8 +29,8 @@ export class ReportModal {
         dialogController.settings.centerHorizontalOnly = true;
     }
 
-    activate(message) {
-        typeof message == 'undefined' ? this.message = '' : this.message = message;
+    activate() {
+        this.message = '';
         this.maxLength = Const.REPORT_MESSAGE_MAX_LENGTH;
     }
 

@@ -2,19 +2,19 @@
     <div class="well">
         <div if.bind="comment.deleted == false" class="btn-group pull-right">
             <a if.bind="comment.loggedUserVote == 'UP'" type=button class="btn btn-success"
-               click.delegate="commentContainer.deleteCommentVote(comment.id)">
+               click.delegate="deleteCommentVote(comment.id)">
                 <div class="glyphicon glyphicon-plus-sign"></div>
             </a>
             <a if.bind="comment.loggedUserVote != 'UP'" type=button class="btn btn-default"
-               click.delegate="commentContainer.voteOnComment(comment.id,'UP')">
+               click.delegate="voteOnComment(comment.id,'UP')">
                 <div class="glyphicon glyphicon-plus"></div>
             </a>
             <a if.bind="comment.loggedUserVote == 'DOWN'" type=button class="btn btn-danger"
-               click.delegate="commentContainer.deleteCommentVote(comment.id)">
+               click.delegate="deleteCommentVote(comment.id)">
                 <div class="glyphicon glyphicon-minus-sign"></div>
             </a>
             <a if.bind="comment.loggedUserVote != 'DOWN'" type=button class="btn btn-default"
-               click.delegate="commentContainer.voteOnComment(comment.id,'DOWN')">
+               click.delegate="voteOnComment(comment.id,'DOWN')">
                 <div class="glyphicon glyphicon-minus"></div>
             </a>
         </div>
@@ -25,7 +25,7 @@
             </div>
             <div class="media-body">
                 <i class="glyphicon glyphicon-user"></i>
-                ${comment.owner.username}
+                <label click.delegate="showUser(comment.owner)">${comment.owner.username}</label>
                 <br/>
                 <i class="glyphicon glyphicon-envelope"></i>
                 ${comment.owner.email}
@@ -37,12 +37,12 @@
             <br/>
         </div>
         <div class="btn-group">
-            <a class="btn btn-default" click.delegate="commentContainer.reportComment(comment)">
+            <a class="btn btn-default" click.delegate="reportComment(comment)">
                 <span class="glyphicon glyphicon-warning-sign"></span> Report
             </a>
         </div>
         <a if.bind="comment.deleted == false && comment.owner.id == currentUser.id"
            class="glyphicon glyphicon-remove btn btn-danger pull-right"
-           click.delegate="commentContainer.deleteComment(comment.id)"> Delete</a>
+           click.delegate="deleteComment(comment.id)"> Delete</a>
     </div>
 </template>
