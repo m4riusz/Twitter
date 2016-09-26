@@ -2,43 +2,39 @@
 
     <require from='../../templates/tweet/tweet-template'></require>
 
-    <div>
-        <div class="row">
-            <div class="col-xs-6 col-sm-8">
-                <div class=" media">
-                    <div class="media-left">
-                        <img src="data:image/jpg;base64, ${user.avatar.bytes}"
-                             alt="${user.avatar.fileName}">
-                    </div>
-                    <div class="media-body">
-                        <i class="glyphicon glyphicon-user"></i>
-                        <label click.delegate="tweetContainer.showUser(tweet.owner)">${user.username}</label>
-                        <br/>
-                        <i class="glyphicon glyphicon-envelope"></i>
-                        ${user.email}
-                        <br/>
-                        <i class="glyphicon glyphicon-calendar"></i>
-                        ${user.createDate}
-                    </div>
+    <div class="row">
+        <div class="col-xs-6 col-sm-8">
+            <div class=" media">
+                <div class="media-left">
+                    <img src="data:image/jpg;base64, ${user.avatar.bytes}"
+                         alt="${user.avatar.fileName}">
+                </div>
+                <div class="media-body">
+                    <i class="glyphicon glyphicon-user"></i>
+                    <label click.delegate="tweetContainer.showUser(tweet.owner)">${user.username}</label>
                     <br/>
+                    <i class="glyphicon glyphicon-envelope"></i>
+                    ${user.email}
+                    <br/>
+                    <i class="glyphicon glyphicon-calendar"></i>
+                    ${user.createDate}
+                    </div>
                 </div>
 
-                </p>
-                <div class="btn-group">
-                    <a class="btn btn-primary">
+            <div class="btn-group">
+                <a class="btn btn-primary">
                         Follow
-                    </a>
-                    <a class="btn btn-primary">
+                </a>
+                <a class="btn btn-primary">
                         Unfollow
-                    </a>
-                    <a if.bind="currentLoggedUser.role == 'ADMIN'" class="btn btn-primary">
-                        Ban
-                    </a>
-                    <a if.bind="currentLoggedUser.role == 'ADMIN'" class="btn btn-primary">
-                        Unban
-                    </a>
-                </div>
+                </a>
             </div>
+            <ul class="nav nav-pills">
+                <li><a>Tweets</a></li>
+                <li><a>Comments</a></li>
+                <li><a>Followers</a></li>
+                <li><a>Following</a></li>
+            </ul>
         </div>
     </div>
 

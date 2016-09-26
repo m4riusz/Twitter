@@ -21,5 +21,6 @@ export const TWEET_FAVOURITE = (tweetId:number | string) =>`${USER_URL}/favourit
 export const USER_FAVOURITE_TWEETS = (userId:number, page:number, size:number) => `${USER_URL}/${userId}/favourites/${page}/${size}`;
 export const COMMENTS_FROM_TWEET = (tweetId:number, page:number, size:number) => `${TWEET_BY_ID(tweetId)}/comment/${page}/${size}`;
 export const COMMENT_VOTE_BY_ID = (commentId:number) => `${COMMENT_BY_ID(commentId)}/vote`;
+export const TWEETS_FROM_USER = (userId:number, page:number, size:number) => `${TWEET_URL}/user/${userId}/${page}/${size}`;
 
 

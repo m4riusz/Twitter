@@ -9,7 +9,8 @@ import {
     TWEET_VOTE_GET_BY_ID,
     USER_FAVOURITE_TWEETS,
     TWEET_FAVOURITE,
-    TWEET_VOTE
+    TWEET_VOTE,
+    TWEETS_FROM_USER
 } from "../domain/route";
 import {BasicService} from "./basicService";
 import Tweet = Models.Tweet;
@@ -32,6 +33,7 @@ export interface ITweetService {
     removeTweetFromFavourites(tweetId:number):Promise<{}>;
     getFavouriteTweetsFrom(userId:number, page:number, size:number):Promise<Tweet[]>;
     send(tweet:Tweet):Promise<Tweet>;
+    getTweetsFromUser(userId:number, page:number, size:number):Promise<Tweet[]>;
 }
 
 @inject(HttpClient)
@@ -242,6 +244,20 @@ export class TweetService extends BasicService implements ITweetService {
                         })
                     }
                 });
+        });
+    }
+
+    getTweetsFromUser(userId:number, page:number, size:number):Promise<Tweet[]> {
+        return new Promise<Tweet[]>((resolve, reject) => {
+            this.httpClient.fetch(BASE_URL + TWEETS_FROM_USER(userId, page, size), {
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => response.json())
+                .then((tweets:Tweet[])=> {
+                    resolve(tweets);
+                })
         });
     }
 
