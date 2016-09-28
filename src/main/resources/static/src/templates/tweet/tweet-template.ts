@@ -14,17 +14,15 @@ import Vote = Models.Vote;
  */
 
 @customElement('tweet-template')
-@inject(TweetService, ReportService, Router, DialogService)
+@inject(TweetService, ReportService, DialogService)
 export class TweetTemplate {
     @bindable tweet:Tweet;
     @bindable currentUser:User;
-    private router:Router;
     private tweetService:ITweetService;
     private reportService:IReportService;
     private dialogService:DialogService;
 
-    constructor(tweetService:ITweetService, reportService:IReportService, router:Router, dialogService:DialogService) {
-        this.router = router;
+    constructor(tweetService:ITweetService, reportService:IReportService, dialogService:DialogService) {
         this.tweetService = tweetService;
         this.reportService = reportService;
         this.dialogService = dialogService;
@@ -48,14 +46,6 @@ export class TweetTemplate {
 
     deleteTweetFromFavourites(tweetId:number) {
         this.tweetService.removeTweetFromFavourites(tweetId).then(() => this.setFavourite(false));
-    }
-
-    showComments(tweet:Tweet) {
-        this.router.navigate(`comment/${tweet.id}`, {tweetId: tweet.id});
-    }
-
-    showUser(user:User) {
-        this.router.navigate(`users/${user.id}`, {userId: user.id})
     }
 
     report(tweet:Tweet) {
