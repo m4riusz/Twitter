@@ -59,10 +59,9 @@ public final class Route {
     public static final String TWEET_BY_ID = TWEET_URL + TWEET_ID;
     public static final String TWEET_GET_ALL = TWEET_URL + PAGE + SIZE;
     public static final String TWEETS_FROM_FOLLOWINGS_USERS = TWEET_URL + "/my" + USER_ID + PAGE + SIZE;
-    public static final String TWEETS_FROM_USER = TWEET_URL + USER + USER_ID;
+    public static final String TWEETS_FROM_USER = TWEET_URL + USER + USER_ID + PAGE + SIZE;
     public static final String TWEETS_MOST_VOTED = TWEET_URL + POPULAR + HOURS + PAGE + SIZE;
     public static final String TWEET_VOTE = TWEET_URL + VOTE;
-    public static final String TWEET_VOTE_BY_ID = TWEET_VOTE + VOTE_ID;
     public static final String TWEET_USER_VOTE = TWEET_BY_ID + VOTE;
     public static final String TWEETS_WITH_TAGS = TWEET_URL + TAGS + PAGE + SIZE;
     public static final String TWEETS_FROM_USER_FAVOURITES = USER_BY_ID + FAVOURITES + PAGE + SIZE;

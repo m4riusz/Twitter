@@ -22,8 +22,8 @@ public class Report extends AbstractEntity{
     private ReportCategory category;
     @NotNull
     @Length(
-            min = 1, max = 100,
-            message = "Report length should be between {min} and {max}!"
+            max = 100,
+            message = "Report length should be smaller than {max}!"
     )
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private String message;

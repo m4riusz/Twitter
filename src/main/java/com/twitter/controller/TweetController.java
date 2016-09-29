@@ -49,7 +49,7 @@ public class TweetController {
 
     @RequestMapping(value = Route.TWEETS_FROM_USER, method = RequestMethod.GET)
     public ResponseEntity<List<Tweet>> getTweetsFromUser(@PathVariable long userId, @PathVariable int page, @PathVariable int size) {
-        return new ResponseEntity<>(tweetService.getAllFromUserById(userId, new PageRequest(page, size)), HttpStatus.OK);
+        return new ResponseEntity<>(tweetService.getAllFromUserById(userId, new PageRequest(page, size, Direction.DESC, "createDate")), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.TWEET_VOTE, method = {RequestMethod.POST, RequestMethod.PUT})
