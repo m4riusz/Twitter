@@ -1,0 +1,18 @@
+<template bindable="user">
+    <div class=" media">
+        <div class="media-left">
+            <img src="data:image/jpg;base64, ${user.avatar.bytes}"
+                 alt="${user.avatar.fileName}">
+        </div>
+        <div class="media-body">
+            <i class="glyphicon glyphicon-user"></i>
+            <a class="label label-info" href="#/users/${user.id}">${user.username}</a>
+            <br/>
+            <i class="glyphicon glyphicon-envelope"></i>
+            ${user.email}
+            <br/>
+            <i class="glyphicon glyphicon-calendar"></i>
+            ${user.createDate}
+        </div>
+    </div>
+</template>
