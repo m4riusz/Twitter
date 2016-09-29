@@ -14,7 +14,7 @@ export class User {
     userTweetsPage:number;
     user:Models.User;
     currentLoggedUser:Models.User;
-    private router:Router;
+    router:Router;
     private userService:IUserService;
     private tweetService:ITweetService;
 
@@ -24,18 +24,25 @@ export class User {
         this.tweetService = tweetService;
     }
 
-    async activate(params, config) {
-        this.currentLoggedUser = config.settings.currentUser;
+    async activate(params) {
         [this.user, this.userTweets] = await Promise.all([
             this.userService.getUserById(params.userId),
             this.tweetService.getTweetsFromUser(params.userId, this.userTweetsPage, Const.PAGE_SIZE)]
         );
     }
 
-    configureRouter(config:RouterConfiguration, router:Router):void {
+    async configureRouter(config:RouterConfiguration, router:Router) {
+        this.currentLoggedUser = await this.userService.getCurrentLoggedUser();
+        config.map([
+            {
+                route: ['', 'tweets'],
+                name: 'usersTweets',
+                moduleId: '../tweets/userTweets',
+                nav: true,
+                title: 'Tweets from user',
+                settings: {currentUser: this.currentLoggedUser}
+            }
+        ]);
         this.router = router;
-        config.map([]);
-
     }
-
 }

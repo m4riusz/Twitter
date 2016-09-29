@@ -1,0 +1,11 @@
+<template>
+    <require from='../../templates/tweet/tweet-template'></require>
+
+    <div repeat.for="tweet of userTweets">
+        <tweet-template tweet.bind="tweet" current-user.bind="currentLoggedUser"></tweet-template>
+    </div>
+
+    <div class="well well-sm text-center" click.delegate="nextPage()">
+        <h3 class="h3">More</h3>
+    </div>
+</template>
