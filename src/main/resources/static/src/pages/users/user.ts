@@ -15,6 +15,7 @@ export class User {
     user:Models.User;
     currentLoggedUser:Models.User;
     router:Router;
+    followed:boolean;
     private userService:IUserService;
     private tweetService:ITweetService;
 
@@ -25,10 +26,30 @@ export class User {
     }
 
     async activate(params) {
-        [this.user, this.userTweets] = await Promise.all([
-            this.userService.getUserById(params.userId),
-            this.tweetService.getTweetsFromUser(params.userId, this.userTweetsPage, Const.PAGE_SIZE)]
-        );
+        const userId = params.userId;
+        [this.user, this.userTweets, this.followed] = await Promise.all([
+            this.userService.getUserById(userId),
+            this.tweetService.getTweetsFromUser(userId, this.userTweetsPage, Const.PAGE_SIZE),
+            this.userService.isFollowed(userId)
+        ]);
+    }
+
+    async followUser(userId:number) {
+        try {
+            await this.userService.followUser(userId);
+            this.followed = true;
+        } catch (error) {
+            alert(error);
+        }
+    }
+
+    async unfollowUser(userId:number) {
+        try {
+            await this.userService.unfollowUser(userId);
+            this.followed = false;
+        } catch (error) {
+            alert(error);
+        }
     }
 
     async configureRouter(config:RouterConfiguration, router:Router) {

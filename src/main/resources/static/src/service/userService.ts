@@ -1,7 +1,7 @@
 import {inject} from "aurelia-dependency-injection";
 import {HttpClient} from "aurelia-fetch-client";
 import {Const} from "../domain/const";
-import {BASE_URL, CURRENT_USER, USER_BY_ID} from "../domain/route";
+import {BASE_URL, CURRENT_USER, USER_BY_ID, FOLLOW_USER} from "../domain/route";
 import {BasicService} from "./basicService";
 import User = Models.User;
 /**
@@ -12,6 +12,9 @@ import User = Models.User;
 export interface IUserService {
     getCurrentLoggedUser():Promise<User>;
     getUserById(userId:number):Promise<User>;
+    isFollowed(userId:number):Promise<boolean>;
+    followUser(userId:number):Promise<any>;
+    unfollowUser(userId:number):Promise<any>;
 }
 
 @inject(HttpClient)
@@ -48,6 +51,54 @@ export class UserService extends BasicService implements IUserService {
                 .then((user:User) => {
                     resolve(user);
                 });
+        });
+    }
+
+    followUser(userId:number):Promise<any> {
+        return new Promise<any>((resolve, reject) => {
+            this.httpClient.fetch(BASE_URL + FOLLOW_USER(userId), {
+                method: 'post',
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        resolve();
+                    } else {
+                        response.json().then(data => reject(data.message));
+                    }
+                })
+        });
+    }
+
+    unfollowUser(userId:number):Promise<any> {
+        return new Promise<any>((resolve, reject) => {
+            this.httpClient.fetch(BASE_URL + FOLLOW_USER(userId), {
+                method: 'delete',
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        resolve();
+                    } else {
+                        response.json().then(data => reject(data.message));
+                    }
+                })
+        });
+    }
+
+    isFollowed(userId:number):Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            this.httpClient.fetch(BASE_URL + FOLLOW_USER(userId), {
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => response.json())
+                .then(followed => resolve(followed))
         });
     }
 

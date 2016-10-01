@@ -2,26 +2,25 @@
 
     <require from='../../templates/tweet/tweet-template'></require>
     <require from='../../templates/user/user-template.html'></require>
-
-    <div class="row">
-        <user-template user.bind="user"></user-template>
-
-        <div class="btn-group">
-            <a class="btn btn-primary">
-                Follow
-            </a>
-            <a class="btn btn-primary">
-                Unfollow
-            </a>
-        </div>
-    </div>
-    <hr>
-    <ul class="btn-group">
-        <li repeat.for="item of router.navigation" class="btn btn-default">
-            <a href.bind="item.href">${item.title}</a>
-        </li>
-    </ul>
     <div class="container-fluid">
+        <div class="row">
+            <user-template user.bind="user"></user-template>
+
+            <div class="btn-group">
+                <a class="btn btn-primary" if.bind="followed == false" click.delegate="followUser(user.id)">
+                    <i class="glyphicon glyphicon-star-empty"></i> Follow
+                </a>
+                <a class="btn btn-primary" if.bind="followed == true" click.delegate="unfollowUser(user.id)">
+                    <i class="glyphicon glyphicon-trash"></i> Unfollow
+                </a>
+            </div>
+        </div>
+        <hr>
+        <ul class="btn-group">
+            <li repeat.for="item of router.navigation" class="btn btn-default">
+                <a href.bind="item.href">${item.title}</a>
+            </li>
+        </ul>
         <router-view></router-view>
     </div>
 
