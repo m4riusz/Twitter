@@ -112,6 +112,11 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @RequestMapping(value = Route.USER_FOLLOW, method = RequestMethod.GET)
+    public ResponseEntity<Boolean> isFollowedByLoggedUser(@PathVariable long userId) {
+        return new ResponseEntity<>(userService.isFollowed(userId), HttpStatus.OK);
+    }
+
     @RequestMapping(value = Route.USER_FOLLOW, method = RequestMethod.DELETE)
     public ResponseEntity unfollowUser(@PathVariable long userId) {
         userService.unfollow(userId);

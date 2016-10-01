@@ -80,4 +80,8 @@ public interface UserService extends UserDetailsService {
 
     @PreAuthorize(SecurityUtil.PERSONAL_USAGE)
     Avatar changeUserAvatar(long userId, Avatar avatar) throws IOException;
+
+    // TODO: 01.10.16 add tests
+    @PreAuthorize(SecurityUtil.AUTHENTICATED)
+    Boolean isFollowed(long userId);
 }

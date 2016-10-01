@@ -9,6 +9,7 @@ import com.twitter.model.User;
 import com.twitter.util.AvatarUtil;
 import com.twitter.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -189,6 +190,13 @@ public class UserServiceImpl implements UserService {
         User user = getUserById(userId);
         user.setAvatar(avatarUtil.resizeToStandardSize(avatar));
         return user.getAvatar();
+    }
+
+    @Override
+    public Boolean isFollowed(long userId) {
+        User user = getCurrentLoggedUser();
+        User followed = getUserById(userId);
+        return getUserFollowingsById(user.getId(), new PageRequest(0, Integer.MAX_VALUE)).contains(followed);
     }
 
     @Override
