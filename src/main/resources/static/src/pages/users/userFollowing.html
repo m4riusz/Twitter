@@ -1,0 +1,11 @@
+<template>
+    <require from='../../templates/user/user-template.html'></require>
+    <p><label class="label label-default">Number of following users: ${followingCount}</label></p>
+    <div class="row" repeat.for="user of following">
+        <user-template user.bind="user"></user-template>
+    </div>
+
+    <div if.bind="following.length != followingCount" class="well well-sm text-center" click.delegate="nextPage()">
+        <h3 class="h3">More</h3>
+    </div>
+</template>

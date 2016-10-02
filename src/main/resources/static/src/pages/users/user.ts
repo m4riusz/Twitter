@@ -52,7 +52,6 @@ export class User {
         config.map([
             {
                 route: ['', 'tweets'],
-                name: 'userTweets',
                 moduleId: '../tweets/userTweets',
                 nav: true,
                 title: 'Tweets from user',
@@ -60,10 +59,16 @@ export class User {
             },
             {
                 route: 'followers',
-                name: 'userFollowers',
                 moduleId: './userFollowers',
                 nav: true,
                 title: 'User followers',
+                settings: {currentUser: this.currentLoggedUser}
+            },
+            {
+                route: 'following',
+                moduleId: './userFollowing',
+                nav: true,
+                title: 'User following users',
                 settings: {currentUser: this.currentLoggedUser}
             }
         ]);
