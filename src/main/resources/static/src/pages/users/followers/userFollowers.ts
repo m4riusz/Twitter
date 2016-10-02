@@ -1,7 +1,7 @@
 import User = Models.User;
-import {IUserService, UserService} from "../../service/userService";
+import {IUserService, UserService} from "../../../service/userService";
 import {inject} from "aurelia-framework";
-import {Const} from "../../domain/const";
+import {Const} from "../../../domain/const";
 /**
  * Created by mariusz on 02.10.16.
  */

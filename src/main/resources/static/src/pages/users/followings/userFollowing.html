@@ -1,5 +1,5 @@
 <template>
-    <require from='../../templates/user/user-template.html'></require>
+    <require from='../../../templates/user/user-template.html'></require>
     <p><label class="label label-default">Number of following users: ${followingCount}</label></p>
     <div class="row" repeat.for="user of following">
         <user-template user.bind="user"></user-template>

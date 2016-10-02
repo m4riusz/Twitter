@@ -59,14 +59,14 @@ export class User {
             },
             {
                 route: 'followers',
-                moduleId: './userFollowers',
+                moduleId: './followers/userFollowers',
                 nav: true,
                 title: 'User followers',
                 settings: {currentUser: this.currentLoggedUser}
             },
             {
                 route: 'following',
-                moduleId: './userFollowing',
+                moduleId: './followings/userFollowing',
                 nav: true,
                 title: 'User following users',
                 settings: {currentUser: this.currentLoggedUser}
