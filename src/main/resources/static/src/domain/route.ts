@@ -11,6 +11,7 @@ export const TWEET_URL = `/api/tweet`;
 export const COMMENT_URL = `/api/comment`;
 export const REPORT_URL = `/api/report`;
 export const USER_BY_ID = (userId:number) => `${USER_URL}/${userId}`;
+export const USER_FOLLOWERS_URL = (userId:number) => `${USER_BY_ID(userId)}/followers`;
 export const COMMENT_BY_ID = (commentId:number) => `${COMMENT_URL}/${commentId}`;
 export const TWEET_BY_ID = (tweetId:number) => `${TWEET_URL}/${tweetId}`;
 export const TWEET_GET_ALL = (page:number, size:number) => `${TWEET_URL}/${page}/${size}`;
@@ -23,4 +24,6 @@ export const COMMENTS_FROM_TWEET = (tweetId:number, page:number, size:number) =>
 export const COMMENT_VOTE_BY_ID = (commentId:number) => `${COMMENT_BY_ID(commentId)}/vote`;
 export const TWEETS_FROM_USER = (userId:number, page:number, size:number) => `${TWEET_URL}/user/${userId}/${page}/${size}`;
 export const FOLLOW_USER = (userId:number) =>`${USER_URL}/follow/${userId}`;
+export const USER_FOLLOWERS = (userId:number, page:number, size:number) => `${USER_FOLLOWERS_URL(userId)}/${page}/${size}`;
+export const USER_FOLLOWERS_COUNT = (userId:number) => `${USER_FOLLOWERS_URL(userId)}/count`;
 

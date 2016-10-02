@@ -1,7 +1,6 @@
 import {IUserService, UserService} from "../../service/userService";
 import {inject} from "aurelia-framework";
 import {TweetService, ITweetService} from "../../service/tweetService";
-import {Const} from "../../domain/const";
 import {Router, RouterConfiguration} from "aurelia-router";
 import Tweet = Models.Tweet;
 /**
@@ -10,8 +9,6 @@ import Tweet = Models.Tweet;
 
 @inject(UserService, TweetService)
 export class User {
-    userTweets:Tweet[];
-    userTweetsPage:number;
     user:Models.User;
     currentLoggedUser:Models.User;
     router:Router;
@@ -20,16 +17,14 @@ export class User {
     private tweetService:ITweetService;
 
     constructor(userService:IUserService, tweetService:ITweetService) {
-        this.userTweetsPage = 0;
         this.userService = userService;
         this.tweetService = tweetService;
     }
 
     async activate(params) {
         const userId = params.userId;
-        [this.user, this.userTweets, this.followed] = await Promise.all([
+        [this.user, this.followed] = await Promise.all([
             this.userService.getUserById(userId),
-            this.tweetService.getTweetsFromUser(userId, this.userTweetsPage, Const.PAGE_SIZE),
             this.userService.isFollowed(userId)
         ]);
     }
@@ -57,10 +52,18 @@ export class User {
         config.map([
             {
                 route: ['', 'tweets'],
-                name: 'usersTweets',
+                name: 'userTweets',
                 moduleId: '../tweets/userTweets',
                 nav: true,
                 title: 'Tweets from user',
+                settings: {currentUser: this.currentLoggedUser}
+            },
+            {
+                route: 'followers',
+                name: 'userFollowers',
+                moduleId: './userFollowers',
+                nav: true,
+                title: 'User followers',
                 settings: {currentUser: this.currentLoggedUser}
             }
         ]);

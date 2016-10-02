@@ -1,7 +1,7 @@
 import {inject} from "aurelia-dependency-injection";
 import {HttpClient} from "aurelia-fetch-client";
 import {Const} from "../domain/const";
-import {BASE_URL, CURRENT_USER, USER_BY_ID, FOLLOW_USER} from "../domain/route";
+import {BASE_URL, CURRENT_USER, USER_BY_ID, FOLLOW_USER, USER_FOLLOWERS, USER_FOLLOWERS_COUNT} from "../domain/route";
 import {BasicService} from "./basicService";
 import User = Models.User;
 /**
@@ -15,6 +15,9 @@ export interface IUserService {
     isFollowed(userId:number):Promise<boolean>;
     followUser(userId:number):Promise<any>;
     unfollowUser(userId:number):Promise<any>;
+    getUserFollowers(userId:number, page:number, size:number):Promise<User[]>;
+    getUserFollowersCount(userId:number):Promise<number>;
+
 }
 
 @inject(HttpClient)
@@ -99,6 +102,30 @@ export class UserService extends BasicService implements IUserService {
             })
                 .then(response => response.json())
                 .then(followed => resolve(followed))
+        });
+    }
+
+    getUserFollowers(userId:number, page:number, size:number):Promise<User[]> {
+        return new Promise<User[]>((resolve, reject) => {
+            this.httpClient.fetch(BASE_URL + USER_FOLLOWERS(userId, page, size), {
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => response.json())
+                .then(followers => resolve(followers));
+        });
+    }
+
+    getUserFollowersCount(userId:number):Promise<number> {
+        return new Promise<number>((resolve, reject) => {
+            this.httpClient.fetch(BASE_URL + USER_FOLLOWERS_COUNT(userId), {
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => response.json())
+                .then(count => resolve(count));
         });
     }
 
