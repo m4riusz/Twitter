@@ -54,6 +54,13 @@ export class App {
                 moduleId: 'pages/users/user',
                 title: 'User',
                 settings: {currentUser: this.loggedUser}
+            },
+            {
+                route: ['reports'],
+                moduleId: 'pages/reports/reports',
+                title: ' Reports',
+                nav: true,
+                settings: {currentUser: this.loggedUser}
             }
         ]);
         this.router = router;

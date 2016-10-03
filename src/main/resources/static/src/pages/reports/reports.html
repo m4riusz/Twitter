@@ -1,0 +1,10 @@
+<template>
+    <ul class="btn-group">
+        <li repeat.for="item of router.navigation" class="btn btn-default">
+            <a href.bind="item.href">${item.title}</a>
+        </li>
+    </ul>
+    <div class="container-fluid">
+        <router-view></router-view>
+    </div>
+</template>
