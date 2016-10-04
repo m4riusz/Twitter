@@ -1,7 +1,7 @@
 import {HttpClient, json} from "aurelia-fetch-client";
 import {BasicService} from "./basicService";
 import {Const} from "../domain/const";
-import {BASE_URL, REPORT_URL} from "../domain/route";
+import {BASE_URL, REPORT_URL, USER_REPORTS} from "../domain/route";
 import {inject} from "aurelia-dependency-injection";
 import Report = Models.Report;
 
@@ -11,10 +11,12 @@ import Report = Models.Report;
 
 export interface IReportService {
     send(report:Report):Promise<Report>;
+    getUserReports(page:number, size:number):Promise<Report[]>;
 }
 
 @inject(HttpClient)
 export class ReportService extends BasicService implements IReportService {
+
     private authToken:string;
 
     constructor(httpClient:HttpClient) {
@@ -38,6 +40,18 @@ export class ReportService extends BasicService implements IReportService {
                 })
 
         })
+    }
+
+    getUserReports(page:number, size:number):Promise<Models.Report[]> {
+        return new Promise<Report[]>((resolve, reject) => {
+            this.httpClient.fetch(BASE_URL + USER_REPORTS(page, size), {
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => response.json())
+                .then(reports => resolve(reports))
+        });
     }
 
 }

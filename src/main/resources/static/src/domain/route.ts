@@ -29,4 +29,5 @@ export const USER_FOLLOWERS = (userId:number, page:number, size:number) => `${US
 export const USER_FOLLOWING = (userId:number, page:number, size:number) => `${USER_FOLLOWING_URL(userId)}/${page}/${size}`;
 export const USER_FOLLOWERS_COUNT = (userId:number) => `${USER_FOLLOWERS_URL(userId)}/count`;
 export const USER_FOLLOWING_COUNT = (userId:number) => `${USER_FOLLOWING_URL(userId)}/count`;
+export const USER_REPORTS = (page:number, size:number) => `${REPORT_URL}/${page}/${size}`;
 

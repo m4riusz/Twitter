@@ -22,8 +22,8 @@ export class Login {
     }
 
     activate() {
-        this.username = '';
-        this.password = '';
+        this.username = 'mariusz';
+        this.password = 'not2you';
         this.error = '';
     }
 
