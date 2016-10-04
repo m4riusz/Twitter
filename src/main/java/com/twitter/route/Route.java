@@ -75,10 +75,10 @@ public final class Route {
     public static final String COMMENTS_OLDEST = TWEET_BY_ID + COMMENT + OLDEST + PAGE + SIZE;
     public static final String COMMENTS_POPULAR = TWEET_BY_ID + COMMENT + POPULAR + PAGE + SIZE;
     public static final String COMMENT_VOTE = COMMENT_URL + VOTE;
-    public static final String COMMENT_VOTE_BY_ID = COMMENT_VOTE + VOTE_ID;
     public static final String COMMENT_VOTE_BY_COMMENT_ID = COMMENT_BY_ID + VOTE;
 
     public static final String REPORT_URL = API + REPORT;
+    public static final String REPORT_GET_FROM_USER = REPORT_URL + PAGE + SIZE;
     public static final String REPORT_BY_ID = REPORT_URL + REPORT_ID;
     public static final String REPORT_GET_ALL_BY_STATUS = REPORT_URL + STATUS + REPORT_STATUS + PAGE + SIZE;
     public static final String REPORT_GET_ALL_BY_CATEGORY = REPORT_URL + CATEGORY + REPORT_CATEGORY + PAGE + SIZE;

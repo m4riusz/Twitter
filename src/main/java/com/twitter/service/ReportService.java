@@ -33,4 +33,8 @@ public interface ReportService {
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
     List<Report> findLatestByStatusAndCategory(ReportStatus reportStatus, ReportCategory reportCategory, Pageable pageable);
 
+    // TODO: 04.10.16 add tests
+    @PreAuthorize(SecurityUtil.AUTHENTICATED)
+    List<Report> findUserReports(Pageable pageable);
+
 }

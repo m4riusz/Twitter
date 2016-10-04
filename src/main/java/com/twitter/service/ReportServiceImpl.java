@@ -1,13 +1,13 @@
 package com.twitter.service;
 
 import com.twitter.dao.ReportDao;
+import com.twitter.dto.ReportSentence;
 import com.twitter.exception.ReportNotFoundException;
 import com.twitter.exception.TwitterDateException;
 import com.twitter.model.Report;
 import com.twitter.model.ReportCategory;
 import com.twitter.model.ReportStatus;
 import com.twitter.model.User;
-import com.twitter.dto.ReportSentence;
 import com.twitter.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -83,6 +83,12 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<Report> findLatestByStatusAndCategory(ReportStatus reportStatus, ReportCategory reportCategory, Pageable pageable) {
         return reportDao.findByStatusAndCategoryOrderByCreateDateAsc(reportStatus, reportCategory, pageable);
+    }
+
+    @Override
+    public List<Report> findUserReports(Pageable pageable) {
+        User user = userService.getCurrentLoggedUser();
+        return reportDao.findByUser(user, pageable);
     }
 
     private boolean isGuilty(ReportSentence reportSentence) {

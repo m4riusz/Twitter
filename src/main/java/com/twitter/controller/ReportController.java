@@ -1,19 +1,22 @@
 package com.twitter.controller;
 
+import com.twitter.dto.ReportSentence;
 import com.twitter.model.Report;
 import com.twitter.model.ReportCategory;
 import com.twitter.model.ReportStatus;
-import com.twitter.dto.ReportSentence;
 import com.twitter.route.Route;
 import com.twitter.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+
+import static org.springframework.data.domain.Sort.*;
 
 /**
  * Created by mariusz on 07.08.16.
@@ -41,6 +44,11 @@ public class ReportController {
     @RequestMapping(value = Route.REPORT_BY_ID, method = RequestMethod.GET)
     public ResponseEntity<Report> getReportById(@PathVariable long reportId) {
         return new ResponseEntity<>(reportService.findById(reportId), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = Route.REPORT_GET_FROM_USER, method = RequestMethod.GET)
+    public ResponseEntity<List<Report>> findReportsFromUser(@PathVariable int page, @PathVariable int size) {
+        return new ResponseEntity<>(reportService.findUserReports(new PageRequest(page, size, Direction.DESC, "createDate")), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.REPORT_GET_ALL_BY_STATUS, method = RequestMethod.GET)
