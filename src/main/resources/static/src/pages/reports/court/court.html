@@ -1,3 +1,30 @@
 <template>
-    REPORT COURT
+    <div class="container-fluid">
+        <table style="table-layout: fixed; word-break: break-all;" class="table">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Category</th>
+                <th>Message</th>
+                <th>Post</th>
+                <th>Operations</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr repeat.for="report of reports">
+                <td>${report.createDate}</td>
+                <td>${report.status}</td>
+                <td>${report.category}</td>
+                <td>${report.message}</td>
+                <td>${report.judge.username}</td>
+                <td><a class="btn btn-default" click.delegate="judge(report)">Judge</a></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="well well-sm text-center" click.delegate="nextPage()">
+            <h3 class="h3">More</h3>
+        </div>
+    </div>
 </template>

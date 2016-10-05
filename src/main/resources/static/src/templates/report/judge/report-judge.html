@@ -1,0 +1,21 @@
+<template>
+    <ai-dialog>
+        <ai-dialog-body>
+            <div class="container-fluid">
+                <h3>Judge</h3>
+                <div class="radio" repeat.for="status of statuses">
+                    <label> <input type="radio" name="st" model.bind="status"
+                                   checked.bind="$parent.selectedStatus"/>
+                        ${status.text}
+                    </label>
+                </div>
+
+            </div>
+        </ai-dialog-body>
+        <ai-dialog-footer>
+            <button click.trigger="dialogController.cancel()">Cancel</button>
+            <button click.trigger="dialogController.ok(selectedStatus)">Ok</button>
+        </ai-dialog-footer>
+
+    </ai-dialog>
+</template>

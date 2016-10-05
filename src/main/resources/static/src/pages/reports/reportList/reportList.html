@@ -1,6 +1,6 @@
 <template>
     <div class="container-fluid">
-        <table style="table-layout: fixed; word-break: keep-all;" class="table">
+        <table style="table-layout: fixed; word-break: break-all;" class="table">
             <thead>
             <tr>
                 <th>Date</th>
@@ -16,7 +16,7 @@
                 <td>${report.createDate}</td>
                 <td>${report.status}</td>
                 <td>${report.category}</td>
-                <td style="word-break: break-all">${report.message}</td>
+                <td>${report.message}</td>
                 <td>${report.judge.username}</td>
                 <td>${report.abstractPost.content}</td>
             </tr>
