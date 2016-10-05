@@ -78,6 +78,7 @@ public final class Route {
     public static final String COMMENT_VOTE_BY_COMMENT_ID = COMMENT_BY_ID + VOTE;
 
     public static final String REPORT_URL = API + REPORT;
+    public static final String REPORT_GET_LATEST = REPORT_URL + LATEST + PAGE + SIZE;
     public static final String REPORT_GET_FROM_USER = REPORT_URL + PAGE + SIZE;
     public static final String REPORT_BY_ID = REPORT_URL + REPORT_ID;
     public static final String REPORT_GET_ALL_BY_STATUS = REPORT_URL + STATUS + REPORT_STATUS + PAGE + SIZE;

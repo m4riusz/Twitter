@@ -8,7 +8,6 @@ import com.twitter.route.Route;
 import com.twitter.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-import static org.springframework.data.domain.Sort.*;
+import static org.springframework.data.domain.Sort.Direction;
 
 /**
  * Created by mariusz on 07.08.16.
@@ -44,6 +43,11 @@ public class ReportController {
     @RequestMapping(value = Route.REPORT_BY_ID, method = RequestMethod.GET)
     public ResponseEntity<Report> getReportById(@PathVariable long reportId) {
         return new ResponseEntity<>(reportService.findById(reportId), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = Route.REPORT_GET_LATEST, method = RequestMethod.GET)
+    public ResponseEntity<List<Report>> findLatestReports(@PathVariable int page, @PathVariable int size) {
+        return new ResponseEntity<>(reportService.findLatestReports(new PageRequest(page, size, Direction.DESC, "createDate")), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.REPORT_GET_FROM_USER, method = RequestMethod.GET)

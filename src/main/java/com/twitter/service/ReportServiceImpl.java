@@ -91,6 +91,11 @@ public class ReportServiceImpl implements ReportService {
         return reportDao.findByUser(user, pageable);
     }
 
+    @Override
+    public List<Report> findLatestReports(Pageable pageable) {
+        return reportDao.findAll(pageable).getContent();
+    }
+
     private boolean isGuilty(ReportSentence reportSentence) {
         return reportSentence.getReportStatus() == ReportStatus.GUILTY;
     }

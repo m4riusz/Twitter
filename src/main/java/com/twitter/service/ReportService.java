@@ -1,7 +1,9 @@
 package com.twitter.service;
 
-import com.twitter.model.*;
 import com.twitter.dto.ReportSentence;
+import com.twitter.model.Report;
+import com.twitter.model.ReportCategory;
+import com.twitter.model.ReportStatus;
 import com.twitter.util.SecurityUtil;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,5 +38,9 @@ public interface ReportService {
     // TODO: 04.10.16 add tests
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     List<Report> findUserReports(Pageable pageable);
+
+    // TODO: 05.10.16 add tests
+    @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
+    List<Report> findLatestReports(Pageable pageable);
 
 }
