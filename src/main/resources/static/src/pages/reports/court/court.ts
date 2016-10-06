@@ -30,7 +30,7 @@ export class Court {
     }
 
     judge(report:Report) {
-        this.dialogService.open({viewModel: ReportJudge}).then(response => {
+        this.dialogService.open({viewModel: ReportJudge, model: report}).then(response => {
             if (!response.wasCancelled) {
                 const data = response.output;
                 console.log(response.output.text);

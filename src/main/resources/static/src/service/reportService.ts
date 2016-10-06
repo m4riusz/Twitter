@@ -4,6 +4,7 @@ import {Const} from "../domain/const";
 import {BASE_URL, REPORT_URL, USER_REPORTS, REPORTS_LATEST} from "../domain/route";
 import {inject} from "aurelia-framework";
 import Report = Models.Report;
+import ReportStatus = Models.ReportStatus;
 
 /**
  * Created by mariusz on 20.09.16.
@@ -13,6 +14,7 @@ export interface IReportService {
     send(report:Report):Promise<Report>;
     getUserReports(page:number, size:number):Promise<Report[]>;
     getLatestReports(page:number, size:number):Promise<Report[]>;
+    judgeReport(reportId:number, reportStatus:ReportStatus, date):Promise<Report>;
 }
 
 @inject(HttpClient)
@@ -65,6 +67,10 @@ export class ReportService extends BasicService implements IReportService {
                 .then(response => response.json())
                 .then(reports => resolve(reports));
         });
+    }
+
+    judgeReport(reportId:number, reportStatus:Models.ReportStatus, date):Promise<Models.Report> {
+        return undefined;
     }
 
 }

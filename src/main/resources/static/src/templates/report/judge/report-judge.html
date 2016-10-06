@@ -2,14 +2,17 @@
     <ai-dialog>
         <ai-dialog-body>
             <div class="container-fluid">
-                <h3>Judge</h3>
+                <h3 class="text text-danger">Judge post</h3>
+                <h5>Post content: <label style="word-break: break-all" class="bg-primary">${postContent}</label></h5>
+                <h5>Category : <label class="bg-danger">${category}</label></h5>
+                <h5>Message from reporter: <label style="word-break: break-all" class="bg-info">${message}</label></h5>
+
                 <div class="radio" repeat.for="status of statuses">
                     <label> <input type="radio" name="st" model.bind="status"
                                    checked.bind="$parent.selectedStatus"/>
                         ${status.text}
                     </label>
                 </div>
-
             </div>
         </ai-dialog-body>
         <ai-dialog-footer>
