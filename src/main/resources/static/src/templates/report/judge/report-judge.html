@@ -1,4 +1,6 @@
 <template>
+    <require from="../../date/datepicker"></require>
+
     <ai-dialog>
         <ai-dialog-body>
             <div class="container-fluid">
@@ -12,6 +14,10 @@
                                    checked.bind="$parent.selectedStatus"/>
                         ${status.text}
                     </label>
+                </div>
+
+                <div if.bind="selectedStatus.text == 'GUILTY'">
+                    Ban date: <input datepicker value.bind="banDate">
                 </div>
             </div>
         </ai-dialog-body>
