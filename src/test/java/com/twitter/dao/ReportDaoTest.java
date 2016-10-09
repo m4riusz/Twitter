@@ -22,6 +22,7 @@ import static com.twitter.util.Util.aListWith;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
+import static org.springframework.data.domain.Sort.Direction;
 
 /**
  * Created by mariusz on 22.07.16.
@@ -52,7 +53,7 @@ public class ReportDaoTest {
     }
 
     @Test
-    public void findByStatusOrderByCreateDateAsc_tweetOwnerReportsHimself() {
+    public void findByStatus_tweetOwnerReportsHimself() {
         User tweetOwner = a(user());
         userDao.save(aListWith(tweetOwner));
         Tweet tweet = a(tweet().withOwner(tweetOwner));
@@ -62,7 +63,7 @@ public class ReportDaoTest {
                 .withAbstractPost(tweet)
         );
         reportDao.save(report);
-        List<Report> reportList = reportDao.findByStatusOrderByCreateDateAsc(
+        List<Report> reportList = reportDao.findByStatus(
                 ReportStatus.WAITING_FOR_REALIZATION,
                 TestUtil.ALL_IN_ONE_PAGE
         );
@@ -70,7 +71,7 @@ public class ReportDaoTest {
     }
 
     @Test
-    public void findByStatusOrderByCreateDateAsc_manyReportsManyUsers() {
+    public void findByStatus_manyReportsManyUsers() {
         User tweetOwner = a(user());
         User reportUserOne = a(user());
         User reportUserTwo = a(user());
@@ -88,7 +89,7 @@ public class ReportDaoTest {
                 .withUser(reportUserTwo)
         );
         reportDao.save(aListWith(reportOne, reportTwo));
-        List<Report> reportList = reportDao.findByStatusOrderByCreateDateAsc(
+        List<Report> reportList = reportDao.findByStatus(
                 ReportStatus.WAITING_FOR_REALIZATION,
                 TestUtil.ALL_IN_ONE_PAGE
         );
@@ -97,7 +98,7 @@ public class ReportDaoTest {
     }
 
     @Test
-    public void findByStatusOrderByCreateDateAsc_pagingAndOrderTest() {
+    public void findByStatus_pagingAndOrderTest() {
         User tweetOwner = a(user());
         User reportUserOne = a(user());
         User reportUserTwo = a(user());
@@ -122,20 +123,20 @@ public class ReportDaoTest {
                 .withCreateDate(TestUtil.DATE_2002)
         );
         reportDao.save(aListWith(reportOne, reportTwo, reportThree));
-        List<Report> reportListPageOne = reportDao.findByStatusOrderByCreateDateAsc(
+        List<Report> reportListPageOne = reportDao.findByStatus(
                 ReportStatus.WAITING_FOR_REALIZATION,
-                new PageRequest(0, 2)
+                new PageRequest(0, 2, Direction.DESC, "createDate")
         );
-        List<Report> reportListPageTwo = reportDao.findByStatusOrderByCreateDateAsc(
+        List<Report> reportListPageTwo = reportDao.findByStatus(
                 ReportStatus.WAITING_FOR_REALIZATION,
-                new PageRequest(1, 2)
+                new PageRequest(1, 2, Direction.DESC, "createDate")
         );
-        assertThat(reportListPageOne, contains(reportOne, reportTwo));
-        assertThat(reportListPageTwo, contains(reportThree));
+        assertThat(reportListPageOne, contains(reportThree, reportTwo));
+        assertThat(reportListPageTwo, contains(reportOne));
     }
 
     @Test
-    public void findByCategoryOrderByCreateDateAsc_oneReport() {
+    public void findByCategory_oneReport() {
         User owner = a(user());
         User accuser = a(user());
         userDao.save(aListWith(owner, accuser));
@@ -147,7 +148,7 @@ public class ReportDaoTest {
                 .withCategory(ReportCategory.HATE_SPEECH)
         );
         reportDao.save(report);
-        List<Report> reportList = reportDao.findByCategoryOrderByCreateDateAsc(
+        List<Report> reportList = reportDao.findByCategory(
                 ReportCategory.HATE_SPEECH,
                 TestUtil.ALL_IN_ONE_PAGE
         );
@@ -156,7 +157,7 @@ public class ReportDaoTest {
     }
 
     @Test
-    public void findByCategoryOrderByCreateDateAsc_someReportsWithDifferentCategories() {
+    public void findByCategory_someReportsWithDifferentCategories() {
         User owner = a(user());
         User accuser = a(user());
         userDao.save(aListWith(owner, accuser));
@@ -178,7 +179,7 @@ public class ReportDaoTest {
                 .withCategory(ReportCategory.OTHER)
         );
         reportDao.save(aListWith(reportOne, reportTwo, reportThree));
-        List<Report> reportList = reportDao.findByCategoryOrderByCreateDateAsc(
+        List<Report> reportList = reportDao.findByCategory(
                 ReportCategory.OTHER,
                 TestUtil.ALL_IN_ONE_PAGE
         );
@@ -187,7 +188,7 @@ public class ReportDaoTest {
     }
 
     @Test
-    public void findByCategoryOrderByCreateDateAsc_pagingAndOrderTest() {
+    public void findByCategory_pagingAndOrderTest() {
         User tweetOwner = a(user());
         User reportUserOne = a(user());
         User reportUserTwo = a(user());
@@ -214,20 +215,20 @@ public class ReportDaoTest {
                 .withCategory(ReportCategory.ADVERTISEMENT)
         );
         reportDao.save(aListWith(reportOne, reportTwo, reportThree));
-        List<Report> reportListPageOne = reportDao.findByCategoryOrderByCreateDateAsc(
+        List<Report> reportListPageOne = reportDao.findByCategory(
                 ReportCategory.ADVERTISEMENT,
-                new PageRequest(0, 2)
+                new PageRequest(0, 2, Direction.DESC, "createDate")
         );
-        List<Report> reportListPageTwo = reportDao.findByCategoryOrderByCreateDateAsc(
+        List<Report> reportListPageTwo = reportDao.findByCategory(
                 ReportCategory.ADVERTISEMENT,
-                new PageRequest(1, 2)
+                new PageRequest(1, 2, Direction.DESC, "createDate")
         );
-        assertThat(reportListPageOne, contains(reportOne, reportTwo));
-        assertThat(reportListPageTwo, contains(reportThree));
+        assertThat(reportListPageOne, contains(reportThree, reportTwo));
+        assertThat(reportListPageTwo, contains(reportOne));
     }
 
     @Test
-    public void findByStatusAndCategoryOrderByCreateDateAsc_oneReportWithGoodStatusAndGoodCategory() {
+    public void findByStatusAndCategory_oneReportWithGoodStatusAndGoodCategory() {
         User accuser = a(user());
         User tweetOwner = a(user());
         userDao.save(aListWith(accuser, tweetOwner));
@@ -240,7 +241,7 @@ public class ReportDaoTest {
                 .withCategory(ReportCategory.HATE_SPEECH)
         );
         reportDao.save(report);
-        List<Report> reportList = reportDao.findByStatusAndCategoryOrderByCreateDateAsc(
+        List<Report> reportList = reportDao.findByStatusAndCategory(
                 ReportStatus.WAITING_FOR_REALIZATION,
                 ReportCategory.HATE_SPEECH,
                 TestUtil.ALL_IN_ONE_PAGE
@@ -249,7 +250,7 @@ public class ReportDaoTest {
     }
 
     @Test
-    public void findByStatusAndCategoryOrderByCreateDateAsc_oneReportWithGoodStatusAndBadCategory() {
+    public void findByStatusAndCategory_oneReportWithGoodStatusAndBadCategory() {
         User tweetOwner = a(user());
         User accuser = a(user());
         userDao.save(aListWith(tweetOwner, accuser));
@@ -262,7 +263,7 @@ public class ReportDaoTest {
                 .withCategory(ReportCategory.SPAM_OR_FLOOD)
         );
         reportDao.save(report);
-        List<Report> reportList = reportDao.findByStatusAndCategoryOrderByCreateDateAsc(
+        List<Report> reportList = reportDao.findByStatusAndCategory(
                 ReportStatus.WAITING_FOR_REALIZATION,
                 ReportCategory.HATE_SPEECH,
                 TestUtil.ALL_IN_ONE_PAGE
@@ -271,7 +272,7 @@ public class ReportDaoTest {
     }
 
     @Test
-    public void findByStatusAndCategoryOrderByCreateDateAsc_oneReportWithBadStatusAndGoodCategory() {
+    public void findByStatusAndCategory_oneReportWithBadStatusAndGoodCategory() {
         User tweetOwner = a(user());
         User accuser = a(user());
         userDao.save(aListWith(tweetOwner, accuser));
@@ -284,7 +285,7 @@ public class ReportDaoTest {
                 .withCategory(ReportCategory.SPAM_OR_FLOOD)
         );
         reportDao.save(report);
-        List<Report> reportList = reportDao.findByStatusAndCategoryOrderByCreateDateAsc(
+        List<Report> reportList = reportDao.findByStatusAndCategory(
                 ReportStatus.GUILTY,
                 ReportCategory.SPAM_OR_FLOOD,
                 TestUtil.ALL_IN_ONE_PAGE
@@ -293,7 +294,7 @@ public class ReportDaoTest {
     }
 
     @Test
-    public void findByStatusAndCategoryOrderByCreateDateAsc_oneReportWithBadStatusAndBadCategory() {
+    public void findByStatusAndCategory_oneReportWithBadStatusAndBadCategory() {
         User tweetOwner = a(user());
         User accuser = a(user());
         userDao.save(aListWith(tweetOwner, accuser));
@@ -306,7 +307,7 @@ public class ReportDaoTest {
                 .withCategory(ReportCategory.SPAM_OR_FLOOD)
         );
         reportDao.save(report);
-        List<Report> reportList = reportDao.findByStatusAndCategoryOrderByCreateDateAsc(
+        List<Report> reportList = reportDao.findByStatusAndCategory(
                 ReportStatus.GUILTY,
                 ReportCategory.ADVERTISEMENT,
                 TestUtil.ALL_IN_ONE_PAGE
@@ -315,7 +316,7 @@ public class ReportDaoTest {
     }
 
     @Test
-    public void findByStatusAndCategoryOrderByCreateDateAsc_pagingAndOrderTest() {
+    public void findByStatusAndCategory_pagingAndOrderTest() {
         User tweetOwner = a(user());
         User reportUserOne = a(user());
         User reportUserTwo = a(user());
@@ -346,15 +347,107 @@ public class ReportDaoTest {
         );
         reportDao.save(aListWith(reportOne, reportTwo, reportThree));
 
-        List<Report> reportListPageOne = reportDao.findByStatusAndCategoryOrderByCreateDateAsc(
+        List<Report> reportListPageOne = reportDao.findByStatusAndCategory(
                 ReportStatus.WAITING_FOR_REALIZATION,
-                ReportCategory.ADVERTISEMENT, new PageRequest(0, 2)
+                ReportCategory.ADVERTISEMENT, new PageRequest(0, 2, Direction.DESC, "createDate")
         );
-        List<Report> reportListPageTwo = reportDao.findByStatusAndCategoryOrderByCreateDateAsc(
+        List<Report> reportListPageTwo = reportDao.findByStatusAndCategory(
                 ReportStatus.WAITING_FOR_REALIZATION,
-                ReportCategory.ADVERTISEMENT, new PageRequest(1, 2)
+                ReportCategory.ADVERTISEMENT, new PageRequest(1, 2, Direction.DESC, "createDate")
         );
-        assertThat(reportListPageOne, contains(reportOne, reportTwo));
-        assertThat(reportListPageTwo, contains(reportThree));
+        assertThat(reportListPageOne, contains(reportThree, reportTwo));
+        assertThat(reportListPageTwo, contains(reportOne));
+    }
+
+    @Test
+    public void findByUser_oneUserNoReports() {
+        User user = a(user());
+        userDao.save(user);
+        List<Report> userReports = reportDao.findByUser(user, new PageRequest(0, 10));
+        assertThat(userReports, is(emptyList()));
+    }
+
+    @Test
+    public void findByUser_oneUserSomeReports() {
+        User user = a(user());
+        User postOwner = a(user());
+        userDao.save(aListWith(user, postOwner));
+
+        Tweet tweetOne = a(tweet().withOwner(postOwner));
+        Tweet tweetTwo = a(tweet().withOwner(postOwner));
+        tweetDao.save(aListWith(tweetOne, tweetTwo));
+
+        Report reportOne = a(report().withUser(user).withAbstractPost(tweetOne));
+        Report reportTwo = a(report().withUser(user).withAbstractPost(tweetTwo));
+        reportDao.save(aListWith(reportOne, reportTwo));
+
+        List<Report> userReports = reportDao.findByUser(user, new PageRequest(0, 10));
+        assertThat(userReports, hasItems(reportOne, reportTwo));
+        assertThat(userReports, hasSize(2));
+    }
+
+    @Test
+    public void findByUser_someUserSomeReports() {
+        User userOne = a(user());
+        User userTwo = a(user());
+        User postOwner = a(user());
+        userDao.save(aListWith(userOne, userTwo, postOwner));
+
+        Tweet tweetOne = a(tweet().withOwner(postOwner));
+        Tweet tweetTwo = a(tweet().withOwner(postOwner));
+        Tweet tweetThree = a(tweet().withOwner(postOwner));
+        Tweet tweetFour = a(tweet().withOwner(postOwner));
+        tweetDao.save(aListWith(tweetOne, tweetTwo, tweetThree, tweetFour));
+
+        Report reportOne = a(report().withUser(userOne).withAbstractPost(tweetOne));
+        Report reportTwo = a(report().withUser(userOne).withAbstractPost(tweetTwo));
+        Report reportThree = a(report().withUser(userTwo).withAbstractPost(tweetThree));
+        Report reportFour = a(report().withUser(userTwo).withAbstractPost(tweetFour));
+        reportDao.save(aListWith(reportOne, reportTwo, reportThree, reportFour));
+
+        List<Report> userOneReports = reportDao.findByUser(userOne, new PageRequest(0, 10));
+        List<Report> userTwoReports = reportDao.findByUser(userTwo, new PageRequest(0, 10));
+        assertThat(userOneReports, hasItems(reportOne, reportTwo));
+        assertThat(userTwoReports, hasItems(reportThree, reportFour));
+        assertThat(userOneReports, hasSize(2));
+        assertThat(userTwoReports, hasSize(2));
+    }
+
+    @Test
+    public void findByUser_orderTest() {
+        User user = a(user());
+        User postOwner = a(user());
+        userDao.save(aListWith(user, postOwner));
+
+        Tweet tweetOne = a(tweet().withOwner(postOwner));
+        Tweet tweetTwo = a(tweet().withOwner(postOwner));
+        Tweet tweetThree = a(tweet().withOwner(postOwner));
+
+        tweetDao.save(aListWith(tweetOne, tweetTwo, tweetThree));
+
+        Report reportOne = a(report()
+                .withUser(user)
+                .withAbstractPost(tweetOne)
+                .withCreateDate(TestUtil.DATE_2000)
+        );
+        Report reportTwo = a(report()
+                .withUser(user)
+                .withAbstractPost(tweetTwo)
+                .withCreateDate(TestUtil.DATE_2001)
+        );
+        Report reportThree = a(report()
+                .withUser(user)
+                .withAbstractPost(tweetThree)
+                .withCreateDate(TestUtil.DATE_2002)
+        );
+        reportDao.save(aListWith(reportOne, reportTwo, reportThree));
+
+        List<Report> userReportsPageOne = reportDao.findByUser(user, new PageRequest(0, 2, Direction.DESC, "createDate"));
+        List<Report> userReportsPageTwo = reportDao.findByUser(user, new PageRequest(1, 2, Direction.DESC, "createDate"));
+        assertThat(userReportsPageOne, contains(reportThree, reportTwo));
+        assertThat(userReportsPageOne, hasSize(2));
+        assertThat(userReportsPageTwo, contains(reportOne));
+        assertThat(userReportsPageTwo, hasSize(1));
+
     }
 }

@@ -256,7 +256,7 @@ public class ReportServiceTest {
                 .withStatus(ReportStatus.WAITING_FOR_REALIZATION)
                 .withCreateDate(TestUtil.DATE_2001)
         );
-        when(reportDao.findByStatusOrderByCreateDateAsc(
+        when(reportDao.findByStatus(
                 ReportStatus.WAITING_FOR_REALIZATION,
                 TestUtil.ALL_IN_ONE_PAGE)
         ).thenReturn(aListWith(reportOne, reportTwo, reportThree));
@@ -282,7 +282,7 @@ public class ReportServiceTest {
                 .withCategory(ReportCategory.HATE_SPEECH)
                 .withCreateDate(TestUtil.DATE_2001)
         );
-        when(reportDao.findByCategoryOrderByCreateDateAsc(
+        when(reportDao.findByCategory(
                 ReportCategory.HATE_SPEECH,
                 TestUtil.ALL_IN_ONE_PAGE)
         ).thenReturn(aListWith(reportOne, reportTwo, reportThree));
@@ -312,7 +312,7 @@ public class ReportServiceTest {
                 .withCreateDate(TestUtil.DATE_2001)
         );
 
-        when(reportDao.findByStatusAndCategoryOrderByCreateDateAsc(
+        when(reportDao.findByStatusAndCategory(
                 ReportStatus.WAITING_FOR_REALIZATION,
                 ReportCategory.HATE_SPEECH,
                 TestUtil.ALL_IN_ONE_PAGE)

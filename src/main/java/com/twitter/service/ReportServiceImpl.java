@@ -72,17 +72,17 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<Report> findLatestByStatus(ReportStatus reportStatus, Pageable pageable) {
-        return reportDao.findByStatusOrderByCreateDateAsc(reportStatus, pageable);
+        return reportDao.findByStatus(reportStatus, pageable);
     }
 
     @Override
     public List<Report> findLatestByCategory(ReportCategory reportCategory, Pageable pageable) {
-        return reportDao.findByCategoryOrderByCreateDateAsc(reportCategory, pageable);
+        return reportDao.findByCategory(reportCategory, pageable);
     }
 
     @Override
     public List<Report> findLatestByStatusAndCategory(ReportStatus reportStatus, ReportCategory reportCategory, Pageable pageable) {
-        return reportDao.findByStatusAndCategoryOrderByCreateDateAsc(reportStatus, reportCategory, pageable);
+        return reportDao.findByStatusAndCategory(reportStatus, reportCategory, pageable);
     }
 
     @Override

@@ -16,12 +16,11 @@ import java.util.List;
 @Repository
 public interface ReportDao extends JpaRepository<Report, Long> {
 
-    public List<Report> findByStatusOrderByCreateDateAsc(ReportStatus reportStatus, Pageable pageable);
+    public List<Report> findByStatus(ReportStatus reportStatus, Pageable pageable);
 
-    public List<Report> findByCategoryOrderByCreateDateAsc(ReportCategory reportCategory, Pageable pageable);
+    public List<Report> findByCategory(ReportCategory reportCategory, Pageable pageable);
 
-    public List<Report> findByStatusAndCategoryOrderByCreateDateAsc(ReportStatus status, ReportCategory reportCategory, Pageable pageable);
+    public List<Report> findByStatusAndCategory(ReportStatus status, ReportCategory reportCategory, Pageable pageable);
 
-    // TODO: 04.10.16 add tests
     public List<Report> findByUser(User user, Pageable pageable);
 }
