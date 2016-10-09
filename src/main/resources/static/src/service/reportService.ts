@@ -69,8 +69,25 @@ export class ReportService extends BasicService implements IReportService {
         });
     }
 
-    judgeReport(reportId:number, reportStatus:Models.ReportStatus, date):Promise<Models.Report> {
-        return undefined;
+    judgeReport(reportId:number, reportStatus:ReportStatus, date):Promise<Report> {
+        return new Promise<Report>((resolve, reject) => {
+            this.httpClient.fetch(BASE_URL + REPORT_URL, {
+                method: 'put',
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                },
+                body: json({reportId: reportId, reportStatus: reportStatus, dateToBlock: date})
+            })
+                .then(response => {
+                    if (response.ok) {
+                        response.json().then(data => resolve(data));
+                    }
+                    else {
+                        response.json().then(res=> reject(res.message));
+                    }
+                })
+
+        });
     }
 
 }
