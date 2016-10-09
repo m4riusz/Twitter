@@ -57,19 +57,19 @@ public class ReportController {
 
     @RequestMapping(value = Route.REPORT_GET_ALL_BY_STATUS, method = RequestMethod.GET)
     public ResponseEntity<List<Report>> findReportsByStatus(@PathVariable ReportStatus reportStatus, @PathVariable int page, @PathVariable int size) {
-        return new ResponseEntity<>(reportService.findLatestByStatus(reportStatus, new PageRequest(page, size)), HttpStatus.OK);
+        return new ResponseEntity<>(reportService.findLatestByStatus(reportStatus, new PageRequest(page, size, Direction.DESC, "createDate")), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.REPORT_GET_ALL_BY_CATEGORY, method = RequestMethod.GET)
     public ResponseEntity<List<Report>> findReportsByCategory(@PathVariable ReportCategory reportCategory, @PathVariable int page, @PathVariable int size) {
-        return new ResponseEntity<>(reportService.findLatestByCategory(reportCategory, new PageRequest(page, size)), HttpStatus.OK);
+        return new ResponseEntity<>(reportService.findLatestByCategory(reportCategory, new PageRequest(page, size, Direction.DESC, "createDate")), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.REPORT_GET_ALL_BY_STATUS_AND_CATEGORY, method = RequestMethod.GET)
     public ResponseEntity<List<Report>> findReportsByStatusAndCategory(@PathVariable ReportStatus reportStatus,
                                                                        @PathVariable ReportCategory reportCategory,
                                                                        @PathVariable int page, @PathVariable int size) {
-        return new ResponseEntity<>(reportService.findLatestByStatusAndCategory(reportStatus, reportCategory, new PageRequest(page, size)), HttpStatus.OK);
+        return new ResponseEntity<>(reportService.findLatestByStatusAndCategory(reportStatus, reportCategory, new PageRequest(page, size, Direction.DESC, "createDate")), HttpStatus.OK);
     }
 
 }
