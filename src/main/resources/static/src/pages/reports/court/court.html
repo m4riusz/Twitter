@@ -2,25 +2,43 @@
     <div class="container-fluid">
         <br/>
         <br/>
+        <div class="form-group">
+            <label for="categorySelect">Report category:</label>
+            <select value.bind="category" class="form-control" id="categorySelect" change.delegate="changeOption()">
+                <option repeat.for="current of categories" value.bind="current">
+                    ${current}
+                </option>
+            </select>
+
+            <label for="statusSelect">Report status:</label>
+            <select value.bind="status" class="form-control" id="statusSelect" change.delegate="changeOption()">
+                <option repeat.for="current of statuses" value.bind="current">
+                    ${current}
+                </option>
+            </select>
+        </div>
         <table style="table-layout: fixed; word-break: break-all;" class="table table-hover table-bordered">
             <thead>
             <tr>
                 <th>Date</th>
-                <th>Status</th>
-                <th>Category</th>
+                <th if.bind="status == 'ALL'">Status</th>
+                <th if.bind="category == 'ALL'">Category</th>
                 <th>Message</th>
-                <th>Post</th>
-                <th>Operations</th>
+                <th>Judge</th>
+                <th if.bind="status == 'WAITING_FOR_REALIZATION' || status == 'ALL'">Operations</th>
             </tr>
             </thead>
             <tbody>
             <tr repeat.for="report of reports">
                 <td>${report.createDate}</td>
-                <td>${report.status}</td>
-                <td>${report.category}</td>
+                <td if.bind="status == 'ALL'">${report.status}</td>
+                <td if.bind="category == 'ALL'">${report.category}</td>
                 <td>${report.message}</td>
                 <td>${report.judge.username}</td>
-                <td><a class="btn btn-default" click.delegate="judge(report)">Judge</a></td>
+                <td if.bind="status =='WAITING_FOR_REALIZATION' || status =='ALL' ">
+                    <a if.bind="report.status != 'INNOCENT' && report.status != 'GUILTY'"
+                       class="btn btn-default" click.delegate="judge(report)">Judge</a>
+                </td>
             </tr>
             </tbody>
         </table>

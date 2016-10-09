@@ -23,7 +23,7 @@
         </ai-dialog-body>
         <ai-dialog-footer>
             <button click.trigger="dialogController.cancel()">Cancel</button>
-            <button click.trigger="dialogController.ok(selectedStatus)">Ok</button>
+            <button click.trigger="dialogController.ok({status:selectedStatus,date:banDate})">Ok</button>
         </ai-dialog-footer>
 
     </ai-dialog>

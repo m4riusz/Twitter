@@ -15,6 +15,10 @@ export class Court {
     page:number;
     currentLoggedUser:User;
     reports:Report[];
+    category:any;
+    categories:any[];
+    status:any;
+    statuses:any[];
     private reportService:IReportService;
     private dialogService:DialogService;
 
@@ -22,18 +26,35 @@ export class Court {
         this.page = 0;
         this.reportService = reportService;
         this.dialogService = dialogService;
+        this.categories = [
+            'ALL', 'VERBAL_ABUSE', 'HATE_SPEECH', 'PORNOGRAPHY', 'ADVERTISEMENT', 'SPAM_OR_FLOOD', 'WRONG_TAGS', 'OTHER'
+        ];
+        this.statuses = [
+            'WAITING_FOR_REALIZATION', 'INNOCENT', 'GUILTY', 'ALL'
+        ];
+        this.status = this.statuses[0];
+        this.category = this.categories[0];
     }
 
     async activate(params, config) {
         this.currentLoggedUser = config.settings.currentUser;
-        this.reports = await this.reportService.getLatestReports(this.page, Const.PAGE_SIZE);
+        this.reports = await this.getReportsBasingOnSelectedOptions();
+    }
+
+    async changeOption() {
+        this.page = 0;
+        this.reports = await this.getReportsBasingOnSelectedOptions();
     }
 
     judge(report:Report) {
         this.dialogService.open({viewModel: ReportJudge, model: report}).then(response => {
             if (!response.wasCancelled) {
                 const data = response.output;
-                console.log(response.output.text);
+                this.reportService.judgeReport(report.id, data.status.text, data.date)
+                    .then(result => {
+                        this.reports = this.reports.map(current => current.id == report.id ? result : current);
+                    }, error => alert(error));
+
             }
         })
     }
@@ -41,10 +62,35 @@ export class Court {
     async nextPage() {
         try {
             this.page = ++this.page;
-            let nextReportPages = await this.reportService.getLatestReports(this.page, Const.PAGE_SIZE);
+            let nextReportPages = await this.getReportsBasingOnSelectedOptions();
             this.reports = this.reports.concat(nextReportPages);
         } catch (error) {
             this.page = --this.page;
         }
     }
+
+    private getReportsBasingOnSelectedOptions() {
+        if (this.isStatusSelected() && this.isCategorySelected()) {
+            return this.reportService.getReportsByStatusAndCategory(this.status, this.category, this.page, Const.PAGE_SIZE);
+        } else if (this.areStatusAndCategoryNotSelected()) {
+            return this.reportService.getLatestReports(this.page, Const.PAGE_SIZE);
+        } else if (this.isStatusSelected()) {
+            return this.reportService.getReportsByStatus(this.status, this.page, Const.PAGE_SIZE);
+        } else {
+            return this.reportService.getReportsByCategory(this.category, this.page, Const.PAGE_SIZE);
+        }
+    }
+
+    private areStatusAndCategoryNotSelected() {
+        return !(this.isStatusSelected() || this.isCategorySelected());
+    }
+
+    private isStatusSelected() {
+        return this.status != 'ALL';
+    }
+
+    private isCategorySelected() {
+        return this.category != 'ALL';
+    }
+
 }

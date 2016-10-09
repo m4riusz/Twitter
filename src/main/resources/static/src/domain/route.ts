@@ -31,4 +31,6 @@ export const USER_FOLLOWERS_COUNT = (userId:number) => `${USER_FOLLOWERS_URL(use
 export const USER_FOLLOWING_COUNT = (userId:number) => `${USER_FOLLOWING_URL(userId)}/count`;
 export const USER_REPORTS = (page:number, size:number) => `${REPORT_URL}/${page}/${size}`;
 export const REPORTS_LATEST = (page:number, size:number) => `${REPORT_URL}/latest/${page}/${size}`;
-
+export const REPORTS_CATEGORY = (category:string, page:number, size:number) => `${REPORT_URL}/category/${category}/${page}/${size}`;
+export const REPORTS_STATUS = (status:string, page:number, size:number) => `${REPORT_URL}/status/${status}/${page}/${size}`;
+export const REPORTS_BY_STATUS_AND_CATEGORY = (status:string, category:string, page:number, size:number) => `${REPORT_URL}/status/${status}/category/${category}/${page}/${size}`;
