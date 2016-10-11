@@ -1,0 +1,39 @@
+<template>
+    <require from="../../../templates/user/user-template.html"></require>
+
+    <user-template user.bind="currentLoggedUser"></user-template>
+
+    <div class="panel-group">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <strong>Change avatar</strong>
+                </h4>
+            </div>
+            <div class="panel-body">
+                <input type="file" files.bind="avatar"/>
+                <a if.bind="avatar.length != 0" class="btn btn-default" click.delegate="changeAvatar()">Change avatar</a>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <strong>Change password</strong>
+                </h4>
+            </div>
+            <div class="panel-body">
+                test 2
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <strong>Change email</strong>
+                </h4>
+            </div>
+            <div class="panel-body">
+                test 3
+            </div>
+        </div>
+    </div>
+</template>

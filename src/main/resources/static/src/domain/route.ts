@@ -19,6 +19,7 @@ export const TWEET_GET_ALL = (page:number, size:number) => `${TWEET_URL}/${page}
 export const TWEET_VOTE_GET_BY_ID = (tweetId:number) => `${TWEET_BY_ID(tweetId)}/vote`;
 export const TWEET_VOTE = `${TWEET_URL}/vote`;
 export const COMMENT_VOTE = `${COMMENT_URL}/vote`;
+export const CHANGE_USER_AVATAR = (userId:number) => `${USER_BY_ID(userId)}/avatar`;
 export const TWEET_FAVOURITE = (tweetId:number | string) =>`${USER_URL}/favourites/${tweetId}`;
 export const USER_FAVOURITE_TWEETS = (userId:number, page:number, size:number) => `${USER_URL}/${userId}/favourites/${page}/${size}`;
 export const COMMENTS_FROM_TWEET = (tweetId:number, page:number, size:number) => `${TWEET_BY_ID(tweetId)}/comment/${page}/${size}`;

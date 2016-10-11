@@ -61,6 +61,13 @@ export class App {
                 title: ' Reports',
                 nav: true,
                 settings: {currentUser: this.loggedUser}
+            },
+            {
+                route: 'profile',
+                moduleId: 'pages/users/profile/profile',
+                title: 'Profile',
+                nav: false,
+                settings: {currentUser: this.loggedUser}
             }
         ]);
         this.router = router;
