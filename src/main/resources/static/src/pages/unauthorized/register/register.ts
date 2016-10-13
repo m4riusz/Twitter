@@ -16,7 +16,7 @@ export class Register {
     passwordConfirm:string;
     email:string;
     emailConfirm:string;
-    gender:Models.Gender;
+    gender:string;
 
     constructor(authService:IAuthService) {
         this.authService = authService;

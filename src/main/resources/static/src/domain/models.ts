@@ -4,12 +4,6 @@
 
 module Models {
 
-    export enum Gender{
-        MALE,
-        FEMALE,
-        UNDEFINED
-    }
-
     export interface AbstractEntity {
         id:number;
         createDate:string;
@@ -23,7 +17,7 @@ module Models {
         owner:User;
         votes:UserVote[];
         reports:Report[];
-        loggedUserVote:Vote;
+        loggedUserVote:'UP'|'DOWN'|'NONE';
     }
 
     export interface AccountStatus extends AbstractEntity {
@@ -67,11 +61,6 @@ module Models {
         GUILTY
     }
 
-    export enum Role{
-        USER,
-        ADMIN,
-        MODERATOR
-    }
 
     export interface Tag extends AbstractEntity {
         text:string;
@@ -87,8 +76,8 @@ module Models {
         avatar:Avatar;
         username:string;
         email:string;
-        role:Role;
-        gender:Gender;
+        role:'USER' | 'ADMIN' | 'MODERATOR';
+        gender:'MALE' | 'FEMALE' | 'UNDEFINED';
         accountStatus:AccountStatus;
         reports:Report[];
         tweets:Tweet[];
@@ -99,14 +88,8 @@ module Models {
     }
 
     export interface UserVote extends AbstractEntity {
-        vote:Vote;
+        vote:'UP' |'DOWN';
         user:User;
         abstractPost:AbstractPost;
-    }
-
-    export enum Vote{
-        UP,
-        DOWN,
-        NONE
     }
 }

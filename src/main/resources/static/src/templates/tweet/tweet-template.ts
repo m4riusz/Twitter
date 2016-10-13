@@ -3,12 +3,10 @@ import {inject} from "aurelia-framework";
 import {ITweetService, TweetService} from "../../service/tweetService";
 import {IReportService, ReportService} from "../../service/reportService";
 import {DialogService} from "aurelia-dialog";
-import {Router} from "aurelia-router";
 import {ReportModal} from "../report/report-modal";
 import User = Models.User;
 import Tweet = Models.Tweet;
 import Report = Models.Report;
-import Vote = Models.Vote;
 /**
  * Created by mariusz on 03.09.16.
  */
@@ -32,7 +30,7 @@ export class TweetTemplate {
         this.tweetService.deleteTweet(tweetId).then(()=> this.updateTweet(tweetId));
     }
 
-    voteOnTweet(tweetId:number, vote:Vote) {
+    voteOnTweet(tweetId:number, vote:'UP'|'DOWN') {
         this.tweetService.voteTweet(tweetId, vote).then((vote)=> this.setTweetVote(vote));
     }
 

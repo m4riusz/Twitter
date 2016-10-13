@@ -11,7 +11,7 @@ import {Const} from "../domain/const";
 export interface IAuthService {
     isTokenValid(token:string):Promise<boolean>;
     login(username:string, password:string):Promise<string>;
-    register(username:string, password:string, email:string, gender:Models.Gender):Promise<string>;
+    register(username:string, password:string, email:string, gender:string):Promise<string>;
 }
 
 @inject(HttpClient)
@@ -45,7 +45,7 @@ export class AuthService extends BasicService implements IAuthService {
         });
     }
 
-    public register(username:string, password:string, email:string, gender:Models.Gender):Promise<string> {
+    public register(username:string, password:string, email:string, gender:string):Promise<string> {
         return new Promise<string>((resolve, reject) => {
             this.httpClient
                 .fetch(BASE_URL + REGISTER, {

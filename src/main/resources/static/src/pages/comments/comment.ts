@@ -3,7 +3,6 @@ import {TweetService, ITweetService} from "../../service/tweetService";
 import {CommentService, ICommentService} from "../../service/commentService";
 import {Const} from "../../domain/const";
 import User = Models.User;
-import Vote = Models.Vote;
 import Tweet = Models.Tweet;
 import AbstractPost = Models.AbstractPost;
 import Report = Models.Report;

@@ -1,5 +1,5 @@
 import {inject} from "aurelia-dependency-injection";
-import {HttpClient} from "aurelia-fetch-client";
+import {HttpClient, json} from "aurelia-fetch-client";
 import {Const} from "../domain/const";
 import {
     BASE_URL,
@@ -28,6 +28,7 @@ export interface IUserService {
     getUserFollowersCount(userId:number):Promise<number>;
     getUserFollowingUsers(userId:number, page:number, size:number):Promise<User[]>;
     getUserFollowingUsersCount(userId:number):Promise<number>;
+    changeUserRole(userId:number, role:'USER'|'MODERATOR'|'ADMIN'):Promise<'USER'|'MODERATOR'|'ROLE'>;
 
 }
 
@@ -161,6 +162,22 @@ export class UserService extends BasicService implements IUserService {
             })
                 .then(response => response.json())
                 .then(count => resolve(count));
+        });
+    }
+
+    changeUserRole(userId:number, role:'USER'|'MODERATOR'|'ADMIN'):Promise<'USER'|'MODERATOR'|'ROLE'> {
+        return new Promise<'USER'|'MODERATOR'|'ROLE'>((resolve, reject)=> {
+            this.httpClient.fetch(BASE_URL + USER_BY_ID(userId), {
+                method: 'put',
+                body: json(role),
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => response.json())
+                .then((user:User)=> {
+                    resolve(user.role);
+                })
         });
     }
     

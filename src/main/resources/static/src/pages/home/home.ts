@@ -3,7 +3,6 @@ import {RouteConfig} from "aurelia-router";
 import {TweetService, ITweetService} from "../../service/tweetService";
 import {Const} from "../../domain/const";
 import Tweet = Models.Tweet;
-import Vote = Models.Vote;
 import User = Models.User;
 import Report = Models.Report;
 

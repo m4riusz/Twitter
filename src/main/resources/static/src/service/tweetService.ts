@@ -15,7 +15,6 @@ import {
 import {BasicService} from "./basicService";
 import Tweet = Models.Tweet;
 import UserVote =Models.UserVote;
-import Vote = Models.Vote;
 
 /**
  * Created by mariusz on 01.09.16.
@@ -26,8 +25,8 @@ export interface ITweetService {
     getAllTweets(page:number, size:number):Promise<Tweet[]>;
     deleteTweet(tweetId:number):Promise<{}>;
     getTweetById(tweetId:number):Promise<Tweet>;
-    getCurrentUserTweetVote(tweetId:number):Promise<Vote>;
-    voteTweet(tweetId:number, vote:Vote):Promise<Vote>;
+    getCurrentUserTweetVote(tweetId:number):Promise<'UP'|'DOWN'|'NONE'>;
+    voteTweet(tweetId:number, vote:'UP'|'DOWN'):Promise<'UP'|'DOWN'>;
     deleteVote(tweetId:number):Promise<{}>;
     addTweetToFavourites(tweetId:number):Promise<Tweet>;
     removeTweetFromFavourites(tweetId:number):Promise<{}>;
@@ -114,8 +113,8 @@ export class TweetService extends BasicService implements ITweetService {
         })
     }
 
-    getCurrentUserTweetVote(tweetId:number):Promise<Vote> {
-        return new Promise((resolve, reject) => {
+    getCurrentUserTweetVote(tweetId:number):Promise<'UP'|'DOWN'|'NONE'> {
+        return new Promise<'UP'|'DOWN'|'NONE'>((resolve, reject) => {
             this.httpClient.fetch(BASE_URL + TWEET_VOTE_GET_BY_ID(tweetId), {
                 headers: {
                     [Const.TOKEN_HEADER]: this.authToken
@@ -130,8 +129,8 @@ export class TweetService extends BasicService implements ITweetService {
         })
     }
 
-    voteTweet(tweetId:number, vote:Vote):Promise<Vote> {
-        return new Promise<Vote>((resolve, reject) => {
+    voteTweet(tweetId:number, vote:'UP'|'DOWN'):Promise<'UP'|'DOWN'> {
+        return new Promise<'UP'|'DOWN'>((resolve, reject) => {
             this.httpClient.fetch(BASE_URL + TWEET_VOTE, {
                 method: 'post',
                 body: json({'postId': tweetId, 'vote': vote}),
@@ -265,7 +264,7 @@ export class TweetService extends BasicService implements ITweetService {
     }
 
     private getTweetCurrentUserData(tweet:Tweet) {
-        this.getCurrentUserTweetVote(tweet.id).then((vote:Vote) => tweet.loggedUserVote = vote);
+        this.getCurrentUserTweetVote(tweet.id).then((vote:'UP'|'DOWN'|'NONE') => tweet.loggedUserVote = vote);
         this.tweetBelongsToUsersFavourites(tweet.id).then((favourite:boolean) => tweet.favourite = favourite);
     }
 }

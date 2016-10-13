@@ -11,7 +11,6 @@ import {
     COMMENT_URL
 } from "../domain/route";
 import Comment = Models.Comment;
-import Vote = Models.Vote;
 import UserVote = Models.UserVote;
 
 /**
@@ -21,8 +20,8 @@ import UserVote = Models.UserVote;
 export interface ICommentService {
     deleteComment(tweetId:number):Promise<{}>;
     getTweetComments(tweetId:number, page:number, size:number):Promise<Comment[]>;
-    getCurrentUserCommentVote(commentId:number):Promise<Vote>;
-    voteComment(commentId:number, vote:Vote):Promise<Vote>;
+    getCurrentUserCommentVote(commentId:number):Promise<'UP'|'DOWN'|'NONE'>;
+    voteComment(commentId:number, vote:'UP'|'DOWN'):Promise<'UP'|'DOWN'>;
     deleteCommentVote(commentId:number):Promise<{}>;
     getCommentById(commentId:number):Promise<Comment>;
     commentTweet(comment:Comment):Promise<Comment>;
@@ -70,8 +69,8 @@ export class CommentService extends BasicService implements ICommentService {
         });
     }
 
-    getCurrentUserCommentVote(commentId:number):Promise<Vote> {
-        return new Promise<Vote>((resolve, reject) => {
+    getCurrentUserCommentVote(commentId:number):Promise<'UP'|'DOWN'|'NONE'> {
+        return new Promise<'UP'|'DOWN'|'NONE'>((resolve, reject) => {
             this.httpClient.fetch(BASE_URL + COMMENT_VOTE_BY_ID(commentId), {
                 headers: {
                     [Const.TOKEN_HEADER]: this.authToken
@@ -86,8 +85,8 @@ export class CommentService extends BasicService implements ICommentService {
         })
     }
 
-    voteComment(commentId:number, vote:Vote):Promise<Vote> {
-        return new Promise<Vote>((resolve, reject) => {
+    voteComment(commentId:number, vote:'UP'|'DOWN'):Promise<'UP'|'DOWN'> {
+        return new Promise<'UP'|'DOWN'>((resolve, reject) => {
             this.httpClient.fetch(BASE_URL + COMMENT_VOTE, {
                 method: 'post',
                 body: json({'postId': commentId, 'vote': vote}),
@@ -162,6 +161,6 @@ export class CommentService extends BasicService implements ICommentService {
     }
 
     private getCommentCurrentUserData(comment:Comment) {
-        this.getCurrentUserCommentVote(comment.id).then((vote:Vote) => comment.loggedUserVote = vote);
+        this.getCurrentUserCommentVote(comment.id).then((vote) => comment.loggedUserVote = vote);
     }
 }

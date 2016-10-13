@@ -8,7 +8,6 @@ import {ReportModal} from "../report/report-modal";
 import Comment = Models.Comment;
 import Tweet = Models.Tweet;
 import User = Models.User;
-import Vote = Models.Vote;
 import Report = Models.Report;
 /**
  * Created by mariusz on 15.09.16.
@@ -36,8 +35,8 @@ export class CommentTemplate {
         this.commentService.deleteComment(commentId).then(() => this.updateComment(commentId));
     }
 
-    voteOnComment(commentId:number, vote:Vote) {
-        this.commentService.voteComment(commentId, vote).then((vote:Vote) => this.setCommentVote(vote));
+    voteOnComment(commentId:number, vote:'UP'|'DOWN') {
+        this.commentService.voteComment(commentId, vote).then((vote:'UP'|'DOWN') => this.setCommentVote(vote));
     }
 
     deleteCommentVote(commentId:number) {
@@ -65,7 +64,7 @@ export class CommentTemplate {
         })
     }
 
-    private setCommentVote(vote:Vote) {
+    private setCommentVote(vote:'UP'|'DOWN'|'NONE') {
         this.comment.loggedUserVote = vote;
     }
 

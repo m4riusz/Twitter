@@ -24,7 +24,6 @@ export class ReportJudge {
     }
 
     activate(report) {
-        console.log(report);
         this.category = report.category;
         this.message = report.message;
         this.postContent = report.abstractPost.content;
