@@ -1,6 +1,11 @@
 package com.twitter.controller;
 
-import com.twitter.model.*;
+import com.twitter.dto.EmailChange;
+import com.twitter.dto.RoleChange;
+import com.twitter.model.Avatar;
+import com.twitter.model.Password;
+import com.twitter.model.Tag;
+import com.twitter.model.User;
 import com.twitter.route.Route;
 import com.twitter.service.TagService;
 import com.twitter.service.UserService;
@@ -60,14 +65,19 @@ public class UserController {
         return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
     }
 
-    @RequestMapping(value = Route.USER_BY_ID, method = RequestMethod.PUT)
-    public ResponseEntity<User> updateUserById(@PathVariable long userId, @RequestBody Password password) {
+    @RequestMapping(value = Route.USER_PASSWORD_CHANGE, method = RequestMethod.PUT)
+    public ResponseEntity<User> changeUserPassword(@PathVariable long userId, @RequestBody @Valid Password password) {
         return new ResponseEntity<>(userService.changeUserPasswordById(userId, password.getPassword()), HttpStatus.OK);
     }
 
-    @RequestMapping(value = Route.USER_BY_ID, method = RequestMethod.PUT, params = "role")
-    public ResponseEntity<User> changeUserRole(@PathVariable long userId, @RequestParam Role role) {
-        return new ResponseEntity<>(userService.changeUserRole(userId, role), HttpStatus.OK);
+    @RequestMapping(value = Route.USER_ROLE_CHANGE, method = RequestMethod.PUT)
+    public ResponseEntity<User> changeUserRole(@PathVariable long userId, @RequestBody @Valid RoleChange role) {
+        return new ResponseEntity<>(userService.changeUserRole(userId, role.getRole()), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = Route.USER_EMAIL_CHANGE, method = RequestMethod.PUT)
+    public ResponseEntity<User> changeUserRole(@PathVariable long userId, @RequestBody @Valid EmailChange emailChange) {
+        return new ResponseEntity<>(userService.changeUserEmail(userId, emailChange.getEmail()), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.USER_BY_ID, method = RequestMethod.DELETE)

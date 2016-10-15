@@ -35,6 +35,10 @@ public final class Route {
     private static final String FAVOURITES = "/favourites";
     private static final String TAGS = "/tags";
     private static final String HOURS = "/{hours}";
+    private static final String PASSWORD = "/password";
+    private static final String ROLE = "/role";
+    private static final String EMAIL = "/email";
+
 
     public static final String LOGIN_URL = API + "/login";
     public static final String LOGOUT_URL = API + "/logout";
@@ -44,6 +48,9 @@ public final class Route {
 
     public static final String USER_URL = API + USER;
     public static final String USER_BY_ID = USER_URL + USER_ID;
+    public static final String USER_PASSWORD_CHANGE = USER_URL + USER_ID + PASSWORD;
+    public static final String USER_ROLE_CHANGE = USER_URL + USER_ID + ROLE;
+    public static final String USER_EMAIL_CHANGE = USER_BY_ID + EMAIL;
     public static final String USER_FOLLOW = USER_URL + FOLLOW + USER_ID;
     public static final String USER_GET_ALL = USER_URL + PAGE + SIZE;
     public static final String USER_COUNT_GET_ALL = USER_URL + COUNT;

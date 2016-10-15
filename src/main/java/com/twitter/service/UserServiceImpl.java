@@ -200,6 +200,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User changeUserEmail(long userId, String email) {
+        User user = getUserById(userId);
+        User userByEmail = userDao.findByEmail(email);
+        if (userByEmail != null) {
+            throw new UserException(MessageUtil.USER_ALREADY_EXISTS_EMAIL_ERROR_MSG);
+        }
+        user.setEmail(email);
+        sendEmail(user.getEmail(), MessageUtil.EMAIL_FROM, MessageUtil.EMAIL_SUBJECT, "You have changed email!");
+        return user;
+    }
+
+    @Override
     public void activateAccount(String verifyKey) {
         User user = userDao.findOneByAccountStatusVerifyKey(verifyKey);
         if (userIsNotActivated(user)) {

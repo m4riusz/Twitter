@@ -1,5 +1,6 @@
 package com.twitter.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.Length;
 import org.joda.time.DateTime;
 
@@ -19,6 +20,7 @@ public class Password extends AbstractEntity {
     )
     private String password;
     @NotNull
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date passwordExpireDate;
 
     public Password() {
