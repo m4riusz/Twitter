@@ -13,10 +13,13 @@ export class User {
     currentLoggedUser:Models.User;
     router:Router;
     followed:boolean;
+    role:string;
+    roles:string[];
     private userService:IUserService;
     private tweetService:ITweetService;
 
     constructor(userService:IUserService, tweetService:ITweetService) {
+        this.roles = ['USER', 'ADMIN', 'MODERATOR'];
         this.userService = userService;
         this.tweetService = tweetService;
     }
@@ -27,6 +30,16 @@ export class User {
             this.userService.getUserById(userId),
             this.userService.isFollowed(userId)
         ]);
+        this.role = this.user.role;
+    }
+
+    async changeUserRole() {
+        try {
+            this.role = await this.userService.changeUserRole(this.user.id, this.role);
+            alert("Success!");
+        } catch (error) {
+            alert(error);
+        }
     }
 
     async followUser(userId:number) {

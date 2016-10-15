@@ -22,7 +22,29 @@
                 </h4>
             </div>
             <div class="panel-body">
-                test 2
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="newPassword" class="col-sm-2 control-label">New password</label>
+                        <div class="col-sm-10">
+                            <input type="password" class="form-control" id="newPassword" ref="newPassword"
+                                   placeholder="New password">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reNewPassword" class="col-sm-2 control-label">Repeat new password</label>
+                        <div class="col-sm-10">
+                            <input type="password" class="form-control" id="reNewPassword" ref="reNewPassword"
+                                   placeholder="Repeat new password">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <a class="btn btn-default"
+                               click.delegate="changePassword(newPassword.value,reNewPassword.value)">Change
+                                password</a>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
         <div class="panel panel-default">
@@ -32,7 +54,28 @@
                 </h4>
             </div>
             <div class="panel-body">
-                test 3
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="newEmail" class="col-sm-2 control-label">New email</label>
+                        <div class="col-sm-10">
+                            <input type="email" class="form-control" id="newEmail" ref="newEmail"
+                                   placeholder="New email">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reNewEmail" class="col-sm-2 control-label">Repeat new email</label>
+                        <div class="col-sm-10">
+                            <input type="email" class="form-control" id="reNewEmail" ref="reNewEmail"
+                                   placeholder="Repeat new email">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <a class="btn btn-default"
+                               click.delegate="changeEmail(newEmail.value,reNewEmail.value)">Change email</a>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

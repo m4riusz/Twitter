@@ -9,7 +9,9 @@ import {
     USER_FOLLOWERS,
     USER_FOLLOWERS_COUNT,
     USER_FOLLOWING,
-    USER_FOLLOWING_COUNT
+    USER_FOLLOWING_COUNT,
+    USER_CHANGE_ROLE,
+    USER_CHANGE_PASSWORD
 } from "../domain/route";
 import {BasicService} from "./basicService";
 import User = Models.User;
@@ -167,16 +169,19 @@ export class UserService extends BasicService implements IUserService {
 
     changeUserRole(userId:number, role:'USER'|'MODERATOR'|'ADMIN'):Promise<'USER'|'MODERATOR'|'ROLE'> {
         return new Promise<'USER'|'MODERATOR'|'ROLE'>((resolve, reject)=> {
-            this.httpClient.fetch(BASE_URL + USER_BY_ID(userId), {
+            this.httpClient.fetch(BASE_URL + USER_CHANGE_ROLE(userId), {
                 method: 'put',
-                body: json(role),
+                body: json({role: role}),
                 headers: {
                     [Const.TOKEN_HEADER]: this.authToken
                 }
             })
-                .then(response => response.json())
-                .then((user:User)=> {
-                    resolve(user.role);
+                .then(response => {
+                    if (response.ok) {
+                        response.json().then(data => resolve(data.role));
+                    } else {
+                        response.json().then(data => reject(data.message));
+                    }
                 })
         });
     }

@@ -32,5 +32,33 @@ export class Profile {
             ).then(avatar => this.currentLoggedUser.avatar = avatar, error => alert(error))
         };
     };
+
+    async changePassword(password:string, rePassword:string) {
+        try {
+            if (password === rePassword) {
+                await this.profileService.changeUserPassword(this.currentLoggedUser.id, password);
+                alert("You have changed password!");
+            } else {
+                alert("Passwords aren't equal!");
+            }
+        } catch (error) {
+            alert(error);
+        }
+    }
+
+    async changeEmail(email:string, reEmail:string) {
+        try {
+            if (email === reEmail) {
+                await this.profileService.changeUserEmail(this.currentLoggedUser.id, email);
+                this.currentLoggedUser.email = email;
+                alert("You have changed email!");
+            } else {
+                alert("Emails aren't equal!");
+            }
+        } catch (error) {
+            alert(error);
+        }
+    }
+    
 }
 

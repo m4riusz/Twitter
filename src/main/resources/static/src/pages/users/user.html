@@ -3,6 +3,13 @@
     <require from='../../templates/user/user-template.html'></require>
 
     <user-template user.bind="user"></user-template>
+    <div if.bind="currentLoggedUser.role == 'ADMIN'" class="form-inline">
+        <strong>Change user role: </strong>
+        <select class="form-control" value.bind="role">
+            <option repeat.for="current of roles">${current}</option>
+        </select>
+        <a click.delegate="changeUserRole()" class="btn btn-default">Change</a>
+    </div>
 
     <div class="btn-group">
         <a class="btn btn-primary" if.bind="followed == false" click.delegate="followUser(user.id)">
