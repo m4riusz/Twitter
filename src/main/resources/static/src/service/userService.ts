@@ -30,7 +30,7 @@ export interface IUserService {
     getUserFollowersCount(userId:number):Promise<number>;
     getUserFollowingUsers(userId:number, page:number, size:number):Promise<User[]>;
     getUserFollowingUsersCount(userId:number):Promise<number>;
-    changeUserRole(userId:number, role:'USER'|'MODERATOR'|'ADMIN'):Promise<'USER'|'MODERATOR'|'ROLE'>;
+    changeUserRole(userId:number, role:'USER'|'MODERATOR'|'ADMIN'):Promise<'USER'|'MODERATOR'|'ADMIN'>;
 
 }
 
@@ -167,8 +167,8 @@ export class UserService extends BasicService implements IUserService {
         });
     }
 
-    changeUserRole(userId:number, role:'USER'|'MODERATOR'|'ADMIN'):Promise<'USER'|'MODERATOR'|'ROLE'> {
-        return new Promise<'USER'|'MODERATOR'|'ROLE'>((resolve, reject)=> {
+    changeUserRole(userId:number, role:'USER'|'MODERATOR'|'ADMIN'):Promise<'USER'|'MODERATOR'|'ADMIN'> {
+        return new Promise<'USER'|'MODERATOR'|'ADMIN'>((resolve, reject)=> {
             this.httpClient.fetch(BASE_URL + USER_CHANGE_ROLE(userId), {
                 method: 'put',
                 body: json({role: role}),

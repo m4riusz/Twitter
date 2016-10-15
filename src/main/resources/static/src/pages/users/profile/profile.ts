@@ -1,18 +1,21 @@
 import User = Models.User;
 import {IProfileService, ProfileService} from "../../../service/profileService";
 import {inject} from "aurelia-framework";
+
+
 /**
  * Created by mariusz on 10.10.16.
  */
 
 @inject(ProfileService)
 export class Profile {
-    avatar:any[];
     currentLoggedUser:User;
+    selectedFiles:any[];
+    image:any;
     private profileService:IProfileService;
 
     constructor(profileService:IProfileService) {
-        this.avatar = [];
+        this.selectedFiles = [];
         this.profileService = profileService;
     }
 
@@ -20,17 +23,25 @@ export class Profile {
         this.currentLoggedUser = config.settings.currentUser;
     }
 
+    openFile() {
+        document.getElementById("fileInput").click();
+    }
+
     changeAvatar() {
+        this.image = this.selectedFiles[0];
         let reader = new FileReader();
-        reader.readAsBinaryString(this.avatar[0]);
-        reader.onload = () => {
-            this.profileService.changeUserAvatar(
-                this.currentLoggedUser.id, {
-                    fileName: this.avatar[0].name,
-                    bytes: reader.readAsDataURL(this.avatar[0])
-                }
-            ).then(avatar => this.currentLoggedUser.avatar = avatar, error => alert(error))
+
+        reader.onload = (event)=> {
+            this.profileService.changeUserAvatar(this.currentLoggedUser.id, {
+                fileName: this.image.name,
+                bytes: event.target.result
+            })
+                .then(avatar => {
+                    this.currentLoggedUser.avatar = avatar;
+                    this.image = "";
+                }, error => alert(error));
         };
+        reader.readAsDataURL(this.image);
     };
 
     async changePassword(password:string, rePassword:string) {
@@ -59,6 +70,7 @@ export class Profile {
             alert(error);
         }
     }
-    
+
+
 }
 

@@ -28,6 +28,7 @@ export class ProfileService extends BasicService implements IProfileService {
 
     changeUserAvatar(userId:number, avatar:Avatar):Promise<Avatar> {
         return new Promise<Avatar>((resolve, reject)=> {
+            avatar.bytes = avatar.bytes.replace(/^data:image\/(png|jpg|jpeg);base64,/, '');
             this.httpClient.fetch(BASE_URL + CHANGE_USER_AVATAR(userId), {
                 method: 'put',
                 body: json(avatar),

@@ -13,8 +13,8 @@ export class User {
     currentLoggedUser:Models.User;
     router:Router;
     followed:boolean;
-    role:string;
-    roles:string[];
+    role:'USER'|'ADMIN'|'MODERATOR';
+    roles:('USER'|'ADMIN'|'MODERATOR')[];
     private userService:IUserService;
     private tweetService:ITweetService;
 
@@ -36,7 +36,6 @@ export class User {
     async changeUserRole() {
         try {
             this.role = await this.userService.changeUserRole(this.user.id, this.role);
-            alert("Success!");
         } catch (error) {
             alert(error);
         }

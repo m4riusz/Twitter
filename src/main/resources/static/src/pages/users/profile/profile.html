@@ -1,6 +1,5 @@
 <template>
     <require from="../../../templates/user/user-template.html"></require>
-
     <user-template user.bind="currentLoggedUser"></user-template>
 
     <div class="panel-group">
@@ -10,9 +9,21 @@
                     <strong>Change avatar</strong>
                 </h4>
             </div>
+
             <div class="panel-body">
-                <input type="file" files.bind="avatar"/>
-                <a if.bind="avatar.length != 0" class="btn btn-default" click.delegate="changeAvatar()">Change avatar</a>
+
+                <input type="file" id="fileInput" class="file" files.bind="selectedFiles"
+                       accept="image/png, image/jpeg, image/jpg"
+                       style="visibility: hidden; position: absolute;">
+
+                <div class="form-inline">
+                    <label for="file">File:</label>
+                    <input type="email" class="form-control" id="file" disabled value.bind="selectedFiles[0].name">
+                    <a class="btn btn-default" click.delegate="openFile()">Browse</a>
+                    <a if.bind="selectedFiles.length == 1" class="btn btn-default" click.delegate="changeAvatar()">Change
+                        avatar</a>
+                </div>
+
             </div>
         </div>
         <div class="panel panel-default">
