@@ -305,4 +305,10 @@ public class UserServiceSecurityTest {
         userService.isFollowed(TestUtil.ID_ONE);
     }
 
+    @WithCustomMockUser(id = TestUtil.ID_TWO)
+    @Test(expected = AccessDeniedException.class)
+    public void changeUserEmail_wrongUser() throws IOException {
+        userService.changeUserEmail(TestUtil.ID_ONE, "some@email.com");
+    }
+
 }

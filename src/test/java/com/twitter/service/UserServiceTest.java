@@ -561,6 +561,34 @@ public class  UserServiceTest {
         assertThat(followed, is(false));
     }
 
+    @Test(expected = UserNotFoundException.class)
+    public void changeUserEmail_userDoesNotExist() {
+        User user = a(user());
+        when(userDao.exists(user.getId())).thenReturn(false);
+        userService.changeUserEmail(user.getId(), "some@email.com");
+    }
+
+    @Test(expected = UserException.class)
+    public void changeUserEmail_userExistsEmailIsAlreadyTaken() {
+        User user = a(user());
+        when(userDao.exists(user.getId())).thenReturn(true);
+        when(userDao.findByEmail(anyString())).thenReturn(a(user()));
+        userService.changeUserEmail(user.getId(), "some@email.com");
+    }
+
+    @Test
+    public void changeUserEmail_userExistsEmailIsFree() {
+        String newEmail = "myNew@email.com";
+        String oldEmail = "old@email.com";
+        User user = a(user().withEmail(oldEmail));
+        when(userDao.exists(user.getId())).thenReturn(true);
+        when(userDao.findOne(user.getId())).thenReturn(user);
+        when(userDao.findByEmail(anyString())).thenReturn(null);
+        userService.changeUserEmail(user.getId(), newEmail);
+        assertThat(user.getEmail(), is(newEmail));
+        verify(javaMailSender, times(1)).send(any(SimpleMailMessage.class));
+    }
+
 }
 
 
