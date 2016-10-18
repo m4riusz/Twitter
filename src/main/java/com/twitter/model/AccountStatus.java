@@ -1,6 +1,10 @@
 package com.twitter.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.istack.internal.Nullable;
+import com.twitter.util.MessageUtil;
 
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
@@ -13,14 +17,21 @@ import java.util.Date;
 public class AccountStatus extends AbstractEntity {
 
     @NotNull
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private boolean enable;
     @Nullable
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonFormat(pattern = MessageUtil.DATE_FORMAT)
     private Date enableDate;
     @Nullable
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonFormat(pattern = MessageUtil.DATE_FORMAT)
     private Date bannedUntil;
     @NotNull
+    @JsonIgnore
     private String verifyKey;
     @NotNull
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private boolean deleted;
 
     public AccountStatus(boolean enable, String verifyKey) {

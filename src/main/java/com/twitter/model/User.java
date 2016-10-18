@@ -45,7 +45,6 @@ public class User extends AbstractEntity implements UserDetails {
     private Gender gender;
     @NotNull
     @OneToOne(cascade = CascadeType.ALL)
-    @JsonIgnore
     private AccountStatus accountStatus;
     @NotNull
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")

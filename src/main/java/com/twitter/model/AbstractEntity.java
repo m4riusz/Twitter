@@ -2,6 +2,7 @@ package com.twitter.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.twitter.util.MessageUtil;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
@@ -22,7 +23,7 @@ public abstract class AbstractEntity implements Serializable {
 
     @NotNull
     @CreatedDate
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm")
+    @JsonFormat(pattern= MessageUtil.DATE_FORMAT)
     private Date createDate;
 
     @Version
