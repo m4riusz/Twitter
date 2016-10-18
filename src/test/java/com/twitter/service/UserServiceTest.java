@@ -18,6 +18,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -432,7 +433,7 @@ public class  UserServiceTest {
     @Test(expected = UserNotFoundException.class)
     public void changeUserRole_userDoesNotExist() {
         when(userDao.findOne(anyLong())).thenReturn(null);
-        userService.changeUserRole(1L, Role.MOD);
+        userService.changeUserRole(1L, Role.MODERATOR);
     }
 
     @Test
@@ -440,8 +441,8 @@ public class  UserServiceTest {
         User user = a(user().withRole(Role.USER));
         when(userDao.exists(anyLong())).thenReturn(true);
         when(userDao.findOne(anyLong())).thenReturn(user);
-        userService.changeUserRole(user.getId(), Role.MOD);
-        assertThat(user.getRole(), is(Role.MOD));
+        userService.changeUserRole(user.getId(), Role.MODERATOR);
+        assertThat(user.getRole(), is(Role.MODERATOR));
     }
 
     @Test(expected = UserNotFoundException.class)
@@ -524,6 +525,40 @@ public class  UserServiceTest {
         Avatar changedUserAvatar = userService.changeUserAvatar(TestUtil.ID_ONE, user.getAvatar());
         assertThat(changedUserAvatar.getFileName(), is(newFileName));
         assertThat(changedUserAvatar.getBytes().length, is(avatarSize));
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void isFollowed_userDoesNotExist() {
+        User loggedUser = a(user().withId(TestUtil.ID_ONE));
+        when(authentication.getPrincipal()).thenReturn(loggedUser);
+        when(userDao.exists(TestUtil.ID_TWO)).thenReturn(false);
+        userService.isFollowed(TestUtil.ID_TWO);
+    }
+
+    @Test
+    public void isFollowed_loggedUserFollowingUser() {
+        User loggedUser = a(user().withId(TestUtil.ID_ONE));
+        User user = a(user().withId(TestUtil.ID_ONE));
+        when(authentication.getPrincipal()).thenReturn(loggedUser);
+        when(userDao.exists(user.getId())).thenReturn(true);
+        when(userDao.exists(loggedUser.getId())).thenReturn(true);
+        when(userDao.findOne(user.getId())).thenReturn(user);
+        when(userDao.findFollowingByUserId(loggedUser.getId(), new PageRequest(0, Integer.MAX_VALUE))).thenReturn(aListWith(user));
+        Boolean followed = userService.isFollowed(user.getId());
+        assertThat(followed, is(true));
+    }
+
+    @Test
+    public void isFollowed_loggedUserIsNotFollowingUser() {
+        User loggedUser = a(user().withId(TestUtil.ID_ONE));
+        User user = a(user().withId(TestUtil.ID_ONE));
+        when(authentication.getPrincipal()).thenReturn(loggedUser);
+        when(userDao.exists(user.getId())).thenReturn(true);
+        when(userDao.exists(loggedUser.getId())).thenReturn(true);
+        when(userDao.findOne(user.getId())).thenReturn(user);
+        when(userDao.findFollowingByUserId(loggedUser.getId(), TestUtil.ALL_IN_ONE_PAGE)).thenReturn(emptyList());
+        Boolean followed = userService.isFollowed(user.getId());
+        assertThat(followed, is(false));
     }
 
 }

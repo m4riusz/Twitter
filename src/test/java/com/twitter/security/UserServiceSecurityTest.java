@@ -18,8 +18,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.IOException;
 import java.util.Date;
 
-import static com.twitter.builders.UserBuilder.user;
 import static com.twitter.builders.AvatarBuilder.avatar;
+import static com.twitter.builders.UserBuilder.user;
 import static com.twitter.util.Util.a;
 
 /**
@@ -292,4 +292,17 @@ public class UserServiceSecurityTest {
     public void changeUserAvatar_wrongUser() throws IOException {
         userService.changeUserAvatar(TestUtil.ID_ONE, a(avatar()));
     }
+
+    @WithAnonymousUser
+    @Test(expected = AccessDeniedException.class)
+    public void isFollowed_anonymousAccessDenied() {
+        userService.isFollowed(TestUtil.ID_ONE);
+    }
+
+    @WithMockUser
+    @Test
+    public void isFollowed_userAccessGranted() {
+        userService.isFollowed(TestUtil.ID_ONE);
+    }
+
 }
