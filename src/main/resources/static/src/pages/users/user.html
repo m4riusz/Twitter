@@ -3,22 +3,32 @@
     <require from='../../templates/user/user-template.html'></require>
 
     <user-template user.bind="user"></user-template>
-    <div if.bind="currentLoggedUser.role == 'ADMIN'" class="form-inline">
-        <strong>Change user role: </strong>
-        <select class="form-control" value.bind="role">
-            <option repeat.for="current of roles">${current}</option>
-        </select>
-        <a click.delegate="changeUserRole()" class="btn btn-default">Change</a>
+    <div if.bind="isBanned() && !isDeleted()">
+        </br>
+        <div class="alert alert-danger" role="alert">User banned until: ${user.accountStatus.bannedUntil}</div>
     </div>
-
-    <div class="btn-group">
-        <a class="btn btn-primary" if.bind="followed == false" click.delegate="followUser(user.id)">
-            <i class="glyphicon glyphicon-star-empty"></i> Follow
-        </a>
-        <a class="btn btn-primary" if.bind="followed == true" click.delegate="unfollowUser(user.id)">
-            <i class="glyphicon glyphicon-trash"></i> Unfollow
-        </a>
+    <div if.bind="!isBanned() && isDeleted()">
+        </br>
+        <div class="alert alert-danger" role="alert">Account has been deleted!</div>
+    </div>
+    <div if.bind="!isBanned() && !isDeleted()">
+        <div if.bind="currentLoggedUser.role == 'ADMIN'" class="form-inline">
+            <strong>Change user role: </strong>
+            <select class="form-control" value.bind="role">
+                <option repeat.for="current of roles">${current}</option>
+            </select>
+            <a click.delegate="changeUserRole()" class="btn btn-default">Change</a>
         </div>
+
+        <div class="btn-group">
+            <a class="btn btn-primary" if.bind="followed == false" click.delegate="followUser(user.id)">
+                <i class="glyphicon glyphicon-star-empty"></i> Follow
+            </a>
+            <a class="btn btn-primary" if.bind="followed == true" click.delegate="unfollowUser(user.id)">
+                <i class="glyphicon glyphicon-trash"></i> Unfollow
+            </a>
+        </div>
+    </div>
         <hr>
     <div class="btn-group">
         <a repeat.for="item of router.navigation" href.bind="item.href" class="btn btn-default">${item.title}</a>

@@ -33,6 +33,14 @@ export class User {
         this.role = this.user.role;
     }
 
+    public isBanned(){
+        return this.user.accountStatus.bannedUntil != null;
+    }
+
+    public isDeleted(){
+        return this.user.accountStatus.deleted;
+    }
+
     async changeUserRole() {
         try {
             this.role = await this.userService.changeUserRole(this.user.id, this.role);
