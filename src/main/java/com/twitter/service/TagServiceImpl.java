@@ -62,16 +62,24 @@ public class TagServiceImpl implements TagService {
     @Override
     public List<Tag> getTagsFromText(String content) {
         List<Tag> rawTags = tagExtractor.extract(content);
-        List<Tag> tagList = new ArrayList<>();
+        return udpdateTags(rawTags);
+    }
 
-        for (Tag tag : rawTags) {
+    @Override
+    public List<Tag> updateTagIds(List<Tag> tagList) {
+        return udpdateTags(tagList);
+    }
+
+    private List<Tag> udpdateTags(List<Tag> tagList) {
+        List<Tag> tags = new ArrayList<>();
+        for (Tag tag : tagList) {
             Tag currentTag = tagDao.findByText(tag.getText());
             if (currentTag != null) {
-                tagList.add(currentTag);
+                tags.add(currentTag);
                 continue;
             }
-            tagList.add(tag);
+            tags.add(tag);
         }
-        return tagList;
+        return tags;
     }
 }
