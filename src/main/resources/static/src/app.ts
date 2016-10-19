@@ -68,6 +68,13 @@ export class App {
                 title: 'Profile',
                 nav: false,
                 settings: {currentUser: this.loggedUser}
+            },
+            {
+                route: 'tags/:tagNames',
+                moduleId: 'pages/tags/tag',
+                title: 'Tag',
+                nav: false,
+                settings: {currentUser: this.loggedUser}
             }
         ]);
         this.router = router;

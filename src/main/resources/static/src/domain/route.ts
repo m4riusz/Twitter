@@ -1,3 +1,4 @@
+import Tag = Models.Tag;
 /**
  * Created by mariusz on 30.08.16.
  */
@@ -10,6 +11,7 @@ export const LOGIN = `/api/login`;
 export const TWEET_URL = `/api/tweet`;
 export const COMMENT_URL = `/api/comment`;
 export const REPORT_URL = `/api/report`;
+export const TAG_URL = `/api/tweet/tags`;
 export const USER_BY_ID = (userId:number) => `${USER_URL}/${userId}`;
 export const USER_CHANGE_PASSWORD = (userId:number) => `${USER_BY_ID(userId)}/password`;
 export const USER_CHANGE_ROLE = (userId:number) => `${USER_BY_ID(userId)}/role`;
@@ -38,3 +40,4 @@ export const REPORTS_LATEST = (page:number, size:number) => `${REPORT_URL}/lates
 export const REPORTS_CATEGORY = (category:string, page:number, size:number) => `${REPORT_URL}/category/${category}/${page}/${size}`;
 export const REPORTS_STATUS = (status:string, page:number, size:number) => `${REPORT_URL}/status/${status}/${page}/${size}`;
 export const REPORTS_BY_STATUS_AND_CATEGORY = (status:string, category:string, page:number, size:number) => `${REPORT_URL}/status/${status}/category/${category}/${page}/${size}`;
+export const TWEETS_BY_TAGS = (tags:string[], page:number, size:number) => `${TAG_URL}/${tags.join(',')}/${page}/${size}`;
