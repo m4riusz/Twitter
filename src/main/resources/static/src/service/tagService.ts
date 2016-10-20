@@ -33,7 +33,9 @@ export class TagService extends BasicService implements ITagService {
                 }
             })
                 .then(response => response.json())
-                .then(data => resolve(data))
+                .then((data:Tweet[]) => {
+                    resolve(data);
+                })
         });
     }
 

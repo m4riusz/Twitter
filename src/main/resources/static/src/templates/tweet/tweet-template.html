@@ -25,7 +25,7 @@
                 <div class="media-heading">
                     <i class=" glyphicon glyphicon-send"></i> ${tweet.createDate}
                 </div>
-                ${tweet.content}
+                <div innerHTML.bind="tweet.content">${tweet.content}</div>
             </div>
         </div>
         <br>

@@ -266,5 +266,10 @@ export class TweetService extends BasicService implements ITweetService {
     private getTweetCurrentUserData(tweet:Tweet) {
         this.getCurrentUserTweetVote(tweet.id).then((vote:'UP'|'DOWN'|'NONE') => tweet.loggedUserVote = vote);
         this.tweetBelongsToUsersFavourites(tweet.id).then((favourite:boolean) => tweet.favourite = favourite);
+        this.addTagsInText(tweet);
+    }
+
+    private addTagsInText(tweet:Tweet) {
+        tweet.content = tweet.content.replace(/\#([a-zA-Z0-9]+)/g, "<a class='label label-info' href='#/tags/$1'>#$1</a>");
     }
 }

@@ -27,7 +27,6 @@ export class Home {
         this.tweets = await this.tweetService.getAllTweets(this.page, Const.PAGE_SIZE);
     }
 
-
     async nextPage() {
         try {
             this.page = ++this.page;
