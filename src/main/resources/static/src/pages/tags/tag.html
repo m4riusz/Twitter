@@ -1,5 +1,15 @@
 <template>
-    <ul>
-        <li repeat.for="tag of tags">${tag.text}</li>
-    </ul>
+    <require from='../../templates/tweet/tweet-template'></require>
+    <div class="alert alert-info">
+        <strong>Tags: </strong>
+        <a repeat.for="tag of tags" href="#/tags/${tag.text}" class="label label-info">#${tag.text}</a>
+    </div>
+
+    <hr>
+    <div repeat.for="tweet of tweets">
+        <tweet-template tweet.bind="tweet" current-user.bind="currentLoggedUser"></tweet-template>
+    </div>
+    <div class="well well-sm text-center" click.delegate="nextPage()">
+        <h3 class="h3">More</h3>
+    </div>
 </template>

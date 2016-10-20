@@ -12,9 +12,9 @@ import Tweet = Models.Tweet;
 export class TagView {
 
     tags:Tag[];
+    tweets:Tweet[];
     private page:number;
     private currentLoggedUser:User;
-    private tweets:Tweet[];
     private tagService:ITagService;
 
     constructor(tagService:ITagService) {
@@ -29,8 +29,16 @@ export class TagView {
         });
         this.currentLoggedUser = config.settings.currentUser;
         this.tweets = await this.tagService.getTweetsByTags(this.tags, this.page, Const.PAGE_SIZE);
-        console.log(this.tweets);
     }
 
+    async nextPage() {
+        try {
+            this.page = ++this.page;
+            let nextTweetPage = await this.tagService.getTweetsByTags(this.tags, this.page, Const.PAGE_SIZE);
+            this.tweets = this.tweets.concat(nextTweetPage);
+        } catch (error) {
+            this.page = --this.page;
+        }
+    }
 
 }
