@@ -267,7 +267,7 @@ public class TweetServiceTest {
 
     @Test
     public void getTweetsByTagsOrderedByNewest_noTags() {
-        when(tweetDao.findDistinctByTagsInOrderByCreateDateDesc(anyListOf(Tag.class), any(Pageable.class))).thenReturn(emptyList());
+        when(tweetDao.findDistinctByTagsTextInOrderByCreateDateDesc(anyListOf(String.class), any(Pageable.class))).thenReturn(emptyList());
         List<Tweet> tweetsByTagsOrderedByNewestResult = tweetService.getTweetsByTagsOrderedByNewest(emptyList(), TestUtil.ALL_IN_ONE_PAGE);
         assertThat(tweetsByTagsOrderedByNewestResult, is(emptyList()));
     }
@@ -277,9 +277,9 @@ public class TweetServiceTest {
         Tag tag = a(tag());
         Tweet tweetOne = a(tweet().withTags(aListWith(tag)));
         Tweet tweetTwo = a(tweet().withTags(aListWith(tag)));
-        when(tweetDao.findDistinctByTagsInOrderByCreateDateDesc(anyListOf(Tag.class), any(Pageable.class)))
+        when(tweetDao.findDistinctByTagsTextInOrderByCreateDateDesc(anyListOf(String.class), any(Pageable.class)))
                 .thenReturn(aListWith(tweetOne, tweetTwo));
-        List<Tweet> tweetsByTagsOrderedByNewestResult = tweetService.getTweetsByTagsOrderedByNewest(aListWith(tag), TestUtil.ALL_IN_ONE_PAGE);
+        List<Tweet> tweetsByTagsOrderedByNewestResult = tweetService.getTweetsByTagsOrderedByNewest(aListWith(tag.getText()), TestUtil.ALL_IN_ONE_PAGE);
         assertThat(tweetsByTagsOrderedByNewestResult, hasItems(tweetOne, tweetTwo));
     }
 
@@ -289,9 +289,9 @@ public class TweetServiceTest {
         Tag tagTwo = a(tag());
         Tweet tweetOne = a(tweet().withTags(aListWith(tagOne)));
         Tweet tweetTwo = a(tweet().withTags(aListWith(tagTwo)));
-        when(tweetDao.findDistinctByTagsInOrderByCreateDateDesc(anyListOf(Tag.class), any(Pageable.class)))
+        when(tweetDao.findDistinctByTagsTextInOrderByCreateDateDesc(anyListOf(String.class), any(Pageable.class)))
                 .thenReturn(aListWith(tweetOne, tweetTwo));
-        List<Tweet> tweetsByTagsOrderedByNewestResult = tweetService.getTweetsByTagsOrderedByNewest(aListWith(tagOne, tagTwo), TestUtil.ALL_IN_ONE_PAGE);
+        List<Tweet> tweetsByTagsOrderedByNewestResult = tweetService.getTweetsByTagsOrderedByNewest(aListWith(tagOne.getText(), tagTwo.getText()), TestUtil.ALL_IN_ONE_PAGE);
         assertThat(tweetsByTagsOrderedByNewestResult, is(aListWith(tweetOne, tweetTwo)));
     }
 
@@ -305,12 +305,12 @@ public class TweetServiceTest {
         Pageable pageOneRequest = new PageRequest(0, 2);
         Pageable pageTwoRequest = new PageRequest(1, 2);
 
-        when(tweetDao.findDistinctByTagsInOrderByCreateDateDesc(aListWith(tagOne), pageOneRequest))
+        when(tweetDao.findDistinctByTagsTextInOrderByCreateDateDesc(aListWith(tagOne.getText()), pageOneRequest))
                 .thenReturn(aListWith(tweetOne, tweetTwo));
-        when(tweetDao.findDistinctByTagsInOrderByCreateDateDesc(aListWith(tagOne), pageTwoRequest))
+        when(tweetDao.findDistinctByTagsTextInOrderByCreateDateDesc(aListWith(tagOne.getText()), pageTwoRequest))
                 .thenReturn(aListWith(tweetThree));
-        List<Tweet> tweetsByTagsOrderedByNewestPageOneResult = tweetService.getTweetsByTagsOrderedByNewest(aListWith(tagOne), pageOneRequest);
-        List<Tweet> tweetsByTagsOrderedByNewestPageTwoResult = tweetService.getTweetsByTagsOrderedByNewest(aListWith(tagOne), pageTwoRequest);
+        List<Tweet> tweetsByTagsOrderedByNewestPageOneResult = tweetService.getTweetsByTagsOrderedByNewest(aListWith(tagOne.getText()), pageOneRequest);
+        List<Tweet> tweetsByTagsOrderedByNewestPageTwoResult = tweetService.getTweetsByTagsOrderedByNewest(aListWith(tagOne.getText()), pageTwoRequest);
         assertThat(tweetsByTagsOrderedByNewestPageOneResult, is(aListWith(tweetOne, tweetTwo)));
         assertThat(tweetsByTagsOrderedByNewestPageTwoResult, is(aListWith(tweetThree)));
     }
