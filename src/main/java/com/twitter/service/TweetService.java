@@ -1,6 +1,5 @@
 package com.twitter.service;
 
-import com.twitter.model.Tag;
 import com.twitter.model.Tweet;
 import com.twitter.util.SecurityUtil;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +23,7 @@ public interface TweetService extends PostService<Tweet> {
 
     List<Tweet> getMostVotedTweets(int hours, Pageable pageable);
 
-    List<Tweet> getTweetsByTagsOrderedByNewest(List<Tag> tagList, Pageable pageable);
+    List<Tweet> getTweetsByTagsOrderedByNewest(List<String> tagList, Pageable pageable);
 
     List<Tweet> getFavouriteTweetsFromUser(long userId, Pageable pageable);
 

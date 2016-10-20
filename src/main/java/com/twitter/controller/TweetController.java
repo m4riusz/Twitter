@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.data.domain.Sort.Direction;
@@ -85,13 +86,7 @@ public class TweetController {
 
     @RequestMapping(value = Route.TWEETS_WITH_TAGS, method = RequestMethod.GET)
     public ResponseEntity<List<Tweet>> getTweetsByTags(@PathVariable String[] tags, @PathVariable int page, @PathVariable int size) {
-        List<Tag> tagList = new ArrayList<>();
-        for (String tag : tags) {
-            Tag current = new Tag(tag);
-            current.setId(0L);
-            tagList.add(current);
-        }
-        return new ResponseEntity<>(tweetService.getTweetsByTagsOrderedByNewest(tagList, new PageRequest(page, size)), HttpStatus.OK);
+        return new ResponseEntity<>(tweetService.getTweetsByTagsOrderedByNewest(Arrays.asList(tags), new PageRequest(page, size)), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.TWEETS_FROM_USER_FAVOURITES, method = RequestMethod.GET)

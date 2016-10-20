@@ -22,7 +22,7 @@ public interface TweetDao extends JpaRepository<Tweet, Long> {
     @Query(value = SELECT_MOST_POPULAR_TWEETS_BY_TIME)
     List<Tweet> findMostPopularByVotes(int hours, Pageable pageable);
 
-    List<Tweet> findDistinctByTagsInOrderByCreateDateDesc(List<Tag> tagList, Pageable pageable);
+    List<Tweet> findDistinctByTagsTextInOrderByCreateDateDesc(List<String> tagList, Pageable pageable);
 
     @Query(value = SELECT_NEWEST_TWEETS_FROM_FOLLOWERS)
     List<Tweet> findTweetsFromFollowingUsers(long userId, Pageable pageable);

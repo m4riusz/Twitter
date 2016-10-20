@@ -71,8 +71,8 @@ public class TweetServiceImpl extends PostServiceImpl<Tweet, TweetDao> implement
     }
 
     @Override
-    public List<Tweet> getTweetsByTagsOrderedByNewest(List<Tag> tagList, Pageable pageable) {
-        return repository.findDistinctByTagsInOrderByCreateDateDesc(tagService.updateTagIds(tagList), pageable);
+    public List<Tweet> getTweetsByTagsOrderedByNewest(List<String> tags, Pageable pageable) {
+        return repository.findDistinctByTagsTextInOrderByCreateDateDesc(tags, pageable);
     }
 
     @Override

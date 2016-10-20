@@ -24,7 +24,4 @@ public interface TagService {
 
     List<Tag> getTagsFromText(String string);
 
-    // TODO: 19.10.16 add tests
-    List<Tag> updateTagIds(List<Tag> tagList);
-
 }
