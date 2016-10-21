@@ -10,11 +10,13 @@ import {
     USER_FAVOURITE_TWEETS,
     TWEET_FAVOURITE,
     TWEET_VOTE,
-    TWEETS_FROM_USER
+    TWEETS_FROM_USER, TWEETS_BY_TAGS
 } from "../domain/route";
 import {BasicService} from "./basicService";
+import {ITweetHelper, TweetHelper} from "./tweetHelper";
 import Tweet = Models.Tweet;
 import UserVote =Models.UserVote;
+import Tag = Models.Tag;
 
 /**
  * Created by mariusz on 01.09.16.
@@ -25,7 +27,6 @@ export interface ITweetService {
     getAllTweets(page:number, size:number):Promise<Tweet[]>;
     deleteTweet(tweetId:number):Promise<{}>;
     getTweetById(tweetId:number):Promise<Tweet>;
-    getCurrentUserTweetVote(tweetId:number):Promise<'UP'|'DOWN'|'NONE'>;
     voteTweet(tweetId:number, vote:'UP'|'DOWN'):Promise<'UP'|'DOWN'>;
     deleteVote(tweetId:number):Promise<{}>;
     addTweetToFavourites(tweetId:number):Promise<Tweet>;
@@ -33,15 +34,18 @@ export interface ITweetService {
     getFavouriteTweetsFrom(userId:number, page:number, size:number):Promise<Tweet[]>;
     send(tweet:Tweet):Promise<Tweet>;
     getTweetsFromUser(userId:number, page:number, size:number):Promise<Tweet[]>;
+    getTweetsByTags(tags:Tag[], page:number, size:number):Promise<Tweet[]>;
 }
 
-@inject(HttpClient)
+@inject(HttpClient, TweetHelper)
 export class TweetService extends BasicService implements ITweetService {
 
     private authToken:string;
+    private tweetHelper:ITweetHelper;
 
-    constructor(httpClient:HttpClient) {
+    constructor(httpClient:HttpClient, tweetHelper:ITweetHelper) {
         super(httpClient);
+        this.tweetHelper = tweetHelper;
         this.authToken = localStorage[Const.TOKEN_HEADER];
     }
 
@@ -74,12 +78,9 @@ export class TweetService extends BasicService implements ITweetService {
                 .then(response => response.json())
                 .then((data:Tweet[]) => {
                     data.forEach(tweet => {
-                        this.getTweetCurrentUserData(tweet);
+                        this.tweetHelper.getCurrentUserTweetData(tweet);
                     });
                     resolve(data);
-                })
-                .catch(error => {
-                    reject(error);
                 })
         });
     }
@@ -107,25 +108,9 @@ export class TweetService extends BasicService implements ITweetService {
             })
                 .then(response => response.json())
                 .then((tweet:Tweet)=> {
-                    this.getTweetCurrentUserData(tweet);
+                    this.tweetHelper.getCurrentUserTweetData(tweet);
                     resolve(tweet);
                 })
-        })
-    }
-
-    getCurrentUserTweetVote(tweetId:number):Promise<'UP'|'DOWN'|'NONE'> {
-        return new Promise<'UP'|'DOWN'|'NONE'>((resolve, reject) => {
-            this.httpClient.fetch(BASE_URL + TWEET_VOTE_GET_BY_ID(tweetId), {
-                headers: {
-                    [Const.TOKEN_HEADER]: this.authToken
-                }
-            })
-                .then(response => response.json())
-                .then((data:UserVote)=> {
-                    resolve(data.vote);
-                }, ()=> {
-                    resolve('NONE');
-                });
         })
     }
 
@@ -202,19 +187,6 @@ export class TweetService extends BasicService implements ITweetService {
         })
     }
 
-    tweetBelongsToUsersFavourites(tweetId:number):Promise<boolean> {
-        return new Promise<boolean>((resolve, reject) => {
-            this.httpClient.fetch(BASE_URL + TWEET_FAVOURITE(tweetId), {
-                method: 'get',
-                headers: {
-                    [Const.TOKEN_HEADER]: this.authToken
-                }
-            })
-                .then(response => response.json())
-                .then((belong:boolean)=> resolve(belong))
-        });
-    }
-
     send(tweet:Tweet):Promise<Tweet> {
         return new Promise<Tweet>((resolve, reject)=> {
             this.httpClient.fetch(BASE_URL + TWEET_URL, {
@@ -256,20 +228,26 @@ export class TweetService extends BasicService implements ITweetService {
                 .then(response => response.json())
                 .then((tweets:Tweet[])=> {
                     tweets.forEach(tweet => {
-                        this.getTweetCurrentUserData(tweet);
+                        this.tweetHelper.getCurrentUserTweetData(tweet);
                     });
                     resolve(tweets);
                 })
         });
     }
 
-    private getTweetCurrentUserData(tweet:Tweet) {
-        this.getCurrentUserTweetVote(tweet.id).then((vote:'UP'|'DOWN'|'NONE') => tweet.loggedUserVote = vote);
-        this.tweetBelongsToUsersFavourites(tweet.id).then((favourite:boolean) => tweet.favourite = favourite);
-        this.addTagsInText(tweet);
-    }
-
-    private addTagsInText(tweet:Tweet) {
-        tweet.content = tweet.content.replace(/\#([a-zA-Z0-9]+)/g, "<a class='label label-info' href='#/tags/$1'>#$1</a>");
+    getTweetsByTags(tags:Tag[], page:number, size:number) {
+        return new Promise<Tweet[]>((resolve, reject)=> {
+            this.httpClient.fetch(TWEETS_BY_TAGS(tags.map(tag => tag.text), page, size), {
+                method: 'get',
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => response.json())
+                .then((data:Tweet[]) => {
+                    data.forEach(tweet => this.tweetHelper.getCurrentUserTweetData(tweet));
+                    resolve(data);
+                })
+        });
     }
 }
