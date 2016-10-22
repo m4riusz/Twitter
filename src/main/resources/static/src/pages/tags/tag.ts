@@ -2,13 +2,14 @@ import Tag = Models.Tag;
 import User = Models.User;
 import {inject} from "aurelia-dependency-injection";
 import {Const} from "../../domain/const";
-import Tweet = Models.Tweet;
 import {TweetService, ITweetService} from "../../service/tweetService";
+import {TagService, ITagService} from "../../service/tagService";
+import Tweet = Models.Tweet;
 /**
  * Created by mariusz on 19.10.16.
  */
 
-@inject(TweetService)
+@inject(TweetService, TagService)
 export class TagView {
 
     tags:Tag[];
@@ -16,10 +17,12 @@ export class TagView {
     private page:number;
     private currentLoggedUser:User;
     private tweetService:ITweetService;
+    private tagService:ITagService;
 
-    constructor(tweetService:ITweetService) {
+    constructor(tweetService:ITweetService, tagService:ITagService) {
         this.page = 0;
         this.tweetService = tweetService;
+        this.tagService = tagService;
     }
 
     async activate(params, config) {
@@ -28,7 +31,14 @@ export class TagView {
             return {text: tag}
         });
         this.currentLoggedUser = config.settings.currentUser;
-        this.tweets = await this.tweetService.getTweetsByTags(this.tags, this.page, Const.PAGE_SIZE);
+        [this.tweets, this.currentLoggedUser.favouriteTags] = await Promise.all([
+            this.tweetService.getTweetsByTags(this.tags, this.page, Const.PAGE_SIZE),
+            this.tagService.getUserFavouriteTags(this.currentLoggedUser.id)
+        ]);
+    }
+
+    isTagFavourited(tag:Tag):boolean {
+        return this.currentLoggedUser.favouriteTags.filter(current => current.text === tag.text).length == 1;
     }
 
     async nextPage() {

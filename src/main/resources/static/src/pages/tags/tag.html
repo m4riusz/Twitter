@@ -1,8 +1,12 @@
 <template>
     <require from='../../templates/tweet/tweet-template'></require>
     <div class="alert alert-info">
-        <strong>Tags: </strong>
+        <h4>Tags: </h4>
         <a repeat.for="tag of tags" href="#/tags/${tag.text}" class="label label-info">#${tag.text}</a>
+        <a if.bind="tags.length == 1 && !isTagFavourited(tags[0])" class="btn btn-primary btn-xs pull-right"><span
+                class="glyphicon glyphicon-star-empty"></span></a>
+        <a if.bind="tags.length == 1 && isTagFavourited(tags[0])" class="btn btn-primary btn-xs pull-right"><span
+                class="glyphicon glyphicon-star"></span></a>
     </div>
 
     <hr>
