@@ -3,10 +3,12 @@
     <div class="alert alert-info">
         <h4>Tags: </h4>
         <a repeat.for="tag of tags" href="#/tags/${tag.text}" class="label label-info">#${tag.text}</a>
-        <a if.bind="tags.length == 1 && !isTagFavourited(tags[0])" class="btn btn-primary btn-xs pull-right"><span
-                class="glyphicon glyphicon-star-empty"></span></a>
-        <a if.bind="tags.length == 1 && isTagFavourited(tags[0])" class="btn btn-primary btn-xs pull-right"><span
-                class="glyphicon glyphicon-star"></span></a>
+        <a if.bind="tags.length == 1 && currentTagFollowed == false"
+           class="btn btn-primary btn-xs pull-right" click.delegate="addTagToFavourites(tags[0])">
+            <span class="glyphicon glyphicon-star-empty"></span></a>
+        <a if.bind="tags.length == 1 && currentTagFollowed == true"
+           class="btn btn-primary btn-xs pull-right" click.delegate="deleteTagFromFavourites(tags[0])">
+            <span class="glyphicon glyphicon-star"></span></a>
     </div>
 
     <hr>

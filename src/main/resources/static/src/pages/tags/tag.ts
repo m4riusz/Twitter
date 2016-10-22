@@ -11,7 +11,7 @@ import Tweet = Models.Tweet;
 
 @inject(TweetService, TagService)
 export class TagView {
-
+    currentTagFollowed:boolean
     tags:Tag[];
     tweets:Tweet[];
     private page:number;
@@ -35,10 +35,31 @@ export class TagView {
             this.tweetService.getTweetsByTags(this.tags, this.page, Const.PAGE_SIZE),
             this.tagService.getUserFavouriteTags(this.currentLoggedUser.id)
         ]);
+        this.currentTagFollowed = this.isTagFavourited(this.tags[0]);
+    }
+
+    async addTagToFavourites(tag:Tag) {
+        try {
+            this.tags[0] = await this.tagService.addTagToFavourites(this.currentLoggedUser.id, tag.text);
+            this.currentLoggedUser.favouriteTags.push(this.tags[0]);
+            this.currentTagFollowed = true;
+        } catch (error) {
+            alert(error);
+        }
+    }
+
+    async deleteTagFromFavourites(tag:Tag) {
+        try {
+            await this.tagService.removeTagFromFavourites(this.currentLoggedUser.id, tag.text);
+            this.currentLoggedUser.favouriteTags = this.currentLoggedUser.favouriteTags.filter(current => current.text !== tag.text);
+            this.currentTagFollowed = false;
+        } catch (error) {
+            alert(error);
+        }
     }
 
     isTagFavourited(tag:Tag):boolean {
-        return this.currentLoggedUser.favouriteTags.filter(current => current.text === tag.text).length == 1;
+        return this.currentLoggedUser.favouriteTags.filter(current => current.text == tag.text).length === 1;
     }
 
     async nextPage() {
