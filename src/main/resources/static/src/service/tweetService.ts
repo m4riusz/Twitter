@@ -10,7 +10,9 @@ import {
     USER_FAVOURITE_TWEETS,
     TWEET_FAVOURITE,
     TWEET_VOTE,
-    TWEETS_FROM_USER, TWEETS_BY_TAGS
+    TWEETS_FROM_USER,
+    TWEETS_BY_TAGS,
+    TWEETS_FROM_FOLLOWING_USERS
 } from "../domain/route";
 import {BasicService} from "./basicService";
 import {ITweetHelper, TweetHelper} from "./tweetHelper";
@@ -25,6 +27,7 @@ import Tag = Models.Tag;
 export interface ITweetService {
     create(tweet:Tweet):Promise<Tweet>;
     getAllTweets(page:number, size:number):Promise<Tweet[]>;
+    getTweetsFromFollowingUsers(userId:number, page:number, size:number):Promise<Tweet[]>;
     deleteTweet(tweetId:number):Promise<{}>;
     getTweetById(tweetId:number):Promise<Tweet>;
     voteTweet(tweetId:number, vote:'UP'|'DOWN'):Promise<'UP'|'DOWN'>;
@@ -84,6 +87,24 @@ export class TweetService extends BasicService implements ITweetService {
                 })
         });
     }
+
+    getTweetsFromFollowingUsers(userId:number, page:number, size:number):Promise<Tweet[]> {
+        return new Promise((resolve, reject) => {
+            this.httpClient.fetch(BASE_URL + TWEETS_FROM_FOLLOWING_USERS(userId, page, size), {
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => response.json())
+                .then((data:Tweet[]) => {
+                    data.forEach(tweet => {
+                        this.tweetHelper.getCurrentUserTweetData(tweet);
+                    });
+                    resolve(data);
+                })
+        });
+    }
+
 
     deleteTweet(tweetId:number):Promise<{}> {
         return new Promise<{}>((resolve, reject) => {

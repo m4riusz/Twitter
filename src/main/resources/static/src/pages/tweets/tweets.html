@@ -1,3 +1,12 @@
 <template>
-    TWEETS PAGE
+    <require from='../../templates/tweet/tweet-template'></require>
+    <require from='../../templates/tweet/tweet-input'></require>
+    <tweet-input tweets.bind="tweets" current-user.bind="currentLoggedUser"></tweet-input>
+    <hr>
+    <div repeat.for="tweet of tweets">
+        <tweet-template tweet.bind="tweet" current-user.bind="currentLoggedUser"></tweet-template>
+    </div>
+    <div class="well well-sm text-center" click.delegate="nextPage()">
+        <h3 class="h3">More</h3>
+    </div>
 </template>
