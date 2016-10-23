@@ -1,8 +1,9 @@
 <template>
     <require from='../../templates/tweet/tweet-template'></require>
+    <require from='../../templates/tag/tag-template.html'></require>
     <div class="alert alert-info">
         <h4>Tags: </h4>
-        <a repeat.for="tag of tags" href="#/tags/${tag.text}" class="label label-info">#${tag.text}</a>
+        <tag-template repeat.for="tag of tags" tag.bind="tag"></tag-template>
         <a if.bind="tags.length == 1 && currentTagFollowed == false"
            class="btn btn-primary btn-xs pull-right" click.delegate="addTagToFavourites(tags[0])">
             <span class="glyphicon glyphicon-star-empty"></span></a>

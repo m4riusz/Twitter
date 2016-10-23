@@ -1,26 +1,30 @@
 import User = Models.User;
 import {IProfileService, ProfileService} from "../../../service/profileService";
 import {inject} from "aurelia-framework";
+import {TagService, ITagService} from "../../../service/tagService";
 
 
 /**
  * Created by mariusz on 10.10.16.
  */
 
-@inject(ProfileService)
+@inject(ProfileService, TagService)
 export class Profile {
     currentLoggedUser:User;
     selectedFiles:any[];
     image:any;
     private profileService:IProfileService;
+    private tagService:ITagService;
 
-    constructor(profileService:IProfileService) {
+    constructor(profileService:IProfileService, tagService:ITagService) {
         this.selectedFiles = [];
         this.profileService = profileService;
+        this.tagService = tagService;
     }
 
-    activate(params, config) {
+    async activate(params, config) {
         this.currentLoggedUser = config.settings.currentUser;
+        this.currentLoggedUser.favouriteTags = await this.tagService.getUserFavouriteTags(this.currentLoggedUser.id);
     }
 
     openFile() {

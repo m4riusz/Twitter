@@ -1,7 +1,11 @@
 <template>
     <require from="../../../templates/user/user-template.html"></require>
-    <user-template user.bind="currentLoggedUser"></user-template>
+    <require from="../../../templates/tag/tag-template.html"></require>
 
+    <user-template user.bind="currentLoggedUser"></user-template>
+    <h4>My favourite tags:</h4>
+    <tag-template repeat.for="tag of currentLoggedUser.favouriteTags" tag.bind="tag"></tag-template>
+    <hr/>
     <div class="panel-group">
         <div class="panel panel-default">
             <div class="panel-heading">
