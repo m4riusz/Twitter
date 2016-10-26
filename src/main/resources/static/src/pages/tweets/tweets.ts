@@ -21,13 +21,13 @@ export class Tweets{
 
     async activate(params, routeConfig:RouteConfig) {
         this.currentLoggedUser = routeConfig.settings.currentUser;
-        this.tweets = await this.tweetService.getTweetsFromFollowingUsers(this.currentLoggedUser.id, this.page, Const.PAGE_SIZE);
+        this.tweets = await this.tweetService.getAllTweets(this.page, Const.PAGE_SIZE);
     }
 
     async nextPage() {
         try {
             this.page = ++this.page;
-            let nextTweetPage = await this.tweetService.getTweetsFromFollowingUsers(this.currentLoggedUser.id, this.page, Const.PAGE_SIZE);
+            let nextTweetPage = await this.tweetService.getAllTweets(this.page, Const.PAGE_SIZE);
             this.tweets = this.tweets.concat(nextTweetPage);
         } catch (error) {
             this.page = --this.page;
