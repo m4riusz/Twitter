@@ -63,6 +63,14 @@ export class App {
                 settings: {currentUser: this.loggedUser}
             },
             {
+                route: 'tags/my',
+                moduleId: 'pages/tweetsByTags/tweets',
+                name: 'My tags',
+                title: 'My Tags',
+                nav: true,
+                settings: {currentUser: this.loggedUser}
+            },
+            {
                 route: 'profile',
                 moduleId: 'pages/users/profile/profile',
                 title: 'Profile',

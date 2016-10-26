@@ -11,7 +11,7 @@ import Tweet = Models.Tweet;
 
 @inject(TweetService, TagService)
 export class TagView {
-    currentTagFollowed:boolean
+    currentTagFollowed:boolean;
     tags:Tag[];
     tweets:Tweet[];
     private page:number;
