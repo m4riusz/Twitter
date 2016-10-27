@@ -1,12 +1,6 @@
 <template>
-    <require from='../../templates/tweet/tweet-template'></require>
-    <require from='../../templates/tweet/tweet-input'></require>
-    <tweet-input tweets.bind="tweets" current-user.bind="currentLoggedUser"></tweet-input>
-    <hr>
-    <div repeat.for="tweet of tweets">
-        <tweet-template tweet.bind="tweet" current-user.bind="currentLoggedUser"></tweet-template>
+    <div class="btn-group">
+        <a repeat.for="item of router.navigation" href.bind="item.href" class="btn btn-default">${item.title}</a>
     </div>
-    <div class="well well-sm text-center" click.delegate="nextPage()">
-        <h3 class="h3">More</h3>
-    </div>
+    <router-view></router-view>
 </template>

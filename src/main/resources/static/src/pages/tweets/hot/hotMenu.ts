@@ -1,15 +1,16 @@
-import {RouterConfiguration, Router} from "aurelia-router";
-import {IUserService, UserService} from "../../service/userService";
-import {inject} from "aurelia-dependency-injection";
 import User = Models.User;
+import Tweet = Models.Tweet;
+import {RouterConfiguration, Router} from "aurelia-router";
+import {inject} from "aurelia-dependency-injection";
+import {UserService, IUserService} from "../../../service/userService";
 /**
  * Created by mariusz on 31.08.16.
  */
 @inject(UserService)
-export class Tweets{
+export class HotMenuVM {
 
     router:Router;
-    private currentLoggedUser:User;
+    currentLoggedUser:User;
     private userService:IUserService;
 
     constructor(userService:IUserService) {
@@ -20,24 +21,16 @@ export class Tweets{
         this.currentLoggedUser = await this.userService.getCurrentLoggedUser();
         config.map(
             [
+                {route: [''], redirect: '6'},
                 {
-                    route: ['', 'all'],
-                    name: 'All',
-                    title: 'All',
-                    moduleId: './all/tweets',
-                    nav: true,
+                    route: [':hours'],
+                    name: 'Hot last',
+                    moduleId: './tweets',
+                    nav: false,
                     settings: {currentUser: this.currentLoggedUser}
-                },
-                {
-                    route: 'hot',
-                    name: 'Hot',
-                    title: 'Hot',
-                    moduleId: './hot/hotMenu',
-                    nav: true
                 }
             ]
         );
         this.router = router;
     }
-
 }

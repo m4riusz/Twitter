@@ -12,6 +12,10 @@ import Report = Models.Report;
 
 @inject(TweetService)
 export class FavouriteTweets {
+    
+    configureRouter(){
+        
+    }
     currentLoggedUser:User;
     page:number;
     tweets:Tweet[];
