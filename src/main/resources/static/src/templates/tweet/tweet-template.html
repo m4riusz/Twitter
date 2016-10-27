@@ -1,4 +1,6 @@
 <template>
+    <require from='../user/user-template.html'></require>
+
     <div class="well">
         <div if.bind="tweet.deleted == false" class="btn-group pull-right">
             <a if.bind="tweet.loggedUserVote == 'UP'" type=button class="btn btn-success"
@@ -49,6 +51,4 @@
            class="glyphicon glyphicon-remove btn btn-danger pull-right"
            click.delegate='deleteTweet(tweet.id)'> Delete</a>
     </div>
-
-    <require from='../user/user-template.html'></require>
 </template>

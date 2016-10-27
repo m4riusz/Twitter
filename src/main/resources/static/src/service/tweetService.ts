@@ -174,6 +174,9 @@ export class TweetService extends BasicService implements ITweetService {
             })
                 .then(response => response.json())
                 .then((tweets:Tweet[])=> {
+                    tweets.forEach(tweet => {
+                        this.tweetHelper.getCurrentUserTweetData(tweet);
+                    });
                     resolve(tweets);
                 })
         })
