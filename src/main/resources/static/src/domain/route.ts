@@ -44,3 +44,5 @@ export const REPORTS_BY_STATUS_AND_CATEGORY = (status:string, category:string, p
 export const TWEETS_BY_TAGS = (tags:string[], page:number, size:number) => `${TAG_URL}/${tags.join(',')}/${page}/${size}`;
 export const TWEETS_MOST_VOTED = (hours:number, page:number, size:number) => `${TWEET_URL}/popular/${hours}/${page}/${size}`;
 export const USER_FAVOURITE_TAGS = (userId:number) => `${USER_BY_ID(userId)}/tags`;
+export const TWEET_VOTE_COUNT = (tweetId:number, vote:string) => `${TWEET_BY_ID(tweetId)}/count/vote/${vote}`;
+export const COMMENT_VOTE_COUNT = (commentId:number, vote:string) => `${COMMENT_BY_ID(commentId)}/count/vote/${vote}`;

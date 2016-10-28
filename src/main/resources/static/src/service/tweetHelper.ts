@@ -1,5 +1,5 @@
 import {BasicService} from "./basicService";
-import {TWEET_VOTE_GET_BY_ID, TWEET_FAVOURITE, BASE_URL} from "../domain/route";
+import {TWEET_VOTE_GET_BY_ID, TWEET_FAVOURITE, BASE_URL, TWEET_VOTE_COUNT} from "../domain/route";
 import {HttpClient} from "aurelia-fetch-client";
 import {Const} from "../domain/const";
 import {inject} from "aurelia-framework";
@@ -24,9 +24,11 @@ export class TweetHelper extends BasicService implements ITweetHelper {
         this.authToken = localStorage[Const.TOKEN_HEADER];
     }
 
-    getCurrentUserTweetData(tweet) {
+    getCurrentUserTweetData(tweet:Tweet) {
         this.getCurrentUserTweetVote(tweet.id).then((vote:'UP'|'DOWN'|'NONE') => tweet.loggedUserVote = vote);
         this.tweetBelongsToUsersFavourites(tweet.id).then((favourite:boolean) => tweet.favourite = favourite);
+        this.getTweetVoteCount(tweet.id, "UP").then(data => tweet.upVoteCount = data);
+        this.getTweetVoteCount(tweet.id, "DOWN").then(data => tweet.downVoteCount = data);
         this.addTagsInText(tweet);
     }
 
@@ -58,6 +60,19 @@ export class TweetHelper extends BasicService implements ITweetHelper {
                 .then((belong:boolean)=> resolve(belong))
         });
     }
+
+    private getTweetVoteCount(tweetId:number, vote:'UP'|'DOWN'):Promise<number> {
+        return new Promise<number>((resolve, reject)=> {
+            this.httpClient.fetch(TWEET_VOTE_COUNT(tweetId, vote), {
+                method: 'get',
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => response.json())
+                .then((data) => resolve(data));
+        })
+    };
 
     private addTagsInText(tweet:Tweet) {
         tweet.content = tweet.content.replace(/\#([a-zA-Z0-9]+)/g, "<a class='label label-info' href='#/tags/$1'>#$1</a>");

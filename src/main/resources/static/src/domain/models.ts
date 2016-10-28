@@ -18,6 +18,8 @@ module Models {
         votes:UserVote[];
         reports:Report[];
         loggedUserVote:'UP'|'DOWN'|'NONE';
+        upVoteCount?:number;
+        downVoteCount?:number;
     }
 
     export interface AccountStatus extends AbstractEntity {

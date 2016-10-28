@@ -8,7 +8,8 @@ import {
     COMMENT_VOTE_BY_ID,
     COMMENT_VOTE,
     COMMENT_BY_ID,
-    COMMENT_URL
+    COMMENT_URL,
+    COMMENT_VOTE_COUNT
 } from "../domain/route";
 import Comment = Models.Comment;
 import UserVote = Models.UserVote;
@@ -22,6 +23,7 @@ export interface ICommentService {
     getTweetComments(tweetId:number, page:number, size:number):Promise<Comment[]>;
     getCurrentUserCommentVote(commentId:number):Promise<'UP'|'DOWN'|'NONE'>;
     voteComment(commentId:number, vote:'UP'|'DOWN'):Promise<'UP'|'DOWN'>;
+    getCommentVoteCount(commentId:number, vote:'UP'|'DOWN'):Promise<number>;
     deleteCommentVote(commentId:number):Promise<{}>;
     getCommentById(commentId:number):Promise<Comment>;
     commentTweet(comment:Comment):Promise<Comment>;
@@ -160,7 +162,22 @@ export class CommentService extends BasicService implements ICommentService {
         })
     }
 
+    getCommentVoteCount(commentId:number, vote:'UP'|'DOWN'):Promise<number> {
+        return new Promise<number>((resolve, reject)=> {
+            this.httpClient.fetch(COMMENT_VOTE_COUNT(commentId, vote), {
+                method: 'get',
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => response.json())
+                .then((data) => resolve(data));
+        })
+    };
+
     private getCommentCurrentUserData(comment:Comment) {
         this.getCurrentUserCommentVote(comment.id).then((vote) => comment.loggedUserVote = vote);
+        this.getCommentVoteCount(comment.id, "UP").then(data => comment.upVoteCount = data);
+        this.getCommentVoteCount(comment.id, "DOWN").then(data => comment.downVoteCount = data);
     }
 }
