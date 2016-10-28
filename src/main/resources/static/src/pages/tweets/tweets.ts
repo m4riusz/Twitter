@@ -29,6 +29,14 @@ export class Tweets{
                     settings: {currentUser: this.currentLoggedUser}
                 },
                 {
+                    route: 'favourite',
+                    moduleId: './favourites/tweets',
+                    name: 'My favourite tweets',
+                    title: 'Favourite tweets',
+                    nav: true,
+                    settings: {currentUser: this.currentLoggedUser}
+                },
+                {
                     route: 'hot',
                     name: 'Hot',
                     title: 'Hot',

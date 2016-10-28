@@ -1,5 +1,6 @@
 <template>
-    <require from='../../templates/tweet/tweet-template'></require>
+    <require from='../../../templates/tweet/tweet-template'></require>
+    <h4>My favourite tweets!</h4>
     <div repeat.for="tweet of tweets">
         <tweet-template tweet.bind="tweet" current-user.bind="currentLoggedUser"></tweet-template>
     </div>

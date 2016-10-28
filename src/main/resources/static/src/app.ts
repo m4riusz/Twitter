@@ -71,14 +71,6 @@ export class App {
                 settings: {currentUser: this.loggedUser}
             },
             {
-                route: 'tweets/favourite',
-                moduleId: 'pages/favourites/tweets',
-                name: 'My favourite tweets',
-                title: 'Favourite tweets',
-                nav: true,
-                settings: {currentUser: this.loggedUser}
-            },
-            {
                 route: 'profile',
                 moduleId: 'pages/users/profile/profile',
                 title: 'Profile',

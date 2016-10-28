@@ -1,7 +1,7 @@
 import {inject} from "aurelia-framework";
 import {RouteConfig} from "aurelia-router";
-import {TweetService, ITweetService} from "../../service/tweetService";
-import {Const} from "../../domain/const";
+import {TweetService, ITweetService} from "../../../service/tweetService";
+import {Const} from "../../../domain/const";
 import Tweet = Models.Tweet;
 import User = Models.User;
 import Report = Models.Report;
@@ -12,10 +12,6 @@ import Report = Models.Report;
 
 @inject(TweetService)
 export class FavouriteTweets {
-    
-    configureRouter(){
-        
-    }
     currentLoggedUser:User;
     page:number;
     tweets:Tweet[];
