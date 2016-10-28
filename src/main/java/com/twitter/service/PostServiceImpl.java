@@ -6,6 +6,7 @@ import com.twitter.exception.PostNotFoundException;
 import com.twitter.model.AbstractPost;
 import com.twitter.model.User;
 import com.twitter.model.UserVote;
+import com.twitter.model.Vote;
 import com.twitter.util.MessageUtil;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -86,6 +87,11 @@ abstract class PostServiceImpl<T extends AbstractPost, TRepository extends CrudR
     public UserVote getPostVote(long postId) {
         User user = userService.getCurrentLoggedUser();
         return userVoteService.findUserVoteForPost(user, repository.findOne(postId)) ;
+    }
+
+    @Override
+    public long getPostVoteCount(long postId, Vote vote) {
+        return userVoteService.getPostVoteCount(postId, vote);
     }
 
     protected void checkIfPostExists(long postId) {

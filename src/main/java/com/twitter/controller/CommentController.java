@@ -3,6 +3,7 @@ package com.twitter.controller;
 import com.twitter.dto.PostVote;
 import com.twitter.model.Comment;
 import com.twitter.model.UserVote;
+import com.twitter.model.Vote;
 import com.twitter.route.Route;
 import com.twitter.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +85,11 @@ public class CommentController {
     @RequestMapping(value = Route.COMMENTS_POPULAR, method = RequestMethod.GET)
     public ResponseEntity<List<Comment>> getMostVotedCommentsFromTweet(@PathVariable long tweetId, @PathVariable int page, @PathVariable int size) {
         return new ResponseEntity<>(commentService.getMostVotedComments(tweetId, new PageRequest(page, size)), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = Route.COMMENT_USER_VOTE_COUNT, method = RequestMethod.GET)
+    public ResponseEntity<Long> getTweetVoteCount(@PathVariable long commentId, @PathVariable(value = "voteId") Vote vote) {
+        return new ResponseEntity<>(commentService.getPostVoteCount(commentId, vote), HttpStatus.OK);
     }
 
 }

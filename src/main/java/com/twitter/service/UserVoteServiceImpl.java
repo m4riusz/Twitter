@@ -6,6 +6,7 @@ import com.twitter.exception.UserVoteNotFoundException;
 import com.twitter.model.AbstractPost;
 import com.twitter.model.User;
 import com.twitter.model.UserVote;
+import com.twitter.model.Vote;
 import com.twitter.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,11 @@ public class UserVoteServiceImpl implements UserVoteService {
     @Override
     public boolean exists(long userVoteId) {
         return userVoteDao.exists(userVoteId);
+    }
+
+    @Override
+    public long getPostVoteCount(long postId, Vote vote) {
+        return userVoteDao.countByAbstractPostIdAndVote(postId,vote);
     }
 
     @Override

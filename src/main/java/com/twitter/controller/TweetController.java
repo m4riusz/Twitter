@@ -1,9 +1,9 @@
 package com.twitter.controller;
 
 import com.twitter.dto.PostVote;
-import com.twitter.model.Tag;
 import com.twitter.model.Tweet;
 import com.twitter.model.UserVote;
+import com.twitter.model.Vote;
 import com.twitter.route.Route;
 import com.twitter.service.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -67,6 +66,11 @@ public class TweetController {
     @RequestMapping(value = Route.TWEET_USER_VOTE, method = RequestMethod.GET)
     public ResponseEntity<UserVote> getUserTweetVote(@PathVariable long tweetId) {
         return new ResponseEntity<>(tweetService.getPostVote(tweetId), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = Route.TWEET_USER_VOTE_COUNT, method = RequestMethod.GET)
+    public ResponseEntity<Long> getTweetVoteCount(@PathVariable long tweetId, @PathVariable(value = "voteId") Vote vote) {
+        return new ResponseEntity<>(tweetService.getPostVoteCount(tweetId, vote), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.TWEET_GET_ALL, method = RequestMethod.GET)

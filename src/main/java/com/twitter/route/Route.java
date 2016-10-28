@@ -70,6 +70,7 @@ public final class Route {
     public static final String TWEETS_MOST_VOTED = TWEET_URL + POPULAR + HOURS + PAGE + SIZE;
     public static final String TWEET_VOTE = TWEET_URL + VOTE;
     public static final String TWEET_USER_VOTE = TWEET_BY_ID + VOTE;
+    public static final String TWEET_USER_VOTE_COUNT = TWEET_BY_ID + COUNT + VOTE + VOTE_ID;
     public static final String TWEETS_WITH_TAGS = TWEET_URL + TAGS + "/{tags}"+PAGE + SIZE;
     public static final String TWEETS_FROM_USER_FAVOURITES = USER_BY_ID + FAVOURITES + PAGE + SIZE;
     public static final String TWEET_TO_USER_FAVOURITES = USER_URL + FAVOURITES + TWEET_ID;
@@ -83,6 +84,8 @@ public final class Route {
     public static final String COMMENTS_POPULAR = TWEET_BY_ID + COMMENT + POPULAR + PAGE + SIZE;
     public static final String COMMENT_VOTE = COMMENT_URL + VOTE;
     public static final String COMMENT_VOTE_BY_COMMENT_ID = COMMENT_BY_ID + VOTE;
+    public static final String COMMENT_USER_VOTE_COUNT = COMMENT_BY_ID + COUNT + VOTE + VOTE_ID;
+
 
     public static final String REPORT_URL = API + REPORT;
     public static final String REPORT_GET_LATEST = REPORT_URL + LATEST + PAGE + SIZE;
