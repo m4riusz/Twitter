@@ -3,25 +3,27 @@
 
     <div class="well">
         <div if.bind="tweet.deleted == false" class="btn-group pull-right">
-            <a if.bind="tweet.loggedUserVote == 'UP'" type=button class="btn btn-success"
+            <a if.bind="tweet.loggedUserVote == 'UP'" type=button class="btn btn-success btn-xs"
                click.delegate="deleteTweetVote(tweet.id)">
                 <div class="glyphicon glyphicon-plus-sign"></div>
             </a>
-            <a if.bind="tweet.loggedUserVote != 'UP'" type=button class="btn btn-default"
+            <a if.bind="tweet.loggedUserVote != 'UP'" type=button class="btn btn-default btn-xs"
                click.delegate="voteOnTweet(tweet.id,'UP')">
                 <div class="glyphicon glyphicon-plus"></div>
             </a>
-            <a if.bind="tweet.loggedUserVote == 'DOWN'" type=button class="btn btn-danger"
+            <a if.bind="tweet.loggedUserVote == 'DOWN'" type=button class="btn btn-danger btn-xs"
                click.delegate="deleteTweetVote(tweet.id)">
                 <div class="glyphicon glyphicon-minus-sign"></div>
             </a>
-            <a if.bind="tweet.loggedUserVote != 'DOWN'" type=button class="btn btn-default"
+            <a if.bind="tweet.loggedUserVote != 'DOWN'" type=button class="btn btn-default btn-xs"
                click.delegate="voteOnTweet(tweet.id,'DOWN')">
                 <div class="glyphicon glyphicon-minus"></div>
             </a>
         </div>
-        VOTES UP : ${tweet.upVoteCount}
-        VOTES DOWN : ${tweet.downVoteCount}
+        <div class="pull-right">
+            <div class="label label-success">+${tweet.upVoteCount}</div>
+            <div class="label label-danger">-${tweet.downVoteCount}</div>
+        </div>
         <user-template user.bind="tweet.owner"></user-template>
 
         <div class="media">

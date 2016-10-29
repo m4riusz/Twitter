@@ -65,7 +65,22 @@ export class CommentTemplate {
     }
 
     private setCommentVote(vote:'UP'|'DOWN'|'NONE') {
+        const prevVote = this.comment.loggedUserVote;
         this.comment.loggedUserVote = vote;
+        this.updateVoteCount(vote, prevVote);
+    }
+
+    private updateVoteCount(currentVote, prevVote:"UP"|"DOWN"|"NONE") {
+        if (currentVote == "UP") {
+            this.comment.upVoteCount += 1;
+        } else if (currentVote == "DOWN") {
+            this.comment.downVoteCount += 1;
+        }
+        if (prevVote == "UP") {
+            this.comment.upVoteCount -= 1;
+        } else if (prevVote == "DOWN") {
+            this.comment.downVoteCount -= 1;
+        }
     }
 
     private async updateComment(commentId:number) {

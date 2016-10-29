@@ -19,8 +19,10 @@
                 <div class="glyphicon glyphicon-minus"></div>
             </a>
         </div>
-        VOTES UP : ${comment.upVoteCount}
-        VOTES DOWN : ${comment.downVoteCount}
+        <div class="pull-right">
+            <div class="label label-success">+${comment.upVoteCount}</div>
+            <div class="label label-danger">-${comment.downVoteCount}</div>
+        </div>
         <user-template user.bind="comment.owner"></user-template>
         <div class="media">
             <div class="media-body">

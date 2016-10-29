@@ -68,7 +68,23 @@ export class TweetTemplate {
     }
 
     private setTweetVote(vote) {
+        const prevVote = this.tweet.loggedUserVote;
         this.tweet.loggedUserVote = vote;
+        this.updateVoteCount(vote, prevVote);
+
+    }
+
+    private updateVoteCount(currentVote, prevVote:"UP"|"DOWN"|"NONE") {
+        if (currentVote == "UP") {
+            this.tweet.upVoteCount += 1;
+        } else if (currentVote == "DOWN") {
+            this.tweet.downVoteCount += 1;
+        }
+        if (prevVote == "UP") {
+            this.tweet.upVoteCount -= 1;
+        } else if (prevVote == "DOWN") {
+            this.tweet.downVoteCount -= 1;
+        }
     }
 
     private setFavourite(favourite:boolean) {

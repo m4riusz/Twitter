@@ -145,6 +145,8 @@ export class CommentService extends BasicService implements ICommentService {
                     let data = response.json();
                     if (response.ok) {
                         data.then((data:Comment) => {
+                            data.upVoteCount = 0;
+                            data.downVoteCount = 0;
                             resolve(data)
                         });
                     }

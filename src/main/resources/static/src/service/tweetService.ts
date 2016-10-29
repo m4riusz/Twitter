@@ -227,6 +227,8 @@ export class TweetService extends BasicService implements ITweetService {
                     if (response.ok) {
                         data.then((data:Tweet) => {
                             data.favourite = false;
+                            data.upVoteCount = 0;
+                            data.downVoteCount = 0;
                             resolve(data)
                         });
                     }
