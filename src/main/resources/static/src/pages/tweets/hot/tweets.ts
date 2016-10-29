@@ -18,11 +18,11 @@ export class Tweets {
 
     constructor(tweetService:ITweetService) {
         this.hours = 6;
-        this.page = 0;
         this.tweetService = tweetService;
     }
 
     async activate(params, routeConfig:RouteConfig) {
+        this.page = 0;
         this.hours = params.hours;
         this.currentLoggedUser = routeConfig.settings.currentUser;
         this.tweets = await this.tweetService.getMostPopularTweets(this.hours, this.page, Const.PAGE_SIZE);
