@@ -14,7 +14,7 @@
             <div class="navbar-right">
                 <img class="navbar-brand" src="data:image/jpg;base64, ${loggedUser.avatar.bytes}"
                      alt="${loggedUser.avatar.fileName}">
-                <p class="navbar-text"><a href="#/profile" class="label">${loggedUser.username}</a></p>
+                <p class="navbar-text"><a href="#/profile" class="label">${loggedUser.username}</a> <i class="glyphicon glyphicon-log-out" click.delegate = "logout()"></i></p>
             </div>
 
         </div>

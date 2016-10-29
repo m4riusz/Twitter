@@ -8,6 +8,7 @@ export const USER_URL = `/api/user`;
 export const REGISTER = USER_URL;
 export const CURRENT_USER = USER_URL;
 export const LOGIN = `/api/login`;
+export const LOGOUT = `/api/logout`;
 export const TWEET_URL = `/api/tweet`;
 export const COMMENT_URL = `/api/comment`;
 export const REPORT_URL = `/api/report`;

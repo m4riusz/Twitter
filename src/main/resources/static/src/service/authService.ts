@@ -1,6 +1,6 @@
 import {HttpClient, json} from "aurelia-fetch-client";
 import {inject} from "aurelia-dependency-injection";
-import {BASE_URL, LOGIN, REGISTER, CURRENT_USER} from "../domain/route";
+import {BASE_URL, LOGIN, REGISTER, CURRENT_USER, LOGOUT} from "../domain/route";
 import {BasicService} from "./basicService";
 import {Const} from "../domain/const";
 
@@ -11,12 +11,14 @@ import {Const} from "../domain/const";
 export interface IAuthService {
     isTokenValid(token:string):Promise<boolean>;
     login(username:string, password:string):Promise<string>;
+    logout():Promise<any>;
     register(username:string, password:string, email:string, gender:string):Promise<string>;
 }
 
 @inject(HttpClient)
 export class AuthService extends BasicService implements IAuthService {
-    
+    private authToken:string;
+
     constructor(httpClient:HttpClient) {
         super(httpClient);
     }
@@ -34,7 +36,30 @@ export class AuthService extends BasicService implements IAuthService {
                 .then(response => {
                     if (response.ok) {
                         let authToken = response.headers.get(Const.TOKEN_HEADER);
+                        this.authToken = authToken;
                         resolve(authToken);
+                    } else {
+                        response.json()
+                            .then(data => {
+                                reject(data.message);
+                            })
+                    }
+                })
+        });
+    }
+
+    public logout():Promise<any> {
+        return new Promise<string>((resolve, reject)=> {
+            this.httpClient
+                .fetch(BASE_URL + LOGOUT, {
+                    method: 'post',
+                    headers: {
+                        [Const.TOKEN_HEADER]: this.authToken
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        resolve("You have logged out!");
                     } else {
                         response.json()
                             .then(data => {

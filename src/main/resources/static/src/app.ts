@@ -1,21 +1,24 @@
 import {IUserService, UserService} from "./service/userService";
 import {RouterConfiguration, Router} from "aurelia-router";
 import {inject} from "aurelia-dependency-injection";
+import {AuthService, IAuthService} from "./service/authService";
 import User = Models.User;
 
 /**
  * Created by mariusz on 22.08.16.
  */
 
-@inject(UserService)
+@inject(UserService, AuthService)
 export class App {
 
     public loggedUser:User;
     public router:Router;
     private userService:IUserService;
+    private authService:IAuthService;
 
-    constructor(userService:IUserService) {
+    constructor(userService:IUserService, authService:IAuthService) {
         this.userService = userService;
+        this.authService = authService;
     }
 
     async activate() {
@@ -86,5 +89,14 @@ export class App {
             }
         ]);
         this.router = router;
+    }
+
+    async logout() {
+        try {
+            const message = await this.authService.logout();
+            window.location.href = "/";
+        } catch (error) {
+            alert(error);
+        }
     }
 }
