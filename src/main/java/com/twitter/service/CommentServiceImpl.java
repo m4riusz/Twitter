@@ -1,7 +1,6 @@
 package com.twitter.service;
 
 import com.twitter.dao.CommentDao;
-import com.twitter.dao.UserVoteDao;
 import com.twitter.exception.PostNotFoundException;
 import com.twitter.exception.UserNotFoundException;
 import com.twitter.model.Comment;
@@ -39,7 +38,7 @@ public class CommentServiceImpl extends PostServiceImpl<Comment, CommentDao> imp
     @Override
     public List<Comment> getLatestCommentsById(long tweetId, Pageable pageable) {
         if (doesTweetExist(tweetId)) {
-            return repository.findByTweetIdOrderByCreateDateAsc(tweetId, pageable);
+            return repository.findByTweetIdOrderByCreateDateDesc(tweetId, pageable);
         }
         throw new PostNotFoundException(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
@@ -47,7 +46,7 @@ public class CommentServiceImpl extends PostServiceImpl<Comment, CommentDao> imp
     @Override
     public List<Comment> getOldestCommentsById(long tweetId, Pageable pageable) {
         if (doesTweetExist(tweetId)) {
-            return repository.findByTweetIdOrderByCreateDateDesc(tweetId, pageable);
+            return repository.findByTweetIdOrderByCreateDateAsc(tweetId, pageable);
         }
         throw new PostNotFoundException(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }
@@ -55,7 +54,7 @@ public class CommentServiceImpl extends PostServiceImpl<Comment, CommentDao> imp
     @Override
     public List<Comment> getMostVotedComments(long tweetId, Pageable pageable) {
         if (doesTweetExist(tweetId)) {
-            return repository.findByTweetIdOrderByVotes(tweetId, pageable);
+            return repository.findByTweetIdOrderByVotesAscCreateDateDesc(tweetId, pageable);
         }
         throw new PostNotFoundException(MessageUtil.POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG);
     }

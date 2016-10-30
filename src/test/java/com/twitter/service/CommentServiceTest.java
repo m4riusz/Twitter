@@ -275,7 +275,7 @@ public class CommentServiceTest {
     @Test
     public void getMostVotedComments_tweetExistsNoComments() {
         when(tweetService.exists(anyLong())).thenReturn(true);
-        when(commentDao.findByTweetIdOrderByVotes(anyLong(), any(Pageable.class))).thenReturn(emptyList());
+        when(commentDao.findByTweetIdOrderByVotesAscCreateDateDesc(anyLong(), any(Pageable.class))).thenReturn(emptyList());
 
         List<Comment> tweetCommentsResult = commentService.getMostVotedComments(
                 TestUtil.ID_ONE,
@@ -300,7 +300,7 @@ public class CommentServiceTest {
                 .withNumberOfVotesOf(30L)
         );
         when(tweetService.exists(anyLong())).thenReturn(true);
-        when(commentDao.findByTweetIdOrderByVotes(anyLong(), any(Pageable.class)))
+        when(commentDao.findByTweetIdOrderByVotesAscCreateDateDesc(anyLong(), any(Pageable.class)))
                 .thenReturn(aListWith(
                         commentThree,
                         commentOne,

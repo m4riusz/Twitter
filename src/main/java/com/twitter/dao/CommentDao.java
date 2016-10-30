@@ -22,8 +22,7 @@ public interface CommentDao extends JpaRepository<Comment, Long> {
 
     public List<Comment> findByTweetIdOrderByCreateDateDesc(long tweetId, Pageable pageable);
 
-    @Query(SELECT_MOST_POPULAR_COMMENTS_FROM_TWEET)
-    public List<Comment> findByTweetIdOrderByVotes(long tweetId, Pageable pageable);
+    public List<Comment> findByTweetIdOrderByVotesAscCreateDateDesc(long tweetId, Pageable pageable);
 
     public List<Comment> findByOwnerId(long userId, Pageable pageable);
 }

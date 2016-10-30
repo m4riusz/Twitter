@@ -180,7 +180,7 @@ public class CommentDaoTest {
         userVoteDao.save(commentTwoVotes);
         userVoteDao.save(commentThreeVotes);
 
-        List<Comment> commentsFromTweetOne = commentDao.findByTweetIdOrderByVotes(
+        List<Comment> commentsFromTweetOne = commentDao.findByTweetIdOrderByVotesAscCreateDateDesc(
                 tweetFromUserOne.getId(),
                 TestUtil.ALL_IN_ONE_PAGE
         );
