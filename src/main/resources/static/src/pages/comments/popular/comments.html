@@ -1,0 +1,22 @@
+<template>
+    <require from='../../../templates/comment/comment-input'></require>
+    <require from='../../../templates/comment/comment-template'></require>
+
+
+    <hr>
+    <div class="col-xs-offset-1 col-sm-offset-1">
+        <comment-input tweet.bind="tweet" comments.bind="comments"
+                       current-user.bind="currentLoggedUser"></comment-input>
+    </div>
+    <hr>
+    <div class="col-sm-offset-1 col-xs-offset-1">
+        <div repeat.for="comment of comments">
+            <comment-template comment.bind="comment" current-user.bind="currentLoggedUser"></comment-template>
+        </div>
+        <div class="well well-sm text-center" click.delegate="nextCommentPage()">
+            <h3 class="h3">More comments</h3>
+        </div>
+    </div>
+
+
+</template>

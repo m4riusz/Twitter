@@ -1,0 +1,10 @@
+<template>
+    <require from='../../templates/tweet/tweet-template'></require>
+
+    <tweet-template tweet.bind="tweet" current-user.bind="currentLoggedUser"></tweet-template>
+
+    <div class="btn-group">
+        <a repeat.for="item of router.navigation" href.bind="item.href" class="btn btn-default">${item.title}</a>
+    </div>
+    <router-view></router-view>
+</template>

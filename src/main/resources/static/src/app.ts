@@ -47,7 +47,7 @@ export class App {
             {
                 route: ['comment/:tweetId'],
                 name: 'comment',
-                moduleId: 'pages/comments/comment',
+                moduleId: 'pages/comments/commentMenu',
                 title: 'Tweet comments',
                 settings: {currentUser: this.loggedUser}
             },

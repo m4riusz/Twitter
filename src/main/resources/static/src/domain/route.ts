@@ -29,6 +29,9 @@ export const CHANGE_USER_AVATAR = (userId:number) => `${USER_BY_ID(userId)}/avat
 export const TWEET_FAVOURITE = (tweetId:number | string) =>`${USER_URL}/favourites/${tweetId}`;
 export const USER_FAVOURITE_TWEETS = (userId:number, page:number, size:number) => `${USER_URL}/${userId}/favourites/${page}/${size}`;
 export const COMMENTS_FROM_TWEET = (tweetId:number, page:number, size:number) => `${TWEET_BY_ID(tweetId)}/comment/${page}/${size}`;
+export const COMMENTS_LATEST_FROM_TWEET = (tweetId:number, page:number, size:number) => `${TWEET_BY_ID(tweetId)}/comment/latest/${page}/${size}`;
+export const COMMENTS_OLDEST_FROM_TWEET = (tweetId:number, page:number, size:number) => `${TWEET_BY_ID(tweetId)}/comment/oldest/${page}/${size}`;
+export const COMMENTS_POPULAR_FROM_TWEET = (tweetId:number, page:number, size:number) => `${TWEET_BY_ID(tweetId)}/comment/popular/${page}/${size}`;
 export const COMMENT_VOTE_BY_ID = (commentId:number) => `${COMMENT_BY_ID(commentId)}/vote`;
 export const TWEETS_FROM_USER = (userId:number, page:number, size:number) => `${TWEET_URL}/user/${userId}/${page}/${size}`;
 export const TWEETS_FROM_FOLLOWING_USERS = (userId:number, page:number, size:number) => `${TWEET_URL}/my/${userId}/${page}/${size}`;
