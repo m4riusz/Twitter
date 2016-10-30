@@ -9,7 +9,10 @@ import {
     COMMENT_VOTE,
     COMMENT_BY_ID,
     COMMENT_URL,
-    COMMENT_VOTE_COUNT
+    COMMENT_VOTE_COUNT,
+    COMMENTS_LATEST_FROM_TWEET,
+    COMMENTS_OLDEST_FROM_TWEET,
+    COMMENTS_POPULAR_FROM_TWEET
 } from "../domain/route";
 import Comment = Models.Comment;
 import UserVote = Models.UserVote;
@@ -26,6 +29,9 @@ export interface ICommentService {
     getCommentVoteCount(commentId:number, vote:'UP'|'DOWN'):Promise<number>;
     deleteCommentVote(commentId:number):Promise<{}>;
     getCommentById(commentId:number):Promise<Comment>;
+    getLatestCommentsFromTweet(tweetId:number, page:number, size:number):Promise<Comment[]>;
+    getOldestCommentsFromTweet(tweetId:number, page:number, size:number):Promise<Comment[]>;
+    getMostPopularCommentsFromTweet(tweetId:number, page:number, size:number):Promise<Comment[]>;
     commentTweet(comment:Comment):Promise<Comment>;
 }
 
@@ -162,6 +168,60 @@ export class CommentService extends BasicService implements ICommentService {
                     }
                 });
         })
+    }
+
+    getLatestCommentsFromTweet(tweetId:number, page:number, size:number):Promise<Models.Comment[]> {
+        return new Promise<Comment[]>((resolve, reject)=> {
+            this.httpClient.fetch(BASE_URL + COMMENTS_LATEST_FROM_TWEET(tweetId, page, size), {
+                method: 'get',
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response=> response.json())
+                .then((comments:Comment[]) => {
+                    comments.forEach(comment => {
+                        this.getCommentCurrentUserData(comment);
+                    });
+                    resolve(comments);
+                }, (error) => resolve([]));
+        });
+    }
+
+    getOldestCommentsFromTweet(tweetId:number, page:number, size:number):Promise<Models.Comment[]> {
+        return new Promise<Comment[]>((resolve, reject)=> {
+            this.httpClient.fetch(BASE_URL + COMMENTS_OLDEST_FROM_TWEET(tweetId, page, size), {
+                method: 'get',
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response=> response.json())
+                .then((comments:Comment[]) => {
+                    comments.forEach(comment => {
+                        this.getCommentCurrentUserData(comment);
+                    });
+                    resolve(comments);
+                }, (error) => resolve([]));
+        });
+    }
+
+    getMostPopularCommentsFromTweet(tweetId:number, page:number, size:number):Promise<Models.Comment[]> {
+        return new Promise<Comment[]>((resolve, reject)=> {
+            this.httpClient.fetch(BASE_URL + COMMENTS_POPULAR_FROM_TWEET(tweetId, page, size), {
+                method: 'get',
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response=> response.json())
+                .then((comments:Comment[]) => {
+                    comments.forEach(comment => {
+                        this.getCommentCurrentUserData(comment);
+                    });
+                    resolve(comments);
+                }, (error) => resolve([]));
+        });
     }
 
     getCommentVoteCount(commentId:number, vote:'UP'|'DOWN'):Promise<number> {
