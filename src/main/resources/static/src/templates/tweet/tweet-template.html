@@ -24,13 +24,9 @@
             <div class="label label-success">+${tweet.upVoteCount}</div>
             <div class="label label-danger">-${tweet.downVoteCount}</div>
         </div>
-        <user-template user.bind="tweet.owner"></user-template>
-
+        <user-template user.bind="tweet.owner" post-date="${tweet.createDate}"></user-template>
         <div class="media">
             <div class="media-body">
-                <div class="media-heading">
-                    <i class=" glyphicon glyphicon-send"></i> ${tweet.createDate}
-                </div>
                 <div innerHTML.bind="tweet.content">${tweet.content}</div>
             </div>
         </div>

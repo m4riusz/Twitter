@@ -2,7 +2,7 @@
     <require from="../../../templates/user/user-template.html"></require>
     <require from="../../../templates/tag/tag-template.html"></require>
 
-    <user-template user.bind="currentLoggedUser"></user-template>
+    <user-template user.bind="currentLoggedUser" date.bind = "true"></user-template>
     <h4>My favourite tags:</h4>
     <tag-template repeat.for="tag of currentLoggedUser.favouriteTags" tag.bind="tag"></tag-template>
     <hr/>

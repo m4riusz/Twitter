@@ -2,19 +2,19 @@
     <require from='../user/user-template.html'></require>
     <div class="well">
         <div if.bind="comment.deleted == false" class="btn-group pull-right">
-            <a if.bind="comment.loggedUserVote == 'UP'" type=button class="btn btn-success"
+            <a if.bind="comment.loggedUserVote == 'UP'" type=button class="btn btn-success btn-xs"
                click.delegate="deleteCommentVote(comment.id)">
                 <div class="glyphicon glyphicon-plus-sign"></div>
             </a>
-            <a if.bind="comment.loggedUserVote != 'UP'" type=button class="btn btn-default"
+            <a if.bind="comment.loggedUserVote != 'UP'" type=button class="btn btn-default btn-xs"
                click.delegate="voteOnComment(comment.id,'UP')">
                 <div class="glyphicon glyphicon-plus"></div>
             </a>
-            <a if.bind="comment.loggedUserVote == 'DOWN'" type=button class="btn btn-danger"
+            <a if.bind="comment.loggedUserVote == 'DOWN'" type=button class="btn btn-danger btn-xs"
                click.delegate="deleteCommentVote(comment.id)">
                 <div class="glyphicon glyphicon-minus-sign"></div>
             </a>
-            <a if.bind="comment.loggedUserVote != 'DOWN'" type=button class="btn btn-default"
+            <a if.bind="comment.loggedUserVote != 'DOWN'" type=button class="btn btn-default btn-xs"
                click.delegate="voteOnComment(comment.id,'DOWN')">
                 <div class="glyphicon glyphicon-minus"></div>
             </a>
@@ -23,12 +23,9 @@
             <div class="label label-success">+${comment.upVoteCount}</div>
             <div class="label label-danger">-${comment.downVoteCount}</div>
         </div>
-        <user-template user.bind="comment.owner"></user-template>
+        <user-template user.bind="comment.owner" post-date="${comment.createDate}"></user-template>
         <div class="media">
             <div class="media-body">
-                <div class="media-heading">
-                    <i class=" glyphicon glyphicon-send"></i> ${comment.createDate}
-                </div>
                 <div innerHTML.bind="comment.content">${comment.content}</div>
             </div>
         </div>

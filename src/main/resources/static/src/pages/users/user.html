@@ -2,7 +2,7 @@
     <require from='../../templates/tweet/tweet-template'></require>
     <require from='../../templates/user/user-template.html'></require>
 
-    <user-template user.bind="user"></user-template>
+    <user-template user.bind="user" date="true"></user-template>
     <div if.bind="isBanned() && !isDeleted()">
         </br>
         <div class="alert alert-danger" role="alert">User banned until: ${user.accountStatus.bannedUntil}</div>
