@@ -1,6 +1,8 @@
 <template>
     <require from='../../templates/tweet/tweet-template'></require>
     <require from='../../templates/tag/tag-template.html'></require>
+    <require from='../../templates/tag/tag-input'></require>
+
     <div class="alert alert-info">
         <h4>Tags: </h4>
         <tag-template repeat.for="tag of tags" tag.bind="tag"></tag-template>
@@ -11,7 +13,7 @@
            class="btn btn-primary btn-xs pull-right" click.delegate="deleteTagFromFavourites(tags[0])">
             <span class="glyphicon glyphicon-star"></span></a>
     </div>
-
+    <tag-input></tag-input>
     <hr>
     <div repeat.for="tweet of tweets">
         <tweet-template tweet.bind="tweet" current-user.bind="currentLoggedUser"></tweet-template>

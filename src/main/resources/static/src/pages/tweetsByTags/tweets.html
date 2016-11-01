@@ -1,9 +1,10 @@
 <template>
     <require from='../../templates/tweet/tweet-template'></require>
     <require from='../../templates/tag/tag-template.html'></require>
+    <require from='../../templates/tag/tag-input'></require>
 
     <div class="alert alert-info">
-        <h4>My tags: </h4>
+        <h4>My favourite tags: </h4>
         <tag-template repeat.for="tag of currentLoggedUser.favouriteTags" tag.bind="tag"></tag-template>
         <a if.bind="currentLoggedUser.favouriteTags.length == 1 && currentTagFollowed == false"
            class="btn btn-primary btn-xs pull-right" click.delegate="addTagToFavourites(currentLoggedUser.favouriteTags[0])">
@@ -12,6 +13,7 @@
            class="btn btn-primary btn-xs pull-right" click.delegate="deleteTagFromFavourites(currentLoggedUser.favouriteTags[0])">
             <span class="glyphicon glyphicon-star"></span></a>
     </div>
+    <tag-input></tag-input>
 
     <hr>
     <div repeat.for="tweet of tweets">

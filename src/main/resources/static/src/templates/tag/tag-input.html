@@ -1,0 +1,8 @@
+<template>
+    <div class="form form-inline">
+        <label for="tagField">Tags: </label>
+        <input id="tagField" type="text" class="form-control" ref="tagField" placeholder="#tagOne, #tagTwo"/>
+        <a class="btn btn-default form-control" click.delegate="extractTagNames(tagField.value)">
+            <i class="glyphicon glyphicon-search"></i> Search</a>
+    </div>
+</template>
