@@ -20,7 +20,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
-import static com.twitter.builders.CommentBuilder.comment;
 import static com.twitter.builders.PostVoteBuilder.postVote;
 import static com.twitter.builders.TagBuilder.tag;
 import static com.twitter.builders.TweetBuilder.tweet;
@@ -505,5 +504,35 @@ public class TweetServiceTest {
 
         assertThat(tweet.getVotes(), not(hasItem(userVote)));
     }
+
+    @Test(expected = PostNotFoundException.class)
+    public void tweetBelongsToFavouriteTweets_tweetDoesNotExist() {
+        tweetService.tweetBelongsToFavouriteTweets(TestUtil.ID_ONE);
+    }
+
+    @Test
+    public void tweetBelongsToFavouriteTweets_tweetNotInFavourites() {
+        User user = a(user());
+        Tweet tweet = a(tweet());
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
+        when(tweetDao.exists(anyLong())).thenReturn(true);
+        when(tweetDao.findOne(anyLong())).thenReturn(tweet);
+        when(tweetDao.doesTweetBelongToUserFavouritesTweets(anyLong(), anyLong())).thenReturn(false);
+        boolean belong = tweetService.tweetBelongsToFavouriteTweets(TestUtil.ID_ONE);
+        assertThat(belong, is(false));
+    }
+
+    @Test
+    public void tweetBelongsToFavouriteTweets_tweetInFavourites() {
+        User user = a(user());
+        Tweet tweet = a(tweet());
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
+        when(tweetDao.exists(anyLong())).thenReturn(true);
+        when(tweetDao.findOne(anyLong())).thenReturn(tweet);
+        when(tweetDao.doesTweetBelongToUserFavouritesTweets(anyLong(), anyLong())).thenReturn(true);
+        boolean belong = tweetService.tweetBelongsToFavouriteTweets(TestUtil.ID_ONE);
+        assertThat(belong, is(true));
+    }
+
 
 }

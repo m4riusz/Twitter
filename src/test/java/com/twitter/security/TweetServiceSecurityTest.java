@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -142,4 +143,11 @@ public class TweetServiceSecurityTest {
     public void deleteTweetFromFavourites_anonymousAccessDenied() {
         tweetService.deleteTweetFromFavourites(TestUtil.ID_ONE);
     }
+
+    @WithAnonymousUser
+    @Test(expected = AccessDeniedException.class)
+    public void tweetBelongsToFavouriteTweets_anonymousAccessDenied(){
+        tweetService.tweetBelongsToFavouriteTweets(TestUtil.ID_ONE);
+    }
+
 }
