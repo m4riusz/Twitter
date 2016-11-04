@@ -27,7 +27,7 @@ import static com.twitter.builders.UserVoteBuilder.userVote;
 import static com.twitter.util.Util.a;
 import static com.twitter.util.Util.aListWith;
 import static java.util.Collections.emptyList;
-import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.Is.is;
@@ -203,7 +203,7 @@ public class CommentServiceTest {
                 .withCreateDate(TestUtil.DATE_2002)
         );
         when(tweetService.exists(anyLong())).thenReturn(true);
-        when(commentDao.findByTweetIdOrderByCreateDateAsc(anyLong(), any(Pageable.class)))
+        when(commentDao.findByTweetIdOrderByCreateDateDesc(anyLong(), any(Pageable.class)))
                 .thenReturn(aListWith(
                         commentOne,
                         commentTwo
@@ -250,7 +250,7 @@ public class CommentServiceTest {
                 .withCreateDate(TestUtil.DATE_2002)
         );
         when(tweetService.exists(anyLong())).thenReturn(true);
-        when(commentDao.findByTweetIdOrderByCreateDateDesc(anyLong(), any(Pageable.class)))
+        when(commentDao.findByTweetIdOrderByCreateDateAsc(anyLong(), any(Pageable.class)))
                 .thenReturn(aListWith(
                         commentTwo,
                         commentOne
@@ -373,4 +373,39 @@ public class CommentServiceTest {
         assertThat(userVote.getAbstractPost(), is(comment));
         assertThat(userVote.getUser(), is(user));
     }
+
+    @Test(expected = UserNotFoundException.class)
+    public void deleteVote_userDoesNotExist() {
+        when(userService.getCurrentLoggedUser()).thenThrow(UserNotFoundException.class);
+        commentService.deleteVote(TestUtil.ID_ONE);
+    }
+
+    @Test(expected = PostNotFoundException.class)
+    public void deleteVote_userExistsPostDoesNot() {
+        when(userService.getCurrentLoggedUser()).thenReturn(a(user()));
+        when(commentDao.exists(anyLong())).thenReturn(false);
+        commentService.deleteVote(TestUtil.ID_ONE);
+    }
+
+    @Test
+    public void deleteVote_successDeleteVote() {
+        User owner = a(user());
+        Comment comment = a(comment());
+        UserVote userVote = a(userVote()
+                .withVote(Vote.UP)
+                .withUser(owner)
+                .withAbstractPost(comment)
+        );
+        comment.setVotes(aListWith(userVote));
+        comment.setOwner(owner);
+
+        when(userService.getCurrentLoggedUser()).thenReturn(owner);
+        when(commentDao.exists(anyLong())).thenReturn(true);
+        when(commentDao.findOne(anyLong())).thenReturn(comment);
+        commentService.deleteVote(userVote.getId());
+
+        assertThat(comment.getVotes(), not(hasItem(userVote)));
+    }
+
+
 }

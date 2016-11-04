@@ -20,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
+import static com.twitter.builders.CommentBuilder.comment;
 import static com.twitter.builders.PostVoteBuilder.postVote;
 import static com.twitter.builders.TagBuilder.tag;
 import static com.twitter.builders.TweetBuilder.tweet;
@@ -28,6 +29,8 @@ import static com.twitter.builders.UserVoteBuilder.userVote;
 import static com.twitter.util.Util.a;
 import static com.twitter.util.Util.aListWith;
 import static java.util.Collections.emptyList;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.*;
@@ -469,4 +472,38 @@ public class TweetServiceTest {
         assertThat(user.getFavouriteTweets(), not(hasItem(tweetOne)));
         assertThat(user.getFavouriteTweets(), hasItems(tweetTwo, tweetThree));
     }
+
+    @Test(expected = UserNotFoundException.class)
+    public void deleteVote_userDoesNotExist() {
+        when(userService.getCurrentLoggedUser()).thenThrow(UserNotFoundException.class);
+        tweetService.deleteVote(TestUtil.ID_ONE);
+    }
+
+    @Test(expected = PostNotFoundException.class)
+    public void deleteVote_userExistsPostDoesNot() {
+        when(userService.getCurrentLoggedUser()).thenReturn(a(user()));
+        when(tweetDao.exists(anyLong())).thenReturn(false);
+        tweetService.deleteVote(TestUtil.ID_ONE);
+    }
+
+    @Test
+    public void deleteVote_successDeleteVote() {
+        User owner = a(user());
+        Tweet tweet = a(tweet());
+        UserVote userVote = a(userVote()
+                .withVote(Vote.UP)
+                .withUser(owner)
+                .withAbstractPost(tweet)
+        );
+        tweet.setVotes(aListWith(userVote));
+        tweet.setOwner(owner);
+
+        when(userService.getCurrentLoggedUser()).thenReturn(owner);
+        when(tweetDao.exists(anyLong())).thenReturn(true);
+        when(tweetDao.findOne(anyLong())).thenReturn(tweet);
+        tweetService.deleteVote(userVote.getId());
+
+        assertThat(tweet.getVotes(), not(hasItem(userVote)));
+    }
+
 }
