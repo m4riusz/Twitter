@@ -20,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
+import static com.twitter.builders.CommentBuilder.comment;
 import static com.twitter.builders.PostVoteBuilder.postVote;
 import static com.twitter.builders.TagBuilder.tag;
 import static com.twitter.builders.TweetBuilder.tweet;
@@ -30,6 +31,7 @@ import static com.twitter.util.Util.aListWith;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.*;
@@ -534,5 +536,13 @@ public class TweetServiceTest {
         assertThat(belong, is(true));
     }
 
+    @Test
+    public void getPostVote_postDoesNotExist() {
+        User user = a(user());
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
+        when(tweetDao.findOne(anyLong())).thenReturn(null);
+        UserVote userVoteForPost = userVoteService.findUserVoteForPost(user, a(tweet()));
+        assertThat(userVoteForPost, is(nullValue()));
+    }
 
 }

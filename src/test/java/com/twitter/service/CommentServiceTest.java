@@ -407,5 +407,13 @@ public class CommentServiceTest {
         assertThat(comment.getVotes(), not(hasItem(userVote)));
     }
 
+    @Test
+    public void getPostVote_postDoesNotExist() {
+        User user = a(user());
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
+        when(commentDao.findOne(anyLong())).thenReturn(null);
+        UserVote userVoteForPost = userVoteService.findUserVoteForPost(user, a(comment()));
+        assertThat(userVoteForPost, is(nullValue()));
+    }
 
 }

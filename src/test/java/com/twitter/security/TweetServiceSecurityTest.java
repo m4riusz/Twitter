@@ -150,4 +150,10 @@ public class TweetServiceSecurityTest {
         tweetService.tweetBelongsToFavouriteTweets(TestUtil.ID_ONE);
     }
 
+    @WithAnonymousUser
+    @Test(expected = AccessDeniedException.class)
+    public void getPostVote_anonymousAccessDenied() {
+        tweetService.getPostVote(TestUtil.ID_ONE);
+    }
+
 }

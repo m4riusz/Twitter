@@ -124,4 +124,10 @@ public class CommentServiceSecurityTest {
         commentService.getMostVotedComments(TestUtil.ID_ONE, TestUtil.ALL_IN_ONE_PAGE);
     }
 
+    @WithAnonymousUser
+    @Test(expected = AccessDeniedException.class)
+    public void getPostVote_anonymousAccessDenied() {
+        commentService.getPostVote(TestUtil.ID_ONE);
+    }
+
 }
