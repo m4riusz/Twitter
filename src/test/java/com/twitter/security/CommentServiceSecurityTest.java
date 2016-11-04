@@ -130,4 +130,10 @@ public class CommentServiceSecurityTest {
         commentService.getPostVote(TestUtil.ID_ONE);
     }
 
+    @WithAnonymousUser
+    @Test(expected = AccessDeniedException.class)
+    public void getPostVoteCount_anonymousAccessDenied() {
+        commentService.getPostVoteCount(TestUtil.ID_ONE, Vote.UP);
+    }
+
 }

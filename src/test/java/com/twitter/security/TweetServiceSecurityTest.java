@@ -156,4 +156,9 @@ public class TweetServiceSecurityTest {
         tweetService.getPostVote(TestUtil.ID_ONE);
     }
 
+    @WithAnonymousUser
+    @Test(expected = AccessDeniedException.class)
+    public void getPostVoteCount_anonymousAccessDenied() {
+        tweetService.getPostVoteCount(TestUtil.ID_ONE, Vote.UP);
+    }
 }

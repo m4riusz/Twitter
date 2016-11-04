@@ -34,11 +34,9 @@ public interface PostService<T extends AbstractPost> {
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     void deleteVote(long voteId);
 
-    // TODO: 05.09.16 add tests
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     UserVote getPostVote(long postId);
 
-    // TODO: 28.10.16 add tests
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     long getPostVoteCount(long postId, Vote vote);
 }

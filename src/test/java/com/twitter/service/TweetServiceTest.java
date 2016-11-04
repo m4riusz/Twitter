@@ -545,4 +545,9 @@ public class TweetServiceTest {
         assertThat(userVoteForPost, is(nullValue()));
     }
 
+    @Test
+    public void getPostVoteCount_postDoesNotExist() {
+        long userVoteForPost = userVoteService.getPostVoteCount(TestUtil.ID_ONE, Vote.UP);
+        assertThat(userVoteForPost, is(0L));
+    }
 }
