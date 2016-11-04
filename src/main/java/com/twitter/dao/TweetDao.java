@@ -1,6 +1,5 @@
 package com.twitter.dao;
 
-import com.twitter.model.Tag;
 import com.twitter.model.Tweet;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

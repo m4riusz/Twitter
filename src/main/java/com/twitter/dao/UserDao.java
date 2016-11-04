@@ -17,20 +17,20 @@ import static com.twitter.dao.Query.*;
 public interface UserDao extends JpaRepository<User, Long> {
 
     @Query(GET_USER_FOLLOWERS_BY_ID)
-    public List<User> findFollowersByUserId(long userId, Pageable pageable);
+    List<User> findFollowersByUserId(long userId, Pageable pageable);
 
     @Query(GET_USER_FOLLOWING_BY_ID)
-    public List<User> findFollowingByUserId(long userId, Pageable pageable);
+    List<User> findFollowingByUserId(long userId, Pageable pageable);
 
     @Query(GET_USER_FOLLOWERS_COUNT_BY_ID)
-    public long findFollowersCountByUserId(long userId);
+    long findFollowersCountByUserId(long userId);
 
     @Query(GET_USER_FOLLOWING_COUNT_BY_ID)
-    public long findFollowingCountByUserId(long userId);
+    long findFollowingCountByUserId(long userId);
 
-    public User findByUsername(String username);
+    User findByUsername(String username);
 
-    public User findByEmail(String email);
+    User findByEmail(String email);
 
-    public User findOneByAccountStatusVerifyKey(String verifyKey);
+    User findOneByAccountStatusVerifyKey(String verifyKey);
 }

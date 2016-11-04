@@ -16,11 +16,11 @@ import java.util.List;
 @Repository
 public interface ReportDao extends JpaRepository<Report, Long> {
 
-    public List<Report> findByStatus(ReportStatus reportStatus, Pageable pageable);
+    List<Report> findByStatus(ReportStatus reportStatus, Pageable pageable);
 
-    public List<Report> findByCategory(ReportCategory reportCategory, Pageable pageable);
+    List<Report> findByCategory(ReportCategory reportCategory, Pageable pageable);
 
-    public List<Report> findByStatusAndCategory(ReportStatus status, ReportCategory reportCategory, Pageable pageable);
+    List<Report> findByStatusAndCategory(ReportStatus status, ReportCategory reportCategory, Pageable pageable);
 
-    public List<Report> findByUser(User user, Pageable pageable);
+    List<Report> findByUser(User user, Pageable pageable);
 }

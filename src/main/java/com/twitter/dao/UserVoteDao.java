@@ -12,8 +12,8 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface UserVoteDao extends JpaRepository<UserVote, Long> {
-    public UserVote findByUserAndAbstractPost(User user, AbstractPost abstractPost);
+    UserVote findByUserAndAbstractPost(User user, AbstractPost abstractPost);
 
     // TODO: 28.10.16 add tests
-    public long countByAbstractPostIdAndVote(long abstractPostId, Vote vote);
+    long countByAbstractPostIdAndVote(long abstractPostId, Vote vote);
 }

@@ -25,6 +25,5 @@ public interface UserVoteService {
 
     boolean exists(long userVoteId);
 
-    // TODO: 28.10.16 add tests
     long getPostVoteCount(long postId, Vote vote);
 }
