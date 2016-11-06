@@ -2,10 +2,10 @@ package com.twitter.service;
 
 import com.twitter.config.Profiles;
 import com.twitter.dao.ReportDao;
+import com.twitter.dto.ReportSentence;
 import com.twitter.exception.ReportNotFoundException;
 import com.twitter.exception.TwitterDateException;
 import com.twitter.model.*;
-import com.twitter.dto.ReportSentence;
 import com.twitter.util.MessageUtil;
 import com.twitter.util.TestUtil;
 import org.joda.time.DateTime;
@@ -15,6 +15,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Date;
@@ -28,8 +30,10 @@ import static com.twitter.builders.UserBuilder.user;
 import static com.twitter.matchers.UserIsBanned.isBanned;
 import static com.twitter.util.Util.a;
 import static com.twitter.util.Util.aListWith;
+import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -325,5 +329,60 @@ public class ReportServiceTest {
         );
         assertThat(latestReportsByStatusResult, is(aListWith(reportOne, reportTwo, reportThree)));
     }
+
+    @Test
+    public void findUserReports_noReports() {
+        User user = a(user());
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
+        when(reportDao.findByUser(any(User.class), any(Pageable.class))).thenReturn(emptyList());
+        List<Report> userReports = reportService.findUserReports(TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(userReports, is(emptyList()));
+    }
+
+    @Test
+    public void findUserReports_someReports() {
+        User user = a(user());
+
+        Report reportOne = a(report()
+                .withStatus(ReportStatus.WAITING_FOR_REALIZATION)
+                .withCategory(ReportCategory.HATE_SPEECH)
+                .withUser(user)
+                .withCreateDate(TestUtil.DATE_2003)
+        );
+        Report reportTwo = a(report()
+                .withStatus(ReportStatus.WAITING_FOR_REALIZATION)
+                .withCategory(ReportCategory.HATE_SPEECH)
+                .withUser(user)
+                .withCreateDate(TestUtil.DATE_2002)
+        );
+
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
+        when(reportDao.findByUser(user, TestUtil.ALL_IN_ONE_PAGE))
+                .thenReturn(aListWith(reportOne, reportTwo));
+        List<Report> userReports = reportService.findUserReports(TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(userReports, hasSize(2));
+        assertThat(userReports, is(aListWith(reportOne, reportTwo)));
+    }
+
+    @Test
+    public void findLatestReports_someReports() {
+        Report reportOne = a(report()
+                .withCreateDate(TestUtil.DATE_2003)
+        );
+        Report reportTwo = a(report()
+                .withCreateDate(TestUtil.DATE_2002)
+        );
+        Report reportThree = a(report()
+                .withCreateDate(TestUtil.DATE_2001)
+        );
+        when(reportDao.findAll(TestUtil.ALL_IN_ONE_PAGE)).thenReturn(new PageImpl<>(aListWith(reportOne, reportTwo, reportThree)));
+
+        List<Report> latestReports = reportService.findLatestReports(
+                TestUtil.ALL_IN_ONE_PAGE
+        );
+        assertThat(latestReports, contains(reportOne, reportTwo, reportThree));
+    }
+
+
 
 }

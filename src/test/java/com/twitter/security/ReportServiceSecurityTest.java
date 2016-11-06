@@ -116,4 +116,22 @@ public class ReportServiceSecurityTest {
         reportService.findLatestByStatusAndCategory(ReportStatus.GUILTY, ReportCategory.ADVERTISEMENT, TestUtil.ALL_IN_ONE_PAGE);
     }
 
+    @Test(expected = AccessDeniedException.class)
+    @WithAnonymousUser
+    public void findUserReports_anonymousAccessDenied() {
+        reportService.findUserReports(TestUtil.ALL_IN_ONE_PAGE);
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    @WithAnonymousUser
+    public void findLatestReports_anonymousAccessDenied() {
+        reportService.findLatestReports(TestUtil.ALL_IN_ONE_PAGE);
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    @WithCustomMockUser(authorities = TestUtil.USER)
+    public void findLatestReports_userAccessDenied() {
+        reportService.findLatestReports(TestUtil.ALL_IN_ONE_PAGE);
+    }
+
 }
