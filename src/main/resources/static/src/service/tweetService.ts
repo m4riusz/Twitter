@@ -226,9 +226,7 @@ export class TweetService extends BasicService implements ITweetService {
                     let data = response.json();
                     if (response.ok) {
                         data.then((data:Tweet) => {
-                            data.favourite = false;
-                            data.upVoteCount = 0;
-                            data.downVoteCount = 0;
+                            this.tweetHelper.getCurrentUserTweetData(data);
                             resolve(data)
                         });
                     }
