@@ -2,11 +2,15 @@ package com.twitter.dao;
 
 import com.twitter.model.Tweet;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import static com.twitter.dao.Query.*;
 
@@ -18,8 +22,7 @@ public interface TweetDao extends JpaRepository<Tweet, Long> {
 
     List<Tweet> findByOwnerId(long userId, Pageable pageable);
 
-    @Query(value = SELECT_MOST_POPULAR_TWEETS_BY_TIME)
-    List<Tweet> findMostPopularByVotes(int hours, Pageable pageable);
+    List<Tweet> findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(Date date, Pageable pageable);
 
     List<Tweet> findDistinctByTagsTextInOrderByCreateDateDesc(List<String> tagList, Pageable pageable);
 

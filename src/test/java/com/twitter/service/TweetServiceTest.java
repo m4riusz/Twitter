@@ -7,20 +7,23 @@ import com.twitter.exception.*;
 import com.twitter.model.*;
 import com.twitter.util.MessageUtil;
 import com.twitter.util.TestUtil;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Date;
 import java.util.List;
 
-import static com.twitter.builders.CommentBuilder.comment;
 import static com.twitter.builders.PostVoteBuilder.postVote;
 import static com.twitter.builders.TagBuilder.tag;
 import static com.twitter.builders.TweetBuilder.tweet;
@@ -34,11 +37,13 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 /**
  * Created by mariusz on 29.07.16.
@@ -46,7 +51,8 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ActiveProfiles(Profiles.DEV)
-@RunWith(MockitoJUnitRunner.class)
+@PrepareForTest({DateTime.class})
+@RunWith(PowerMockRunner.class)
 public class TweetServiceTest {
 
     @Mock
@@ -245,24 +251,33 @@ public class TweetServiceTest {
 
     @Test
     public void getMostVotedTweets_someTweets() {
-        Tweet tweetOne = a(tweet());
-        Tweet tweetTwo = a(tweet());
-        when(tweetDao.findMostPopularByVotes(anyInt(), any(Pageable.class))).thenReturn(aListWith(tweetOne, tweetTwo));
+        Date date = TestUtil.DATE_2000;
+        User owner = a(user());
+        Date createDate = TestUtil.DATE_2000;
+        Tweet tweetOne = a(tweet().withOwner(owner).withCreateDate(createDate));
+        Tweet tweetTwo = a(tweet().withOwner(owner).withCreateDate(createDate));
+        when(tweetDao.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(any(Date.class), any(Pageable.class))).thenReturn(aListWith(tweetOne, tweetTwo));
+        mockStatic(DateTime.class);
+        PowerMockito.when(DateTime.now()).thenReturn(new DateTime(date));
         List<Tweet> mostVotedTweetsResult = tweetService.getMostVotedTweets(10, TestUtil.ALL_IN_ONE_PAGE);
         assertThat(mostVotedTweetsResult, hasItems(tweetOne, tweetTwo));
     }
 
     @Test
     public void getMostVotedTweets_pagingTest() {
+        Date date = TestUtil.DATE_2000;
         int hours = 10;
-        Tweet tweetOne = a(tweet());
-        Tweet tweetTwo = a(tweet());
-        Tweet tweetThree = a(tweet());
+        User tweetOwner = a(user());
+        Tweet tweetOne = a(tweet().withOwner(tweetOwner));
+        Tweet tweetTwo = a(tweet().withOwner(tweetOwner));
+        Tweet tweetThree = a(tweet().withOwner(tweetOwner));
         Pageable pageOneRequest = new PageRequest(0, 2);
         Pageable pageTwoRequest = new PageRequest(1, 2);
         when(userService.exists(anyLong())).thenReturn(true);
-        when(tweetDao.findMostPopularByVotes(hours, pageOneRequest)).thenReturn(aListWith(tweetOne, tweetTwo));
-        when(tweetDao.findMostPopularByVotes(hours, pageTwoRequest)).thenReturn(aListWith(tweetThree));
+        when(tweetDao.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(new DateTime(date).minusHours(hours).toDate(), pageOneRequest)).thenReturn(aListWith(tweetOne, tweetTwo));
+        when(tweetDao.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(new DateTime(date).minusHours(hours).toDate(), pageTwoRequest)).thenReturn(aListWith(tweetThree));
+        mockStatic(DateTime.class);
+        PowerMockito.when(DateTime.now()).thenReturn(new DateTime(date));
         List<Tweet> mostVotedTweetsPageOneResult = tweetService.getMostVotedTweets(hours, pageOneRequest);
         List<Tweet> mostVotedTweetsPageTwoResult = tweetService.getMostVotedTweets(hours, pageTwoRequest);
         assertThat(mostVotedTweetsPageOneResult, contains(tweetOne, tweetTwo));

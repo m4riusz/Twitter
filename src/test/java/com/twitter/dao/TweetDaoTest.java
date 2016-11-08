@@ -105,8 +105,8 @@ public class TweetDaoTest {
 
     @Test
     public void findMostPopularByVotes_noTweets() {
-        List<Tweet> mostPopular = tweetDao.findMostPopularByVotes(
-                24,
+        List<Tweet> mostPopular = tweetDao.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(
+                TestUtil.DATE_2000,
                 TestUtil.ALL_IN_ONE_PAGE
         );
         assertThat(mostPopular, is(emptyList()));
@@ -116,11 +116,11 @@ public class TweetDaoTest {
     public void findMostPopularByVotes_tooOldTweet() {
         User user = a(user());
         userDao.save(aListWith(user));
-        Date tooOldDate = DateTime.now().minusHours(8).plusMinutes(1).toDate();
+        Date tooOldDate = new DateTime(TestUtil.DATE_2003).minusMinutes(1).toDate();
         Tweet tweet = a(tweet().withOwner(user).withCreateDate(tooOldDate));
         tweetDao.save(aListWith(tweet));
-        List<Tweet> mostPopularTweetList = tweetDao.findMostPopularByVotes(
-                8,
+        List<Tweet> mostPopularTweetList = tweetDao.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(
+                TestUtil.DATE_2003,
                 TestUtil.ALL_IN_ONE_PAGE
         );
         assertThat(mostPopularTweetList, is(emptyList()));
@@ -132,10 +132,11 @@ public class TweetDaoTest {
         userDao.save(aListWith(user));
         Tweet tweet = a(tweet()
                 .withOwner(user)
+                .withCreateDate(TestUtil.DATE_2001)
         );
         tweetDao.save(aListWith(tweet));
-        List<Tweet> mostPopularTweetList = tweetDao.findMostPopularByVotes(
-                8,
+        List<Tweet> mostPopularTweetList = tweetDao.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(
+                TestUtil.DATE_2000,
                 TestUtil.ALL_IN_ONE_PAGE
         );
         assertThat(mostPopularTweetList, hasItem(tweet));
@@ -146,8 +147,9 @@ public class TweetDaoTest {
         User user = a(user());
 
         userDao.save(aListWith(user));
-        Date tooOldDate = DateTime.now().minusHours(10).toDate();
+        Date tooOldDate = DateTime.now().minusMinutes(10).toDate();
         Date currentDate = DateTime.now().toDate();
+        Date currentDateTwo = DateTime.now().minusMinutes(1).toDate();
         Tweet tweetOne = a(tweet()
                 .withOwner(user)
                 .withCreateDate(tooOldDate)
@@ -162,8 +164,8 @@ public class TweetDaoTest {
         );
         tweetDao.save(aListWith(tweetOne, tweetTwo, tweetThree));
 
-        List<Tweet> mostPopularTweets = tweetDao.findMostPopularByVotes(
-                10,
+        List<Tweet> mostPopularTweets = tweetDao.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(
+                currentDateTwo,
                 new PageRequest(0, 2)
         );
         assertThat(mostPopularTweets, hasItems(tweetTwo, tweetThree));
@@ -201,12 +203,12 @@ public class TweetDaoTest {
                 )
         );
 
-        List<Tweet> mostPopularOnFirstPage = tweetDao.findMostPopularByVotes(
-                24,
+        List<Tweet> mostPopularOnFirstPage = tweetDao.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(
+                DateTime.now().minusHours(1).toDate(),
                 new PageRequest(0, 2)
         );
-        List<Tweet> mostPopularSecondPage = tweetDao.findMostPopularByVotes(
-                24,
+        List<Tweet> mostPopularSecondPage = tweetDao.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(
+                DateTime.now().minusHours(1).toDate(),
                 new PageRequest(1, 2)
         );
 

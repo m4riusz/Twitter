@@ -9,6 +9,7 @@ import com.twitter.model.Tweet;
 import com.twitter.model.User;
 import com.twitter.util.MessageUtil;
 import com.twitter.util.SecurityUtil;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
@@ -16,7 +17,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by mariusz on 29.07.16.
@@ -67,7 +70,8 @@ public class TweetServiceImpl extends PostServiceImpl<Tweet, TweetDao> implement
         if (hours <= 0){
             throw new TwitterGetException(MessageUtil.HOURS_CANT_BE_LESS_OR_EQUAL_0_ERROR_MSG);
         }
-        return repository.findMostPopularByVotes(hours, pageable);
+        Date date = DateTime.now().minusHours(hours).toDate();
+        return repository.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(date, pageable).stream().distinct().collect(Collectors.toList());
     }
 
     @Override
