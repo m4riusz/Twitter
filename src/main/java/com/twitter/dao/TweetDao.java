@@ -34,5 +34,8 @@ public interface TweetDao extends JpaRepository<Tweet, Long> {
 
     @Query(value = TWEET_EXISTS_IN_USER_FAVOURITES_TWEETS)
     boolean doesTweetBelongToUserFavouritesTweets(long userId, long postId);
+
+    // TODO: 09.11.16 tests
+    List<Tweet> findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc(List<String> tagList, Date date, Pageable pageable);
 }
 

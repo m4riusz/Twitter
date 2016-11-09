@@ -93,6 +93,11 @@ public class TweetController {
         return new ResponseEntity<>(tweetService.getTweetsByTagsOrderedByNewest(Arrays.asList(tags), new PageRequest(page, size)), HttpStatus.OK);
     }
 
+    @RequestMapping(value = Route.TWEETS_WITH_TAGS_POPULAR, method = RequestMethod.GET)
+    public ResponseEntity<List<Tweet>> getTweetsByTagsPopularOrder(@PathVariable String[] tags, @PathVariable int hours,@PathVariable int page, @PathVariable int size) {
+        return new ResponseEntity<>(tweetService.getTweetsByTagsOrderByPopularity(Arrays.asList(tags),hours, new PageRequest(page, size)), HttpStatus.OK);
+    }
+
     @RequestMapping(value = Route.TWEETS_FROM_USER_FAVOURITES, method = RequestMethod.GET)
     public ResponseEntity<List<Tweet>> getFavouriteTweetsByUserId(@PathVariable long userId, @PathVariable int page, @PathVariable int size) {
         return new ResponseEntity<>(tweetService.getFavouriteTweetsFromUser(userId, new PageRequest(page, size)), HttpStatus.OK);

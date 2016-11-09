@@ -25,6 +25,9 @@ public interface TweetService extends PostService<Tweet> {
 
     List<Tweet> getTweetsByTagsOrderedByNewest(List<String> tagList, Pageable pageable);
 
+    // TODO: 09.11.16 tests
+    List<Tweet> getTweetsByTagsOrderByPopularity(List<String> tagList, int hours, Pageable pageable);
+
     List<Tweet> getFavouriteTweetsFromUser(long userId, Pageable pageable);
 
     Tweet addTweetToFavourites(long tweetId);

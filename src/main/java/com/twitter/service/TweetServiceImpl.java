@@ -80,6 +80,15 @@ public class TweetServiceImpl extends PostServiceImpl<Tweet, TweetDao> implement
     }
 
     @Override
+    public List<Tweet> getTweetsByTagsOrderByPopularity(List<String> tagList, int hours, Pageable pageable) {
+        if (hours <= 0){
+            throw new TwitterGetException(MessageUtil.HOURS_CANT_BE_LESS_OR_EQUAL_0_ERROR_MSG);
+        }
+        Date date = DateTime.now().minusHours(hours).toDate();
+        return repository.findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc(tagList,date,pageable);
+    }
+
+    @Override
     public List<Tweet> getFavouriteTweetsFromUser(long userId, Pageable pageable) {
         if (doesUserExist(userId)) {
             return repository.findFavouriteTweetsFromUser(userId, pageable);
