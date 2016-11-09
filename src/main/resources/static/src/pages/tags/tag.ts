@@ -15,12 +15,14 @@ export class TagView {
     tags:Tag[];
     tweets:Tweet[];
     private page:number;
+    private mode:number;
     private currentLoggedUser:User;
     private tweetService:ITweetService;
     private tagService:ITagService;
 
     constructor(tweetService:ITweetService, tagService:ITagService) {
         this.page = 0;
+        this.mode = 0;
         this.tweetService = tweetService;
         this.tagService = tagService;
     }
@@ -36,6 +38,12 @@ export class TagView {
             this.tagService.getUserFavouriteTags(this.currentLoggedUser.id)
         ]);
         this.currentTagFollowed = this.isTagFavourited(this.tags[0]);
+    }
+
+    setMode(mode:number) {
+        this.page = 0;
+        this.mode = mode;
+        this.getTweetsByMode();
     }
 
     async addTagToFavourites(tag:Tag) {
@@ -62,10 +70,41 @@ export class TagView {
         return this.currentLoggedUser.favouriteTags.filter(current => current.text == tag.text).length === 1;
     }
 
-    async nextPage() {
+    private async getTweetsByMode() {
+        switch (this.mode) {
+            case 0:
+                this.tweets = await this.tweetService.getTweetsByTags(this.tags, this.page, Const.PAGE_SIZE);
+                break;
+            case 1:
+                this.tweets = await this.tweetService.getMostPopularTweetsWithTags(this.tags, 6, this.page, Const.PAGE_SIZE);
+                break;
+            case 2:
+                this.tweets = await this.tweetService.getMostPopularTweetsWithTags(this.tags, 12, this.page, Const.PAGE_SIZE);
+                break;
+            case 3:
+                this.tweets = await this.tweetService.getMostPopularTweetsWithTags(this.tags, 24, this.page, Const.PAGE_SIZE);
+                break;
+        }
+    }
+
+    async getNextPage() {
         try {
             this.page = ++this.page;
-            let nextTweetPage = await this.tweetService.getTweetsByTags(this.tags, this.page, Const.PAGE_SIZE);
+            let nextTweetPage = [];
+            switch (this.mode) {
+                case 0:
+                    nextTweetPage = await this.tweetService.getTweetsByTags(this.tags, this.page, Const.PAGE_SIZE);
+                    break;
+                case 1:
+                    nextTweetPage = await this.tweetService.getMostPopularTweetsWithTags(this.tags, 6, this.page, Const.PAGE_SIZE);
+                    break;
+                case 2:
+                    nextTweetPage = await this.tweetService.getMostPopularTweetsWithTags(this.tags, 12, this.page, Const.PAGE_SIZE);
+                    break;
+                case 3:
+                    nextTweetPage = await this.tweetService.getMostPopularTweetsWithTags(this.tags, 24, this.page, Const.PAGE_SIZE);
+                    break;
+            }
             this.tweets = this.tweets.concat(nextTweetPage);
         } catch (error) {
             this.page = --this.page;

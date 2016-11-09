@@ -13,7 +13,7 @@ import {
     TWEETS_FROM_USER,
     TWEETS_BY_TAGS,
     TWEETS_FROM_FOLLOWING_USERS,
-    TWEETS_MOST_VOTED
+    TWEETS_MOST_VOTED, TWEETS_BY_TAGS_POPULAR
 } from "../domain/route";
 import {BasicService} from "./basicService";
 import {ITweetHelper, TweetHelper} from "./tweetHelper";
@@ -40,6 +40,7 @@ export interface ITweetService {
     getTweetsFromUser(userId:number, page:number, size:number):Promise<Tweet[]>;
     getTweetsByTags(tags:Tag[], page:number, size:number):Promise<Tweet[]>;
     getMostPopularTweets(hours:number, page:number, size:number):Promise<Tweet[]>;
+    getMostPopularTweetsWithTags(tags:Tag[],hours:number, page:number, size:number):Promise<Tweet[]>;
 }
 
 @inject(HttpClient, TweetHelper)
@@ -280,6 +281,22 @@ export class TweetService extends BasicService implements ITweetService {
     getMostPopularTweets(hours:number, page:number, size:number):Promise<Tweet[]> {
         return new Promise<Tweet[]>((resolve, reject)=> {
             this.httpClient.fetch(TWEETS_MOST_VOTED(hours, page, size), {
+                method: 'get',
+                headers: {
+                    [Const.TOKEN_HEADER]: this.authToken
+                }
+            })
+                .then(response => response.json())
+                .then((data:Tweet[]) => {
+                    data.forEach(tweet => this.tweetHelper.getCurrentUserTweetData(tweet));
+                    resolve(data);
+                })
+        });
+    }
+
+    getMostPopularTweetsWithTags(tags:Tag[], hours:number, page:number, size:number):Promise<Tweet[]> {
+        return new Promise<Tweet[]>((resolve, reject)=> {
+            this.httpClient.fetch(TWEETS_BY_TAGS_POPULAR(tags.map(tag => tag.text),hours, page, size), {
                 method: 'get',
                 headers: {
                     [Const.TOKEN_HEADER]: this.authToken

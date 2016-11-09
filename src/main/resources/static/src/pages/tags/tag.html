@@ -15,10 +15,16 @@
     </div>
     <tag-input></tag-input>
     <hr>
+    <div class="btn-group">
+        <a class="btn btn-default" click.delegate="setMode(0)">Latest</a>
+        <a class="btn btn-default" click.delegate="setMode(1)">Hot 6h</a>
+        <a class="btn btn-default" click.delegate="setMode(2)">Hot 12h</a>
+        <a class="btn btn-default" click.delegate="setMode(3)">Hot 24h</a>
+    </div>
     <div repeat.for="tweet of tweets">
         <tweet-template tweet.bind="tweet" current-user.bind="currentLoggedUser"></tweet-template>
     </div>
-    <div class="well well-sm text-center" click.delegate="nextPage()">
+    <div class="well well-sm text-center" click.delegate="getNextPage()">
         <h3 class="h3">More</h3>
     </div>
 </template>
