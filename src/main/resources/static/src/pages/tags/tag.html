@@ -13,14 +13,21 @@
            class="btn btn-primary btn-xs pull-right" click.delegate="deleteTagFromFavourites(tags[0])">
             <span class="glyphicon glyphicon-star"></span></a>
     </div>
-    <tag-input></tag-input>
-    <hr>
-    <div class="btn-group">
-        <a class="btn btn-default" click.delegate="setMode(0)">Latest</a>
-        <a class="btn btn-default" click.delegate="setMode(1)">Hot 6h</a>
-        <a class="btn btn-default" click.delegate="setMode(2)">Hot 12h</a>
-        <a class="btn btn-default" click.delegate="setMode(3)">Hot 24h</a>
+    <div class="panel">
+        <div class="btn-group pull-left">
+            <a class="btn btn-default" click.delegate="setMode(0)">Latest</a>
+            <a class="btn btn-default" click.delegate="setMode(1)">Hot 6h</a>
+            <a class="btn btn-default" click.delegate="setMode(2)">Hot 12h</a>
+            <a class="btn btn-default" click.delegate="setMode(3)">Hot 24h</a>
+        </div>
+        <div class="pull-right">
+            <tag-input></tag-input>
+        </div>
     </div>
+    <div class="container">
+        <hr/>
+    </div>
+
     <div repeat.for="tweet of tweets">
         <tweet-template tweet.bind="tweet" current-user.bind="currentLoggedUser"></tweet-template>
     </div>
