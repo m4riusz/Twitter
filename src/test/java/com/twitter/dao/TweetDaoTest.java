@@ -13,8 +13,11 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.twitter.builders.TagBuilder.tag;
 import static com.twitter.builders.TweetBuilder.tweet;
@@ -104,8 +107,8 @@ public class TweetDaoTest {
     }
 
     @Test
-    public void findMostPopularByVotes_noTweets() {
-        List<Tweet> mostPopular = tweetDao.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(
+    public void findMostPopularAfterDateOrderByVotes_noTweets() {
+        List<Tweet> mostPopular = tweetDao.findMostPopularAfterDateOrderByVotes(
                 TestUtil.DATE_2000,
                 TestUtil.ALL_IN_ONE_PAGE
         );
@@ -113,13 +116,13 @@ public class TweetDaoTest {
     }
 
     @Test
-    public void findMostPopularByVotes_tooOldTweet() {
+    public void findMostPopularAfterDateOrderByVotes_tooOldTweet() {
         User user = a(user());
         userDao.save(aListWith(user));
         Date tooOldDate = new DateTime(TestUtil.DATE_2003).minusMinutes(1).toDate();
         Tweet tweet = a(tweet().withOwner(user).withCreateDate(tooOldDate));
         tweetDao.save(aListWith(tweet));
-        List<Tweet> mostPopularTweetList = tweetDao.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(
+        List<Tweet> mostPopularTweetList = tweetDao.findMostPopularAfterDateOrderByVotes(
                 TestUtil.DATE_2003,
                 TestUtil.ALL_IN_ONE_PAGE
         );
@@ -127,7 +130,7 @@ public class TweetDaoTest {
     }
 
     @Test
-    public void findMostPopularByVotes_newTweet() {
+    public void findMostPopularAfterDateOrderByVotes_newTweet() {
         User user = a(user());
         userDao.save(aListWith(user));
         Tweet tweet = a(tweet()
@@ -135,7 +138,7 @@ public class TweetDaoTest {
                 .withCreateDate(TestUtil.DATE_2001)
         );
         tweetDao.save(aListWith(tweet));
-        List<Tweet> mostPopularTweetList = tweetDao.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(
+        List<Tweet> mostPopularTweetList = tweetDao.findMostPopularAfterDateOrderByVotes(
                 TestUtil.DATE_2000,
                 TestUtil.ALL_IN_ONE_PAGE
         );
@@ -143,7 +146,7 @@ public class TweetDaoTest {
     }
 
     @Test
-    public void findMostPopularByVotes_someOldAndNewTweets(){
+    public void findMostPopularAfterDateOrderByVotes_someOldAndNewTweets() {
         User user = a(user());
 
         userDao.save(aListWith(user));
@@ -164,7 +167,7 @@ public class TweetDaoTest {
         );
         tweetDao.save(aListWith(tweetOne, tweetTwo, tweetThree));
 
-        List<Tweet> mostPopularTweets = tweetDao.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(
+        List<Tweet> mostPopularTweets = tweetDao.findMostPopularAfterDateOrderByVotes(
                 currentDateTwo,
                 new PageRequest(0, 2)
         );
@@ -173,7 +176,7 @@ public class TweetDaoTest {
     }
 
     @Test
-    public void findMostPopularByVotes_unpopularAndPopularTweets() {
+    public void findMostPopularAfterDateOrderByVotes_unpopularAndPopularTweets() {
         User user = a(user());
         User user1 = a(user());
         User user2 = a(user());
@@ -203,11 +206,11 @@ public class TweetDaoTest {
                 )
         );
 
-        List<Tweet> mostPopularOnFirstPage = tweetDao.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(
+        List<Tweet> mostPopularOnFirstPage = tweetDao.findMostPopularAfterDateOrderByVotes(
                 DateTime.now().minusHours(1).toDate(),
                 new PageRequest(0, 2)
         );
-        List<Tweet> mostPopularSecondPage = tweetDao.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(
+        List<Tweet> mostPopularSecondPage = tweetDao.findMostPopularAfterDateOrderByVotes(
                 DateTime.now().minusHours(1).toDate(),
                 new PageRequest(1, 2)
         );
@@ -562,5 +565,276 @@ public class TweetDaoTest {
 
         boolean tweetInFavouritesTweets = tweetDao.doesTweetBelongToUserFavouritesTweets(user.getId(), tweet.getId());
         assertThat(tweetInFavouritesTweets, is(true));
+    }
+
+    @Test
+    public void findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc_findAllBySingleTag() {
+        String TAG = "tag";
+        User user = a(user());
+        userDao.save(aListWith(user));
+        Tag tagOne = a(tag().withText(TAG));
+        Tweet tweetOne = a(tweet()
+                .withOwner(user)
+                .withTags(aListWith(tagOne))
+                .withCreateDate(TestUtil.DATE_2002)
+        );
+        Tweet tweetTwo = a(tweet()
+                .withOwner(user)
+                .withTags(aListWith(tagOne))
+                .withCreateDate(TestUtil.DATE_2002)
+        );
+        Tweet tweetThree = a(tweet()
+                .withOwner(user)
+                .withTags(aListWith(tagOne))
+                .withCreateDate(TestUtil.DATE_2002)
+        );
+        tweetDao.save(aListWith(tweetOne, tweetTwo, tweetThree));
+        List<Tweet> listWithTweetsWithTagOne = tweetDao.findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc(
+                aListWith(
+                        tagOne.getText()
+                ),
+                TestUtil.DATE_2001,
+                TestUtil.ALL_IN_ONE_PAGE
+        );
+        assertThat(listWithTweetsWithTagOne, hasItems(tweetOne, tweetTwo, tweetThree));
+        assertThat(listWithTweetsWithTagOne, hasSize(3));
+    }
+
+    @Test
+    public void findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc_findAllBySingleTag_orderByVoteSizeTest() {
+        String TAG = "tag";
+        User[] users = new User[]{
+                a(user()), a(user()), a(user()), a(user()), a(user())
+        };
+        userDao.save(aListWith(users));
+        Tag tagOne = a(tag().withText(TAG));
+        Tweet tweetOne = a(tweet()
+                .withOwner(users[0])
+                .withTags(aListWith(tagOne))
+                .withCreateDate(TestUtil.DATE_2002)
+        );
+        Tweet tweetTwo = a(tweet()
+                .withOwner(users[0])
+                .withTags(aListWith(tagOne))
+                .withCreateDate(TestUtil.DATE_2002)
+        );
+        Tweet tweetThree = a(tweet()
+                .withOwner(users[0])
+                .withTags(aListWith(tagOne))
+                .withCreateDate(TestUtil.DATE_2002)
+        );
+        tweetDao.save(aListWith(tweetOne, tweetTwo, tweetThree));
+
+        List<UserVote> tweetOneVotes = aListWith(
+                a(userVote().withUser(users[1]).withAbstractPost(tweetOne)),
+                a(userVote().withUser(users[2]).withAbstractPost(tweetOne))
+        );
+
+        List<UserVote> tweetTwoVotes = aListWith(
+                a(userVote().withUser(users[1]).withAbstractPost(tweetTwo)),
+                a(userVote().withUser(users[2]).withAbstractPost(tweetTwo)),
+                a(userVote().withUser(users[3]).withAbstractPost(tweetTwo)),
+                a(userVote().withUser(users[4]).withAbstractPost(tweetTwo))
+        );
+
+        List<UserVote> tweetThreeVotes = aListWith(
+                a(userVote().withUser(users[1]).withAbstractPost(tweetThree)),
+                a(userVote().withUser(users[2]).withAbstractPost(tweetThree)),
+                a(userVote().withUser(users[3]).withAbstractPost(tweetThree))
+        );
+
+        userVoteDao.save(Stream.of(tweetOneVotes, tweetTwoVotes, tweetThreeVotes).flatMap(Collection::stream).collect(Collectors.toList()));
+
+        List<Tweet> listWithTweetsWithTagOne = tweetDao.findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc(
+                aListWith(
+                        tagOne.getText()
+                ),
+                TestUtil.DATE_2001,
+                TestUtil.ALL_IN_ONE_PAGE
+        );
+        assertThat(listWithTweetsWithTagOne, contains(tweetTwo, tweetThree, tweetOne));
+        assertThat(listWithTweetsWithTagOne, hasSize(3));
+    }
+
+    @Test
+    public void findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc_findAllBySingleTag_orderByCreateDateTest() {
+        String TAG = "tag";
+        User user = a(user());
+        userDao.save(aListWith(user));
+        Tag tagOne = a(tag().withText(TAG));
+        Tweet tweetOne = a(tweet()
+                .withOwner(user)
+                .withTags(aListWith(tagOne))
+                .withCreateDate(TestUtil.DATE_2003)
+        );
+        Tweet tweetTwo = a(tweet()
+                .withOwner(user)
+                .withTags(aListWith(tagOne))
+                .withCreateDate(TestUtil.DATE_2002)
+        );
+        Tweet tweetThree = a(tweet()
+                .withOwner(user)
+                .withTags(aListWith(tagOne))
+                .withCreateDate(TestUtil.DATE_2001)
+        );
+        tweetDao.save(aListWith(tweetOne, tweetTwo, tweetThree));
+        List<Tweet> listWithTweetsWithTagOne = tweetDao.findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc(
+                aListWith(
+                        tagOne.getText()
+                ),
+                TestUtil.DATE_2000,
+                TestUtil.ALL_IN_ONE_PAGE
+        );
+        assertThat(listWithTweetsWithTagOne, contains(tweetOne, tweetTwo, tweetThree));
+        assertThat(listWithTweetsWithTagOne, hasSize(3));
+    }
+
+    @Test
+    public void findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc_findAllBySingleTag_orderByVoteSizeAndCreateDateTest() {
+        User[] users = new User[]{
+                a(user()), a(user()), a(user()), a(user()), a(user())
+        };
+        userDao.save(aListWith(users));
+        Tag tagOne = a(tag().withText("text"));
+        Tweet tweetOne = a(tweet()
+                .withOwner(users[0])
+                .withTags(aListWith(tagOne))
+                .withCreateDate(TestUtil.DATE_2003)
+        );
+        Tweet tweetTwo = a(tweet()
+                .withOwner(users[0])
+                .withTags(aListWith(tagOne))
+                .withCreateDate(TestUtil.DATE_2002)
+        );
+        Tweet tweetThree = a(tweet()
+                .withOwner(users[0])
+                .withTags(aListWith(tagOne))
+                .withCreateDate(TestUtil.DATE_2001)
+        );
+        tweetDao.save(aListWith(tweetOne, tweetTwo, tweetThree));
+
+        List<UserVote> tweetOneVotes = aListWith(
+                a(userVote().withUser(users[1]).withAbstractPost(tweetOne)),
+                a(userVote().withUser(users[2]).withAbstractPost(tweetOne)),
+                a(userVote().withUser(users[3]).withAbstractPost(tweetOne))
+        );
+
+        List<UserVote> tweetTwoVotes = aListWith(
+                a(userVote().withUser(users[1]).withAbstractPost(tweetTwo)),
+                a(userVote().withUser(users[2]).withAbstractPost(tweetTwo)),
+                a(userVote().withUser(users[3]).withAbstractPost(tweetTwo)),
+                a(userVote().withUser(users[4]).withAbstractPost(tweetTwo))
+        );
+
+        List<UserVote> tweetThreeVotes = aListWith(
+                a(userVote().withUser(users[1]).withAbstractPost(tweetThree)),
+                a(userVote().withUser(users[2]).withAbstractPost(tweetThree)),
+                a(userVote().withUser(users[3]).withAbstractPost(tweetThree))
+        );
+        userVoteDao.save(Stream.of(tweetOneVotes, tweetTwoVotes, tweetThreeVotes).flatMap(Collection::stream).collect(Collectors.toList()));
+        List<Tweet> listWithTweetsWithTagOne = tweetDao.findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc(
+                aListWith(
+                        tagOne.getText()
+                ),
+                TestUtil.DATE_2000,
+                TestUtil.ALL_IN_ONE_PAGE
+        );
+        assertThat(listWithTweetsWithTagOne, contains(tweetTwo, tweetOne, tweetThree));
+        assertThat(listWithTweetsWithTagOne, hasSize(3));
+    }
+
+    @Test
+    public void findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc_findAllByManyTags_allOrderTest() {
+        User[] users = new User[]{
+                a(user()), a(user()), a(user()), a(user()), a(user())
+        };
+        userDao.save(aListWith(users));
+        Tag tagOne = a(tag().withText("TAG_ONE"));
+        Tag tagTwo = a(tag().withText("TAG_TWO"));
+        Tag tagThree = a(tag().withText("TAG_THREE"));
+        Tweet tweetOne = a(tweet()
+                .withOwner(users[0])
+                .withTags(aListWith(tagOne))
+                .withCreateDate(TestUtil.DATE_2003)
+        );
+
+        Tweet tweetTwo = a(tweet()
+                .withOwner(users[0])
+                .withTags(aListWith(tagTwo))
+                .withCreateDate(TestUtil.DATE_2002)
+        );
+
+        Tweet tweetThree = a(tweet()
+                .withOwner(users[0])
+                .withTags(aListWith(tagThree))
+                .withCreateDate(TestUtil.DATE_2001)
+        );
+        tweetDao.save(aListWith(tweetOne, tweetTwo, tweetThree));
+
+        List<UserVote> tweetOneVotes = aListWith(
+                a(userVote().withUser(users[1]).withAbstractPost(tweetOne)),
+                a(userVote().withUser(users[2]).withAbstractPost(tweetOne)),
+                a(userVote().withUser(users[3]).withAbstractPost(tweetOne))
+        );
+
+        List<UserVote> tweetTwoVotes = aListWith(
+                a(userVote().withUser(users[1]).withAbstractPost(tweetTwo)),
+                a(userVote().withUser(users[2]).withAbstractPost(tweetTwo)),
+                a(userVote().withUser(users[3]).withAbstractPost(tweetTwo)),
+                a(userVote().withUser(users[4]).withAbstractPost(tweetTwo))
+        );
+
+        List<UserVote> tweetThreeVotes = aListWith(
+                a(userVote().withUser(users[1]).withAbstractPost(tweetThree)),
+                a(userVote().withUser(users[2]).withAbstractPost(tweetThree)),
+                a(userVote().withUser(users[3]).withAbstractPost(tweetThree))
+        );
+
+        userVoteDao.save(Stream.of(tweetOneVotes, tweetTwoVotes, tweetThreeVotes).flatMap(Collection::stream).collect(Collectors.toList()));
+
+        List<Tweet> listWithTweetsWithTagOne = tweetDao.findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc(
+                aListWith(
+                        tagOne.getText(),
+                        tagTwo.getText(),
+                        tagThree.getText()
+                ),
+                TestUtil.DATE_2000,
+                TestUtil.ALL_IN_ONE_PAGE
+        );
+        assertThat(listWithTweetsWithTagOne, contains(tweetTwo, tweetOne, tweetThree));
+        assertThat(listWithTweetsWithTagOne, hasSize(3));
+    }
+
+    @Test
+    public void findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc_tweetWithManyTagsShouldBeOnceInList() {
+        User user = a(user());
+        userDao.save(aListWith(user));
+        Tag tagOne = a(tag().withText("TAG_ONE"));
+        Tag tagTwo = a(tag().withText("TAG_TWO"));
+        Tag tagThree = a(tag().withText("TAG_THREE"));
+        Tweet tweetOne = a(tweet()
+                .withOwner(user)
+                .withTags(
+                        aListWith(
+                                tagOne,
+                                tagTwo,
+                                tagThree
+                        ))
+                .withCreateDate(TestUtil.DATE_2003)
+        );
+
+        tweetDao.save(tweetOne);
+
+        List<Tweet> listWithTweetsWithTagOne = tweetDao.findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc(
+                aListWith(
+                        tagOne.getText(),
+                        tagTwo.getText(),
+                        tagThree.getText()
+                ),
+                TestUtil.DATE_2000,
+                TestUtil.ALL_IN_ONE_PAGE
+        );
+        assertThat(listWithTweetsWithTagOne, contains(tweetOne));
+        assertThat(listWithTweetsWithTagOne, hasSize(1));
     }
 }

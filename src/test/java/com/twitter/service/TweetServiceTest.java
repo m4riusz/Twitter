@@ -256,7 +256,7 @@ public class TweetServiceTest {
         Date createDate = TestUtil.DATE_2000;
         Tweet tweetOne = a(tweet().withOwner(owner).withCreateDate(createDate));
         Tweet tweetTwo = a(tweet().withOwner(owner).withCreateDate(createDate));
-        when(tweetDao.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(any(Date.class), any(Pageable.class))).thenReturn(aListWith(tweetOne, tweetTwo));
+        when(tweetDao.findMostPopularAfterDateOrderByVotes(any(Date.class), any(Pageable.class))).thenReturn(aListWith(tweetOne, tweetTwo));
         mockStatic(DateTime.class);
         PowerMockito.when(DateTime.now()).thenReturn(new DateTime(date));
         List<Tweet> mostVotedTweetsResult = tweetService.getMostVotedTweets(10, TestUtil.ALL_IN_ONE_PAGE);
@@ -274,8 +274,8 @@ public class TweetServiceTest {
         Pageable pageOneRequest = new PageRequest(0, 2);
         Pageable pageTwoRequest = new PageRequest(1, 2);
         when(userService.exists(anyLong())).thenReturn(true);
-        when(tweetDao.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(new DateTime(date).minusHours(hours).toDate(), pageOneRequest)).thenReturn(aListWith(tweetOne, tweetTwo));
-        when(tweetDao.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(new DateTime(date).minusHours(hours).toDate(), pageTwoRequest)).thenReturn(aListWith(tweetThree));
+        when(tweetDao.findMostPopularAfterDateOrderByVotes(new DateTime(date).minusHours(hours).toDate(), pageOneRequest)).thenReturn(aListWith(tweetOne, tweetTwo));
+        when(tweetDao.findMostPopularAfterDateOrderByVotes(new DateTime(date).minusHours(hours).toDate(), pageTwoRequest)).thenReturn(aListWith(tweetThree));
         mockStatic(DateTime.class);
         PowerMockito.when(DateTime.now()).thenReturn(new DateTime(date));
         List<Tweet> mostVotedTweetsPageOneResult = tweetService.getMostVotedTweets(hours, pageOneRequest);
