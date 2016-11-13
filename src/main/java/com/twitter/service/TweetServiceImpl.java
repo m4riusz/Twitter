@@ -71,7 +71,7 @@ public class TweetServiceImpl extends PostServiceImpl<Tweet, TweetDao> implement
             throw new TwitterGetException(MessageUtil.HOURS_CANT_BE_LESS_OR_EQUAL_0_ERROR_MSG);
         }
         Date date = DateTime.now().minusHours(hours).toDate();
-        return repository.findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(date, pageable).stream().distinct().collect(Collectors.toList());
+        return repository.findMostPopularAfterDateOrderByVotes(date, pageable);
     }
 
     @Override

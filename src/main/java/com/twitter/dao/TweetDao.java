@@ -19,7 +19,8 @@ public interface TweetDao extends JpaRepository<Tweet, Long> {
 
     List<Tweet> findByOwnerId(long userId, Pageable pageable);
 
-    List<Tweet> findByCreateDateAfterOrderByVotesVoteAscCreateDateDesc(Date date, Pageable pageable);
+    @Query(value = SELECT_TWEETS_AFTER_DATE_ORDER_BY_VOTES)
+    List<Tweet> findMostPopularAfterDateOrderByVotes(Date date, Pageable pageable);
 
     List<Tweet> findDistinctByTagsTextInOrderByCreateDateDesc(List<String> tagList, Pageable pageable);
 
