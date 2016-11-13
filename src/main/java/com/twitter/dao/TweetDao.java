@@ -2,15 +2,12 @@ package com.twitter.dao;
 
 import com.twitter.model.Tweet;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
 
 import static com.twitter.dao.Query.*;
 
@@ -35,7 +32,7 @@ public interface TweetDao extends JpaRepository<Tweet, Long> {
     @Query(value = TWEET_EXISTS_IN_USER_FAVOURITES_TWEETS)
     boolean doesTweetBelongToUserFavouritesTweets(long userId, long postId);
 
-    // TODO: 09.11.16 tests
+    @Query(value = SELECT_TWEETS_WITH_TAGS_AND_AFTER_DATE_ORDER_BY_VOTES)
     List<Tweet> findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc(List<String> tagList, Date date, Pageable pageable);
 }
 
