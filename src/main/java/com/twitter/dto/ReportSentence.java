@@ -1,6 +1,5 @@
 package com.twitter.dto;
 
-import com.sun.istack.internal.Nullable;
 import com.twitter.model.ReportStatus;
 
 import javax.validation.constraints.NotNull;
@@ -14,7 +13,7 @@ public class ReportSentence {
     private long reportId;
     @NotNull
     private ReportStatus reportStatus;
-    @Nullable
+
     private Date dateToBlock;
 
     public ReportSentence() {

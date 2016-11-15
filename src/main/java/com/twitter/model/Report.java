@@ -1,7 +1,6 @@
 package com.twitter.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sun.istack.internal.Nullable;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Entity;
@@ -30,7 +29,6 @@ public class Report extends AbstractEntity{
     @NotNull
     @ManyToOne
     private User user;
-    @Nullable
     @OneToOne
     private User judge;
     @NotNull
