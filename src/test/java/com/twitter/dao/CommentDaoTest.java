@@ -162,14 +162,15 @@ public class CommentDaoTest {
         commentDao.save(aListWith(commentOne, commentTwo, commentThree));
 
 
+        List<UserVote> commentOneVotes = aListWith(
+                a(userVote().withAbstractPost(commentOne).withUser(commentatorOne)),
+                a(userVote().withAbstractPost(commentOne).withUser(commentatorTwo))
+        );
+
         List<UserVote> commentTwoVotes = aListWith(
                 a(userVote().withAbstractPost(commentTwo).withUser(commentatorOne)),
                 a(userVote().withAbstractPost(commentTwo).withUser(commentatorTwo)),
                 a(userVote().withAbstractPost(commentTwo).withUser(commentatorThree))
-        );
-        List<UserVote> commentOneVotes = aListWith(
-                a(userVote().withAbstractPost(commentOne).withUser(commentatorOne)),
-                a(userVote().withAbstractPost(commentOne).withUser(commentatorTwo))
         );
 
         List<UserVote> commentThreeVotes = aListWith(
