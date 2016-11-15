@@ -565,4 +565,63 @@ public class TweetServiceTest {
         long userVoteForPost = userVoteService.getPostVoteCount(TestUtil.ID_ONE, Vote.UP);
         assertThat(userVoteForPost, is(0L));
     }
+
+    @Test
+    public void getTweetsByTagsOrderByPopularity_noTags() {
+        when(tweetDao.findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc(anyListOf(String.class), any(Date.class), any(Pageable.class))).thenReturn(emptyList());
+        List<Tweet> tweetsByTagsOrderedByPopularityAndCreateDate = tweetService.getTweetsByTagsOrderByPopularity(emptyList(), 1, TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(tweetsByTagsOrderedByPopularityAndCreateDate, is(emptyList()));
+    }
+
+    @Test
+    public void getTweetsByTagsOrderByPopularity_someTags() {
+        Tag tagOne = a(tag());
+        Tag tagTwo = a(tag());
+        Tweet tweetOne = a(tweet().withTags(aListWith(tagOne)));
+        Tweet tweetTwo = a(tweet().withTags(aListWith(tagTwo)));
+        when(tweetDao.findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc(anyListOf(String.class), any(Date.class), any(Pageable.class))).thenReturn(aListWith(tweetOne, tweetTwo));
+        List<Tweet> tweetsByTagsOrderedByPopularityAndCreateDate = tweetService.getTweetsByTagsOrderByPopularity(aListWith(tagOne.getText(), tagTwo.getText()), 3, TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(tweetsByTagsOrderedByPopularityAndCreateDate, is(aListWith(tweetOne, tweetTwo)));
+    }
+
+    @Test
+    public void getTweetsByTagsOrderByPopularity_dateTest() {
+        Tag tagOne = a(tag());
+        Tag tagTwo = a(tag());
+        Tweet tweetOne = a(tweet().withOwner(a(user())).withTags(aListWith(tagOne)).withCreateDate(DateTime.now().minusHours(10).toDate()));
+        Tweet tweetTwo = a(tweet().withOwner(a(user())).withTags(aListWith(tagTwo)).withCreateDate(DateTime.now().minusHours(5).toDate()));
+        when(tweetDao.findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc(anyListOf(String.class), any(Date.class), any(Pageable.class))).thenReturn(aListWith(tweetTwo));
+        List<Tweet> tweetsByTagsOrderedByPopularityAndCreateDate = tweetService.getTweetsByTagsOrderByPopularity(aListWith(tagOne.getText(), tagTwo.getText()), 6, TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(tweetsByTagsOrderedByPopularityAndCreateDate, is(aListWith(tweetTwo)));
+        assertThat(tweetsByTagsOrderedByPopularityAndCreateDate, hasSize(1));
+    }
+
+    @Test
+    public void getTweetsByTagsOrderByPopularity_pagingTest() {
+        Tag tagOne = a(tag());
+        DateTime dateTime = DateTime.now();
+        int minusHours = 11;
+        int minusCreateHours = 10;
+        DateTime dateTimeAfter = dateTime.minusHours(minusHours);
+        DateTime dateOfCreate = dateTime.minusHours(minusCreateHours);
+        mockStatic(DateTime.class);
+        PowerMockito.when(DateTime.now()).thenReturn(dateTime);
+
+        Tweet tweetOne = a(tweet().withOwner(a(user())).withTags(aListWith(tagOne)).withCreateDate(dateOfCreate.toDate()));
+        Tweet tweetTwo = a(tweet().withOwner(a(user())).withTags(aListWith(tagOne)).withCreateDate(dateOfCreate.toDate()));
+        Tweet tweetThree = a(tweet().withOwner(a(user())).withTags(aListWith(tagOne)).withCreateDate(dateOfCreate.toDate()));
+        Pageable pageOneRequest = new PageRequest(0, 2);
+        Pageable pageTwoRequest = new PageRequest(1, 2);
+
+
+        when(tweetDao.findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc(aListWith(tagOne.getText()), dateTimeAfter.toDate(), pageOneRequest))
+                .thenReturn(aListWith(tweetOne, tweetTwo));
+        when(tweetDao.findByTagsTextInAndCreateDateAfterOrderByVotesVoteAscCreateDateDesc(aListWith(tagOne.getText()), dateTimeAfter.toDate(), pageTwoRequest))
+                .thenReturn(aListWith(tweetThree));
+
+        List<Tweet> tweetsByTagsOrderedByNewestPageOneResult = tweetService.getTweetsByTagsOrderByPopularity(aListWith(tagOne.getText()), minusHours, pageOneRequest);
+        List<Tweet> tweetsByTagsOrderedByNewestPageTwoResult = tweetService.getTweetsByTagsOrderByPopularity(aListWith(tagOne.getText()), minusHours, pageTwoRequest);
+        assertThat(tweetsByTagsOrderedByNewestPageOneResult, is(aListWith(tweetOne, tweetTwo)));
+        assertThat(tweetsByTagsOrderedByNewestPageTwoResult, is(aListWith(tweetThree)));
+    }
 }

@@ -12,9 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.ArrayList;
 
 import static com.twitter.builders.PostVoteBuilder.postVote;
 import static com.twitter.builders.TweetBuilder.tweet;
@@ -161,4 +162,11 @@ public class TweetServiceSecurityTest {
     public void getPostVoteCount_anonymousAccessDenied() {
         tweetService.getPostVoteCount(TestUtil.ID_ONE, Vote.UP);
     }
+
+    @WithAnonymousUser
+    @Test(expected = AccessDeniedException.class)
+    public void getTweetsByTagsOrderByPopularity_anonymousAccessDenied() {
+        tweetService.getTweetsByTagsOrderByPopularity(new ArrayList<>(), 10, TestUtil.ALL_IN_ONE_PAGE);
+    }
+
 }
