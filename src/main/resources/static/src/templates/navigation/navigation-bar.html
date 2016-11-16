@@ -1,0 +1,5 @@
+<template bindable="router">
+    <div class="btn-group">
+        <a repeat.for="item of router.navigation" href.bind="item.href" class="${item.isActive ? 'btn btn-primary' : 'btn btn-default'}">${item.title}</a>
+    </div>
+</template>
