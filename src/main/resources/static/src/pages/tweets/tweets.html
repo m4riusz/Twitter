@@ -1,6 +1,5 @@
 <template>
-    <div class="btn-group">
-        <a repeat.for="item of router.navigation" href.bind="item.href" class="btn btn-default">${item.title}</a>
-    </div>
+    <require from='../../templates/navigation/navigation-bar.html'></require>
+    <navigation-bar router.bind = "router"></navigation-bar>
     <router-view></router-view>
 </template>

@@ -11,20 +11,23 @@ export class HotMenuVM {
 
     router:Router;
     currentLoggedUser:User;
+    hours:number;
     private userService:IUserService;
 
     constructor(userService:IUserService) {
         this.userService = userService;
     }
 
+
     async configureRouter(config:RouterConfiguration, router:Router) {
+        this.hours = 6;
         this.currentLoggedUser = await this.userService.getCurrentLoggedUser();
         config.map(
             [
                 {route: [''], redirect: '6'},
                 {
                     route: [':hours'],
-                    name: 'Hot last',
+                    name: 'Hot-last',
                     moduleId: './tweets',
                     nav: false,
                     settings: {currentUser: this.currentLoggedUser}
@@ -32,5 +35,10 @@ export class HotMenuVM {
             ]
         );
         this.router = router;
+    }
+
+    move(hours:number) {
+        this.hours = hours;
+        this.router.navigate(`${hours}`);
     }
 }

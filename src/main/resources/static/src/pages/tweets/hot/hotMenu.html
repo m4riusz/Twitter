@@ -1,8 +1,8 @@
 <template>
     <div class="btn-group">
-        <a class="btn btn-default" href="#/tweets/hot/6">Last 6 hours</a>
-        <a class="btn btn-default" href="#/tweets/hot/12">Last 12 hours</a>
-        <a class="btn btn-default" href="#/tweets/hot/24">Last 24 hours</a>
+        <a class="${hours == 6 ? 'btn btn-primary' : 'btn btn-default'}" click.delegate="move(6)">Last 6 hours</a>
+        <a class="${hours == 12 ? 'btn btn-primary' : 'btn btn-default'}" click.delegate="move(12)">Last 12 hours</a>
+        <a class="${hours == 24 ? 'btn btn-primary' : 'btn btn-default'}" click.delegate="move(24)">Last 24 hours</a>
     </div>
     <router-view></router-view>
 </template>

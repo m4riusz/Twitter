@@ -15,10 +15,10 @@
     </div>
     <div class="panel">
         <div class="btn-group pull-left">
-            <a class="btn btn-default" click.delegate="setMode(0)">Latest</a>
-            <a class="btn btn-default" click.delegate="setMode(1)">Hot 6h</a>
-            <a class="btn btn-default" click.delegate="setMode(2)">Hot 12h</a>
-            <a class="btn btn-default" click.delegate="setMode(3)">Hot 24h</a>
+            <a class="${mode == 0? 'btn btn-primary' : 'btn btn-default'}" click.delegate="setMode(0)">Latest</a>
+            <a class="${mode == 1? 'btn btn-primary' : 'btn btn-default'}" click.delegate="setMode(1)">Hot 6h</a>
+            <a class="${mode == 2? 'btn btn-primary' : 'btn btn-default'}" click.delegate="setMode(2)">Hot 12h</a>
+            <a class="${mode == 3? 'btn btn-primary' : 'btn btn-default'}" click.delegate="setMode(3)">Hot 24h</a>
         </div>
         <div class="pull-right">
             <tag-input></tag-input>

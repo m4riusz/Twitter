@@ -1,6 +1,7 @@
 <template>
     <require from='../../templates/tweet/tweet-template'></require>
     <require from='../../templates/user/user-template.html'></require>
+    <require from='../../templates/navigation/navigation-bar.html'></require>
 
     <user-template user.bind="user" date="true"></user-template>
     <div if.bind="isBanned() && !isDeleted()">
@@ -30,9 +31,7 @@
         </div>
     </div>
         <hr>
-    <div class="btn-group">
-        <a repeat.for="item of router.navigation" href.bind="item.href" class="btn btn-default">${item.title}</a>
-    </div>
+    <navigation-bar router.bind="router"></navigation-bar>
     <hr>
 
     <router-view></router-view>
