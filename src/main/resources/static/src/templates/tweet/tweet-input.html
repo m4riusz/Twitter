@@ -2,7 +2,13 @@
     <h3>Tweet:</h3>
     <div class="input-group">
         <textarea class="form-control" rows="3" value.bind="message"></textarea>
-        <a class="input-group-addon btn btn-primary"
+        <a class="input-group-addon ${(message.length >= minLength && message.length <= maxLength)? 'btn btn-primary' : 'btn btn-primary disabled'}"
            click.delegate="send(message)">Send</a>
+    </div>
+    <div>
+        <small class="pull-right" if.bind="message.length <= maxLength"> Chars left
+            ${maxLength-message.length}
+        </small>
+        <small class="pull-right text-danger" if.bind="message.length > maxLength">Too long text!</small>
     </div>
 </template>

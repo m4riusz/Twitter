@@ -10,6 +10,10 @@ export class Const {
         MIN: 6,
         MAX: 10
     };
+    public static POST_LENGTH = {
+        min: 1,
+        max: 100
+    };
     public static TOKEN_HEADER:string = 'Auth-Token';
     public static UNAUTHORIZE_ROOT:string = 'unauthorize';
     public static APP_ROOT:string = 'app';

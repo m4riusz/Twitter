@@ -2,6 +2,7 @@ import {customElement, bindable} from "aurelia-templating";
 import {inject} from "aurelia-framework";
 import {TweetService, ITweetService} from "../../service/tweetService";
 import {User} from "../../pages/users/user";
+import {Const} from "../../domain/const";
 import Tweet = Models.Tweet;
 /**
  * Created by mariusz on 17.09.16.
@@ -14,11 +15,15 @@ export class TweetInput {
     @bindable currentUser:User;
 
     message:string;
+    maxLength:number;
+    minLength:number;
     private tweetService:ITweetService;
 
     constructor(tweetService:ITweetService) {
         this.tweetService = tweetService;
         this.message = '';
+        this.maxLength = Const.POST_LENGTH.max;
+        this.minLength = Const.POST_LENGTH.min;
     }
 
     async send(message:string) {
@@ -33,5 +38,9 @@ export class TweetInput {
         } catch (error) {
             alert(error);
         }
+    }
+
+    isInputLengthValid() {
+        return this.message.length >= this.minLength && this.message.length <= this.maxLength;
     }
 }
