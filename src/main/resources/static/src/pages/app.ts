@@ -1,28 +1,31 @@
-import {IUserService, UserService} from "./service/userService";
+import {IUserService, UserService} from "../service/userService";
 import {RouterConfiguration, Router} from "aurelia-router";
 import {inject} from "aurelia-dependency-injection";
-import {AuthService, IAuthService} from "./service/authService";
+import {AuthService, IAuthService} from "../service/authService";
+import {TagService, ITagService} from "../service/tagService";
 import User = Models.User;
 
 /**
  * Created by mariusz on 22.08.16.
  */
 
-@inject(UserService, AuthService)
+@inject(UserService, TagService, AuthService)
 export class App {
-
-    public loggedUser:User;
-    public router:Router;
+    loggedUser:User;
+    router:Router;
     private userService:IUserService;
     private authService:IAuthService;
+    private tagService:ITagService;
 
-    constructor(userService:IUserService, authService:IAuthService) {
+    constructor(userService:IUserService, tagService:ITagService, authService:IAuthService) {
         this.userService = userService;
+        this.tagService = tagService;
         this.authService = authService;
     }
 
     async activate() {
         this.loggedUser = await this.userService.getCurrentLoggedUser();
+        this.loggedUser.favouriteTags = await this.tagService.getUserFavouriteTags(this.loggedUser.id);
     }
 
     configureRouter(config:RouterConfiguration, router:Router) {
@@ -31,7 +34,7 @@ export class App {
             {
                 route: ['', 'home'],
                 name: 'home',
-                moduleId: 'pages/home/home',
+                moduleId: './home/home',
                 title: 'Home',
                 nav: true,
                 settings: {currentUser: this.loggedUser}
@@ -39,7 +42,7 @@ export class App {
             {
                 route: ['tweets'],
                 name: 'tweets',
-                moduleId: 'pages/tweets/tweets',
+                moduleId: './tweets/tweets',
                 title: 'Tweets',
                 nav: true,
                 settings: {currentUser: this.loggedUser}
@@ -47,42 +50,40 @@ export class App {
             {
                 route: ['comment/:tweetId'],
                 name: 'comment',
-                moduleId: 'pages/comments/commentMenu',
+                moduleId: './comments/commentMenu',
                 title: 'Tweet comments',
                 settings: {currentUser: this.loggedUser}
             },
             {
                 route: ['users/:userId'],
                 name: 'users',
-                moduleId: 'pages/users/user',
+                moduleId: './users/user',
                 title: 'User',
                 settings: {currentUser: this.loggedUser}
             },
             {
                 route: ['reports'],
-                moduleId: 'pages/reports/reports',
+                moduleId: './reports/reports',
                 title: ' Reports',
                 nav: true,
                 settings: {currentUser: this.loggedUser}
             },
             {
-                route: 'tags/my',
-                moduleId: 'pages/tweetsByTags/tweets',
-                name: 'My tags',
-                title: 'My Tags',
+                route: 'favourite/tags',
+                redirect: `tags/${this.loggedUser.favouriteTags.map(tag => tag.text)}`,
+                title: 'My favourite tags',
                 nav: true,
-                settings: {currentUser: this.loggedUser}
             },
             {
                 route: 'profile',
-                moduleId: 'pages/users/profile/profile',
+                moduleId: './users/profile/profile',
                 title: 'Profile',
                 nav: false,
                 settings: {currentUser: this.loggedUser}
             },
             {
                 route: 'tags/:tagNames',
-                moduleId: 'pages/tags/tag',
+                moduleId: './tags/tag',
                 title: 'Tag',
                 nav: false,
                 settings: {currentUser: this.loggedUser}
@@ -93,7 +94,7 @@ export class App {
 
     async logout() {
         try {
-            const message = await this.authService.logout();
+            await this.authService.logout();
             window.location.href = "/";
         } catch (error) {
             alert(error);
