@@ -59,6 +59,8 @@ export class CommentTemplate {
                     abstractPost: comment
                 }).then((report:Report)=> {
                     alert('Thank you for the report!');
+                }, error => {
+                    alert(error);
                 })
             }
         })

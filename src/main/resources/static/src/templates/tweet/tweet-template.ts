@@ -58,6 +58,8 @@ export class TweetTemplate {
                     abstractPost: tweet
                 }).then((report:Report)=> {
                     alert('Thank you for the report!');
+                }, error => {
+                    alert(error);
                 })
             }
         })

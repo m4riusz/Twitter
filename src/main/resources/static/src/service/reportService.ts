@@ -48,11 +48,18 @@ export class ReportService extends BasicService implements IReportService {
                 }
             })
                 .then(response => {
-                    response.json().then((result:Report) => {
-                        response.ok ? resolve(result) : reject();
-                    })
-                })
-
+                    let data = response.json();
+                    if (response.ok) {
+                        data.then((data:Report) => {
+                            resolve(data);
+                        });
+                    }
+                    else {
+                        data.then(res=> {
+                            reject(res.message);
+                        })
+                    }
+                });
         })
     }
 
