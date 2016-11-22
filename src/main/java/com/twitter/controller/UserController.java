@@ -1,7 +1,9 @@
 package com.twitter.controller;
 
 import com.twitter.dto.EmailChange;
+import com.twitter.dto.PasswordChange;
 import com.twitter.dto.RoleChange;
+import com.twitter.dto.UserCreateForm;
 import com.twitter.model.Avatar;
 import com.twitter.model.Password;
 import com.twitter.model.Tag;
@@ -35,7 +37,7 @@ public class UserController {
     }
 
     @RequestMapping(value = Route.REGISTER_USER, method = RequestMethod.POST)
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user) throws IOException {
+    public ResponseEntity<User> createUser(@Valid @RequestBody UserCreateForm user) throws IOException {
         return new ResponseEntity<>(userService.create(user), HttpStatus.CREATED);
     }
 
@@ -66,8 +68,8 @@ public class UserController {
     }
 
     @RequestMapping(value = Route.USER_PASSWORD_CHANGE, method = RequestMethod.PUT)
-    public ResponseEntity<User> changeUserPassword(@PathVariable long userId, @RequestBody @Valid Password password) {
-        return new ResponseEntity<>(userService.changeUserPasswordById(userId, password.getPassword()), HttpStatus.OK);
+    public ResponseEntity<User> changeUserPassword(@PathVariable long userId, @RequestBody @Valid PasswordChange passwordChange) {
+        return new ResponseEntity<>(userService.changeUserPasswordById(userId, passwordChange.getPassword()), HttpStatus.OK);
     }
 
     @RequestMapping(value = Route.USER_ROLE_CHANGE, method = RequestMethod.PUT)

@@ -1,7 +1,6 @@
 package com.twitter.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.hibernate.validator.constraints.Length;
 import org.joda.time.DateTime;
 
 import javax.persistence.Entity;
@@ -14,10 +13,6 @@ import java.util.Date;
 @Entity
 public class Password extends AbstractEntity {
     @NotNull
-    @Length(
-            min = 6, max = 10,
-            message = "Password length should be between {min} and {max}!"
-    )
     private String password;
     @NotNull
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

@@ -1,14 +1,12 @@
 package com.twitter.dao;
 
-import com.twitter.model.Report;
-import com.twitter.model.ReportCategory;
-import com.twitter.model.ReportStatus;
-import com.twitter.model.User;
+import com.twitter.model.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by mariusz on 22.07.16.
@@ -23,4 +21,7 @@ public interface ReportDao extends JpaRepository<Report, Long> {
     List<Report> findByStatusAndCategory(ReportStatus status, ReportCategory reportCategory, Pageable pageable);
 
     List<Report> findByUser(User user, Pageable pageable);
+
+    // TODO: 22.11.16 add tests
+    Optional<Report> findByUserAndAbstractPost(User user, AbstractPost abstractPost);
 }

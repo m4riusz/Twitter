@@ -2,6 +2,7 @@ package com.twitter.service;
 
 import com.twitter.dao.ReportDao;
 import com.twitter.dto.ReportSentence;
+import com.twitter.exception.ReportAlreadyExist;
 import com.twitter.exception.ReportNotFoundException;
 import com.twitter.exception.TwitterDateException;
 import com.twitter.model.Report;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by mariusz on 31.07.16.
@@ -46,6 +48,10 @@ public class ReportServiceImpl implements ReportService {
     public Report createReport(Report report) {
         report.setJudge(null);
         report.setUser(userService.getCurrentLoggedUser());
+        Optional<Report> userReportOnPost = reportDao.findByUserAndAbstractPost(report.getUser(), report.getAbstractPost());
+        userReportOnPost.ifPresent(rep -> {
+            throw new ReportAlreadyExist("You have already reported this post!");
+        });
         return reportDao.save(report);
     }
 

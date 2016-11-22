@@ -1,5 +1,6 @@
 package com.twitter.service;
 
+import com.twitter.dto.UserCreateForm;
 import com.twitter.model.Avatar;
 import com.twitter.model.Role;
 import com.twitter.model.User;
@@ -21,7 +22,7 @@ import java.util.List;
 @Service
 public interface UserService extends UserDetailsService {
 
-    User create(User user) throws IOException;
+    User create(UserCreateForm userCreateForm) throws IOException;
 
     User loadUserByUsername(String username) throws UsernameNotFoundException;
 

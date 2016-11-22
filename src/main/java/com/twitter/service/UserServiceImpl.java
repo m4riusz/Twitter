@@ -1,6 +1,7 @@
 package com.twitter.service;
 
 import com.twitter.dao.UserDao;
+import com.twitter.dto.UserCreateForm;
 import com.twitter.exception.*;
 import com.twitter.model.Avatar;
 import com.twitter.model.Password;
@@ -8,6 +9,7 @@ import com.twitter.model.Role;
 import com.twitter.model.User;
 import com.twitter.util.AvatarUtil;
 import com.twitter.util.MessageUtil;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +17,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +37,8 @@ public class UserServiceImpl implements UserService {
     private UserDao userDao;
     private JavaMailSender javaMailSender;
     private AvatarUtil avatarUtil;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserServiceImpl(UserDao userDao, JavaMailSender javaMailSender, AvatarUtil avatarUtil) {
@@ -68,20 +73,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User create(User user) throws IOException {
-        if (userWithUsernameExists(user.getUsername())) {
+    public User create(UserCreateForm userCreateForm) throws IOException {
+        if (userWithUsernameExists(userCreateForm.getUsername())) {
             throw new UserAlreadyExistsException(MessageUtil.USER_ALREADY_EXISTS_USERNAME_ERROR_MSG);
-        } else if (userWithEmailExists(user.getEmail())) {
+        } else if (userWithEmailExists(userCreateForm.getEmail())) {
             throw new UserAlreadyExistsException(MessageUtil.USER_ALREADY_EXISTS_EMAIL_ERROR_MSG);
         }
         String verifyKey = UUID.randomUUID().toString();
-        sendEmail(user.getEmail(),
+        sendEmail(userCreateForm.getEmail(),
                 MessageUtil.EMAIL_FROM,
                 MessageUtil.EMAIL_SUBJECT,
                 MessageUtil.EMAIL_CONTENT + "\n" + MessageUtil.EMAIL_VERIFY_LINK + verifyKey
         );
+        User user = new User();
         user.getAccountStatus().setVerifyKey(verifyKey);
         user.setAvatar(avatarUtil.getDefaultAvatar());
+        user.setUsername(userCreateForm.getUsername());
+        user.setEmail(userCreateForm.getEmail());
+        user.setGender(userCreateForm.getGender());
+        user.setPassword(new Password(passwordEncoder.encode(userCreateForm.getPassword())));
         return userDao.save(user);
     }
 
@@ -142,7 +152,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User changeUserPasswordById(long userId, String password) {
         User userToChange = getUserById(userId);
-        userToChange.setPassword(new Password(password));
+        userToChange.setPassword(new Password(passwordEncoder.encode(password)));
         return userToChange;
     }
 
@@ -216,6 +226,7 @@ public class UserServiceImpl implements UserService {
         User user = userDao.findOneByAccountStatusVerifyKey(verifyKey);
         if (userIsNotActivated(user)) {
             user.getAccountStatus().setEnable(true);
+            user.getAccountStatus().setEnableDate(DateTime.now().toDate());
             return;
         } else if (userIsActivated(user)) {
             throw new UserException(MessageUtil.ACCOUNT_HAS_BEEN_ALREADY_ENABLED);
