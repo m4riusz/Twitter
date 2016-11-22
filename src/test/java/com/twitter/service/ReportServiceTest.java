@@ -21,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static com.twitter.builders.AccountStatusBuilder.accountStatus;
 import static com.twitter.builders.ReportBuilder.report;
@@ -89,6 +90,7 @@ public class ReportServiceTest {
                 .withUser(accuser)
         );
         when(reportDao.save(any(Report.class))).thenReturn(report);
+        when(reportDao.findByUserAndAbstractPost(any(User.class), any(AbstractPost.class))).thenReturn(Optional.empty());
         Report savedReport = reportService.createReport(report);
         assertThat(savedReport, is(report));
     }

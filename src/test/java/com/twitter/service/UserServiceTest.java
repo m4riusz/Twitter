@@ -2,11 +2,9 @@ package com.twitter.service;
 
 import com.twitter.config.Profiles;
 import com.twitter.dao.UserDao;
+import com.twitter.dto.UserCreateForm;
 import com.twitter.exception.*;
-import com.twitter.model.AccountStatus;
-import com.twitter.model.Avatar;
-import com.twitter.model.Role;
-import com.twitter.model.User;
+import com.twitter.model.*;
 import com.twitter.util.AvatarUtil;
 import com.twitter.util.TestUtil;
 import org.joda.time.DateTime;
@@ -26,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
@@ -63,6 +62,8 @@ public class  UserServiceTest {
     private JavaMailSender javaMailSender;
     @Mock
     private AvatarUtil avatarUtil;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     private UserService userService;
 
@@ -70,7 +71,7 @@ public class  UserServiceTest {
 
     @Before
     public void setUp() {
-        userService = new UserServiceImpl(userDao, javaMailSender, avatarUtil);
+        userService = new UserServiceImpl(userDao, javaMailSender, avatarUtil,passwordEncoder);
         authentication = mock(Authentication.class);
         mockStatic(SecurityContextHolder.class);
         SecurityContext securityContext = mock(SecurityContext.class);
@@ -115,8 +116,10 @@ public class  UserServiceTest {
         User user = a(user());
         when(userDao.findByUsername(anyString())).thenReturn(null);
         when(userDao.findByEmail(anyString())).thenReturn(null);
+        when(passwordEncoder.encode(any())).thenReturn("ENCRYPTED_PASSWORD");
         when(userDao.save(any(User.class))).thenReturn(user);
-        User createResult = userService.create(user);
+        UserCreateForm userCreateForm = new UserCreateForm(user.getUsername(),user.getPassword(),user.getEmail(),user.getGender());
+        User createResult = userService.create(userCreateForm);
         assertThat(createResult, is(user));
         verify(javaMailSender, times(1)).send(any(SimpleMailMessage.class));
     }
@@ -124,7 +127,8 @@ public class  UserServiceTest {
     @Test(expected = UserAlreadyExistsException.class)
     public void create_usernameAlreadyExist() throws IOException {
         when(userDao.findByUsername(anyString())).thenReturn(a(user()));
-        userService.create(a(user()));
+        UserCreateForm userCreateForm = new UserCreateForm("user","password","email@email.com", Gender.FEMALE);
+        userService.create(userCreateForm);
     }
 
     @Test(expected = UserAlreadyExistsException.class)
@@ -132,7 +136,8 @@ public class  UserServiceTest {
         User user = a(user());
         when(userDao.findByUsername(anyString())).thenReturn(null);
         when(userDao.findByEmail(anyString())).thenReturn(user);
-        userService.create(user);
+        UserCreateForm userCreateForm = new UserCreateForm(user.getUsername(),user.getPassword(),user.getEmail(),user.getGender());
+        userService.create(userCreateForm);
     }
 
     @Test
@@ -456,6 +461,7 @@ public class  UserServiceTest {
         User user = a(user());
         when(userDao.exists(anyLong())).thenReturn(true);
         when(userDao.findOne(anyLong())).thenReturn(user);
+        when(passwordEncoder.encode(anyString())).thenReturn("newPassword");
         userService.changeUserPasswordById(user.getId(), "newPassword");
         assertThat(user.getPassword(), is("newPassword"));
     }

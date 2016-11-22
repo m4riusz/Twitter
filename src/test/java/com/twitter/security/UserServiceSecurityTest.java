@@ -1,6 +1,8 @@
 package com.twitter.security;
 
 import com.twitter.config.Profiles;
+import com.twitter.dto.UserCreateForm;
+import com.twitter.model.Gender;
 import com.twitter.model.Role;
 import com.twitter.service.UserService;
 import com.twitter.util.TestUtil;
@@ -19,7 +21,6 @@ import java.io.IOException;
 import java.util.Date;
 
 import static com.twitter.builders.AvatarBuilder.avatar;
-import static com.twitter.builders.UserBuilder.user;
 import static com.twitter.util.Util.a;
 
 /**
@@ -272,7 +273,7 @@ public class UserServiceSecurityTest {
     @WithAnonymousUser
     @Test
     public void create_anonymousAccess() throws IOException {
-        userService.create(a(user()));
+        userService.create(new UserCreateForm("user", "password", "email@email.com", Gender.FEMALE));
     }
 
     @WithAnonymousUser

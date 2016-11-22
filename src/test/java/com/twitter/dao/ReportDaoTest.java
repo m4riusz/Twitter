@@ -159,23 +159,25 @@ public class ReportDaoTest {
     @Test
     public void findByCategory_someReportsWithDifferentCategories() {
         User owner = a(user());
-        User accuser = a(user());
-        userDao.save(aListWith(owner, accuser));
+        User accuserOne = a(user());
+        User accuserTwo = a(user());
+        User accuserThree = a(user());
+        userDao.save(aListWith(owner, accuserOne,accuserTwo,accuserThree));
         Tweet tweet = a(tweet().withOwner(owner));
         tweetDao.save(tweet);
         Report reportOne = a(report()
                 .withAbstractPost(tweet)
-                .withUser(accuser)
+                .withUser(accuserOne)
                 .withCategory(ReportCategory.HATE_SPEECH)
         );
         Report reportTwo = a(report()
                 .withAbstractPost(tweet)
-                .withUser(accuser)
+                .withUser(accuserTwo)
                 .withCategory(ReportCategory.ADVERTISEMENT)
         );
         Report reportThree = a(report()
                 .withAbstractPost(tweet)
-                .withUser(accuser)
+                .withUser(accuserThree)
                 .withCategory(ReportCategory.OTHER)
         );
         reportDao.save(aListWith(reportOne, reportTwo, reportThree));
