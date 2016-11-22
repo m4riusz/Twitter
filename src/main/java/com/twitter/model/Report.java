@@ -3,15 +3,17 @@ package com.twitter.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 /**
  * Created by mariusz on 11.07.16.
  */
 @Entity
+@Table(
+        uniqueConstraints =
+        @UniqueConstraint(columnNames = {"user_id", "abstract_post_id"})
+)
 public class Report extends AbstractEntity{
     @NotNull
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
