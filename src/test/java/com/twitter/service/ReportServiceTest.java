@@ -3,6 +3,7 @@ package com.twitter.service;
 import com.twitter.config.Profiles;
 import com.twitter.dao.ReportDao;
 import com.twitter.dto.ReportSentence;
+import com.twitter.exception.ReportAlreadyExist;
 import com.twitter.exception.ReportNotFoundException;
 import com.twitter.exception.TwitterDateException;
 import com.twitter.model.*;
@@ -78,6 +79,22 @@ public class ReportServiceTest {
         assertThat(reportFromDb, is(report));
     }
 
+    @Test(expected = ReportAlreadyExist.class)
+    public void createReport_reportAlreadyExists() {
+        User accuser = a(user());
+        Tweet tweet = a(tweet()
+                .withOwner(a(user()))
+        );
+        Report report = a(report()
+                .withAbstractPost(tweet)
+                .withUser(accuser)
+        );
+        when(userService.getCurrentLoggedUser()).thenReturn(accuser);
+        when(reportDao.save(any(Report.class))).thenReturn(report);
+        when(reportDao.findByUserAndAbstractPost(any(User.class), any(AbstractPost.class))).thenReturn(Optional.of(report));
+        reportService.createReport(report);
+    }
+
     @Test
     public void createReport_simpleReport() {
         User tweetOwner = a(user());
@@ -89,10 +106,13 @@ public class ReportServiceTest {
                 .withAbstractPost(tweet)
                 .withUser(accuser)
         );
+        when(userService.getCurrentLoggedUser()).thenReturn(accuser);
         when(reportDao.save(any(Report.class))).thenReturn(report);
         when(reportDao.findByUserAndAbstractPost(any(User.class), any(AbstractPost.class))).thenReturn(Optional.empty());
         Report savedReport = reportService.createReport(report);
         assertThat(savedReport, is(report));
+        assertThat(savedReport.getAbstractPost(), is(tweet));
+        assertThat(savedReport.getAbstractPost().getOwner(), is(tweetOwner));
     }
 
     @Test(expected = ReportNotFoundException.class)

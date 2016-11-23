@@ -50,7 +50,7 @@ public class ReportServiceImpl implements ReportService {
         report.setUser(userService.getCurrentLoggedUser());
         Optional<Report> userReportOnPost = reportDao.findByUserAndAbstractPost(report.getUser(), report.getAbstractPost());
         userReportOnPost.ifPresent(rep -> {
-            throw new ReportAlreadyExist("You have already reported this post!");
+            throw new ReportAlreadyExist(MessageUtil.REPORT_ALREADY_EXISTS);
         });
         return reportDao.save(report);
     }
