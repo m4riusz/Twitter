@@ -22,6 +22,5 @@ public interface ReportDao extends JpaRepository<Report, Long> {
 
     List<Report> findByUser(User user, Pageable pageable);
 
-    // TODO: 22.11.16 add tests
     Optional<Report> findByUserAndAbstractPost(User user, AbstractPost abstractPost);
 }

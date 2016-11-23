@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.twitter.builders.ReportBuilder.report;
 import static com.twitter.builders.TweetBuilder.tweet;
@@ -21,6 +22,7 @@ import static com.twitter.util.Util.a;
 import static com.twitter.util.Util.aListWith;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.springframework.data.domain.Sort.Direction;
 
@@ -452,4 +454,58 @@ public class ReportDaoTest {
         assertThat(userReportsPageTwo, hasSize(1));
 
     }
+
+    @Test
+    public void findByUserAndAbstractPost_userDoesNotExist() {
+        User user = a(user());
+        userDao.save(user);
+        Tweet tweet = a(tweet()
+                .withOwner(user)
+        );
+        tweetDao.save(tweet);
+        Optional<Report> optionalReport = reportDao.findByUserAndAbstractPost(null, tweet);
+        assertFalse(optionalReport.isPresent());
+    }
+
+    @Test
+    public void findByUserAndAbstractPost_postDoesNotExist() {
+        User user = a(user());
+        userDao.save(user);
+        Optional<Report> optionalReport = reportDao.findByUserAndAbstractPost(user, null);
+        assertFalse(optionalReport.isPresent());
+    }
+
+    @Test
+    public void findByUserAndAbstractPost_reportDoesNotExist() {
+        User user = a(user());
+        User accuser = a(user());
+        userDao.save(aListWith(user, accuser));
+        Tweet tweet = a(tweet()
+                .withOwner(accuser)
+        );
+        tweetDao.save(tweet);
+
+        Optional<Report> optionalReport = reportDao.findByUserAndAbstractPost(user, tweet);
+        assertFalse(optionalReport.isPresent());
+    }
+
+    @Test
+    public void findByUserAndAbstractPost_reportExists() {
+        User user = a(user());
+        User accuser = a(user());
+        userDao.save(aListWith(user, accuser));
+        Tweet tweet = a(tweet()
+                .withOwner(accuser)
+        );
+        tweetDao.save(tweet);
+
+        Report report = a(report()
+                .withAbstractPost(tweet)
+                .withUser(user)
+        );
+        reportDao.save(report);
+        Optional<Report> optionalReport = reportDao.findByUserAndAbstractPost(user, tweet);
+        assertThat(optionalReport.get(), is(report));
+    }
+
 }
