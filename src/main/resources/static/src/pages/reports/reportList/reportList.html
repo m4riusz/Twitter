@@ -1,4 +1,5 @@
 <template>
+    <div if.bind = "reports.length > 0">
     <table style="table-layout: fixed; word-break: break-all;" class="table table-hover table-bordered">
             <thead>
             <tr>
@@ -25,5 +26,10 @@
         <div class="well well-sm text-center" click.delegate="nextPage()">
             <h3 class="h3">More</h3>
         </div>
+
+    </div>
+    <div if.bind = "reports.length == 0">
+        <h1 class="text-center">You didn't create any report!</h1>
+    </div>
 
 </template>

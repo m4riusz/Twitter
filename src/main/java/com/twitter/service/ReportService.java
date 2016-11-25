@@ -20,7 +20,6 @@ public interface ReportService {
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
     Report findById(long reportId);
 
-    // TODO: 22.11.16 add tests for report already exist
     @PreAuthorize(SecurityUtil.PERSONAL_REPORT)
     Report createReport(Report report);
 

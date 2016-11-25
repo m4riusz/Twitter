@@ -1,10 +1,16 @@
 <template>
     <require from='../../../templates/tweet/tweet-template'></require>
-    <h4>My favourite tweets!</h4>
-    <div repeat.for="tweet of tweets">
-        <tweet-template tweet.bind="tweet" current-user.bind="currentLoggedUser"></tweet-template>
+    <div if.bind = "tweets.length > 0">
+        <h4>My favourite tweets!</h4>
+        <div repeat.for="tweet of tweets">
+            <tweet-template tweet.bind="tweet" current-user.bind="currentLoggedUser"></tweet-template>
+        </div>
+        <div class="well well-sm text-center" click.delegate="nextPage()">
+            <h3 class="h3">More</h3>
+        </div>
     </div>
-    <div class="well well-sm text-center" click.delegate="nextPage()">
-        <h3 class="h3">More</h3>
+    <div if.bind = "tweets.length == 0">
+        <h1 class="text-center">You have no favourite tweets!</h1>
     </div>
+
 </template>
