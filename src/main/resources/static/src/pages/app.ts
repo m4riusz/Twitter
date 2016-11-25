@@ -29,7 +29,6 @@ export class App {
     }
 
     configureRouter(config:RouterConfiguration, router:Router) {
-
         config.map([
             {
                 route: ['', 'home'],
@@ -70,9 +69,10 @@ export class App {
             },
             {
                 route: 'favourite/tags',
-                redirect: `tags/${this.loggedUser.favouriteTags.map(tag => tag.text)}`,
+                moduleId: './tags/tag',
                 title: 'My favourite tags',
                 nav: true,
+                settings: {currentUser: this.loggedUser, favourite: true}
             },
             {
                 route: 'profile',
@@ -86,7 +86,7 @@ export class App {
                 moduleId: './tags/tag',
                 title: 'Tag',
                 nav: false,
-                settings: {currentUser: this.loggedUser}
+                settings: {currentUser: this.loggedUser, favourite: false}
             }
         ]);
         this.router = router;

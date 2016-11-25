@@ -28,16 +28,19 @@ export class TagView {
     }
 
     async activate(params, config) {
-        const textTags = params.tagNames.split(Const.SEPARATOR);
-        this.tags = textTags.map(tag => {
-            return {text: tag}
-        });
         this.currentLoggedUser = config.settings.currentUser;
-        [this.tweets, this.currentLoggedUser.favouriteTags] = await Promise.all([
-            this.tweetService.getTweetsByTags(this.tags, this.page, Const.PAGE_SIZE),
-            this.tagService.getUserFavouriteTags(this.currentLoggedUser.id)
-        ]);
-        this.currentTagFollowed = this.isTagFavourited(this.tags[0]);
+        if (!config.settings.favourite) {
+            const textTags = params.tagNames.split(Const.SEPARATOR);
+            this.tags = textTags.map(tag => {
+                return {text: tag}
+            });
+            this.tweets = await this.tweetService.getTweetsByTags(this.tags, this.page, Const.PAGE_SIZE);
+            this.currentTagFollowed = this.isTagFavourited(this.tags[0]);
+        } else {
+            this.tags = this.currentLoggedUser.favouriteTags = await this.tagService.getUserFavouriteTags(this.currentLoggedUser.id);
+            this.tweets = await this.tweetService.getTweetsByTags(this.tags, this.page, Const.PAGE_SIZE);
+            this.currentTagFollowed = this.isTagFavourited(this.tags[0]);
+        }
     }
 
     setMode(mode:number) {
