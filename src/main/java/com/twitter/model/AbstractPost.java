@@ -52,6 +52,10 @@ public abstract class AbstractPost extends AbstractEntity {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "abstractPost")
     @JsonIgnore
     private List<Report> reports;
+    @NotNull
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notifications;
 
     public AbstractPost() {
         super();
@@ -59,6 +63,7 @@ public abstract class AbstractPost extends AbstractEntity {
         this.banned = false;
         this.votes = new ArrayList<>();
         this.reports = new ArrayList<>();
+        this.notifications = new ArrayList<>();
     }
 
     public AbstractPost(String content, User owner) {
@@ -113,6 +118,14 @@ public abstract class AbstractPost extends AbstractEntity {
 
     public void setReports(List<Report> reports) {
         this.reports = reports;
+    }
+
+    public List<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
     }
 
     @Override
