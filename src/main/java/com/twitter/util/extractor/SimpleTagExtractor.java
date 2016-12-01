@@ -1,4 +1,4 @@
-package com.twitter.util;
+package com.twitter.util.extractor;
 
 import com.twitter.model.Tag;
 import org.springframework.stereotype.Component;

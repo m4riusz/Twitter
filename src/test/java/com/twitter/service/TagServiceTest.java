@@ -6,7 +6,7 @@ import com.twitter.exception.UserException;
 import com.twitter.exception.UserNotFoundException;
 import com.twitter.model.Tag;
 import com.twitter.model.User;
-import com.twitter.util.TagExtractor;
+import com.twitter.util.extractor.TagExtractor;
 import com.twitter.util.TestUtil;
 import org.junit.Before;
 import org.junit.Test;
