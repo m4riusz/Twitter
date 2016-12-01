@@ -67,6 +67,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean exists(String username) {
+        return userDao.findByUsername(username) != null;
+    }
+
+    @Override
     public User getUserById(long userId) {
         checkIfUserExist(userId);
         return userDao.findOne(userId);
@@ -74,7 +79,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(UserCreateForm userCreateForm) throws IOException {
-        if (userWithUsernameExists(userCreateForm.getUsername())) {
+        if (exists(userCreateForm.getUsername())) {
             throw new UserAlreadyExistsException(MessageUtil.USER_ALREADY_EXISTS_USERNAME_ERROR_MSG);
         } else if (userWithEmailExists(userCreateForm.getEmail())) {
             throw new UserAlreadyExistsException(MessageUtil.USER_ALREADY_EXISTS_EMAIL_ERROR_MSG);
@@ -261,9 +266,6 @@ public class UserServiceImpl implements UserService {
         return userDao.findByEmail(email) != null;
     }
 
-    private boolean userWithUsernameExists(String username) {
-        return userDao.findByUsername(username) != null;
-    }
     private boolean isBanDateBeforeNow(Date date) {
         return date.before(Calendar.getInstance().getTime());
     }

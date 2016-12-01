@@ -34,6 +34,10 @@ public interface UserService extends UserDetailsService {
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     boolean exists(long userId);
 
+    // TODO: 01.12.16 add tests
+    @PreAuthorize(SecurityUtil.AUTHENTICATED)
+    boolean exists(String username);
+
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     User getUserById(long userId);
 
