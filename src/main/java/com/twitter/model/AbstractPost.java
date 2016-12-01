@@ -54,7 +54,7 @@ public abstract class AbstractPost extends AbstractEntity {
     private List<Report> reports;
     @NotNull
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "abstractPost")
     private List<Notification> notifications;
 
     public AbstractPost() {
