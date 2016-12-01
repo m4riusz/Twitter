@@ -27,6 +27,7 @@ public final class TweetBuilder implements Builder<Tweet> {
     private List<Report> reports = new ArrayList<>();
     private long id;
     private Date createDate = Calendar.getInstance().getTime();
+    private List<Notification> notifications = new ArrayList<>();
 
     public static TweetBuilder tweet() {
         counter++;
@@ -95,6 +96,12 @@ public final class TweetBuilder implements Builder<Tweet> {
         return this;
     }
 
+    public TweetBuilder withNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
+        return this;
+    }
+
+
     public Tweet build() {
         Tweet tweet = new Tweet();
         tweet.setTags(tags);
@@ -107,6 +114,7 @@ public final class TweetBuilder implements Builder<Tweet> {
         tweet.setId(id);
         tweet.setDeleted(deleted);
         tweet.setCreateDate(createDate);
+        tweet.setNotifications(notifications);
         return tweet;
     }
 }

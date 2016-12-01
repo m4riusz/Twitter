@@ -26,6 +26,7 @@ public final class CommentBuilder implements Builder<Comment> {
     private List<Report> reports = new ArrayList<>();
     private long id;
     private Date createDate = Calendar.getInstance().getTime();
+    private List<Notification> notifications = new ArrayList<>();
 
 
     public static CommentBuilder comment() {
@@ -91,6 +92,11 @@ public final class CommentBuilder implements Builder<Comment> {
         return this;
     }
 
+    public CommentBuilder withNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
+        return this;
+    }
+
     public Comment build() {
         Comment comment = new Comment();
         comment.setBanned(banned);
@@ -102,6 +108,7 @@ public final class CommentBuilder implements Builder<Comment> {
         comment.setId(id);
         comment.setDeleted(deleted);
         comment.setCreateDate(createDate);
+        comment.setNotifications(notifications);
         return comment;
     }
 }
