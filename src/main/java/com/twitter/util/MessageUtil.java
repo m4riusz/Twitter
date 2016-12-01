@@ -36,4 +36,5 @@ public final class MessageUtil {
     public static final String TAG_ALREADY_IN_FAVOURITES_ERROR_MSG = "You already have this tag in yours favourite tags!";
     public static final String TAG_NOT_IN_FAVOURITES_DELETE_ERROR_MSG = "You cant remove tag, because it is not in your favourite tags!";
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm";
+    public static final String YOU_HAVE_BEEN_MENTIONED_MESSAGE = "You have been mentioned by @";
 }

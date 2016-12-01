@@ -3,14 +3,16 @@ package com.twitter.service;
 import com.twitter.dto.PostVote;
 import com.twitter.exception.PostDeleteException;
 import com.twitter.exception.PostNotFoundException;
-import com.twitter.model.AbstractPost;
-import com.twitter.model.User;
-import com.twitter.model.UserVote;
-import com.twitter.model.Vote;
+import com.twitter.model.*;
 import com.twitter.util.MessageUtil;
+import com.twitter.util.extractor.UsernameExtractor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * Created by mariusz on 08.08.16.
@@ -18,19 +20,38 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 abstract class PostServiceImpl<T extends AbstractPost, TRepository extends CrudRepository<T, Long>> implements PostService<T> {
 
+    private Logger logger = LoggerFactory.getLogger(PostServiceImpl.class.getName());
+
     protected final TRepository repository;
     protected final UserService userService;
     private final UserVoteService userVoteService;
+    private final UsernameExtractor usernameExtractor;
+    private final NotificationService notificationService;
 
-    PostServiceImpl(TRepository repository, UserService userService, UserVoteService userVoteService) {
+    PostServiceImpl(TRepository repository, UserService userService, UserVoteService userVoteService, UsernameExtractor usernameExtractor, NotificationService notificationService) {
         this.repository = repository;
         this.userService = userService;
         this.userVoteService = userVoteService;
+        this.usernameExtractor = usernameExtractor;
+        this.notificationService = notificationService;
     }
 
     @Override
     public T create(@Param("post") T post) {
-        post.setOwner(userService.getCurrentLoggedUser());
+        User currentLoggedUser = userService.getCurrentLoggedUser();
+        post.setOwner(currentLoggedUser);
+        List<String> usernameList = usernameExtractor.extract(post.getContent());
+        usernameList.stream()
+                .filter(userService::exists)
+                .forEach(username -> {
+                    Notification notification = new Notification();
+                    notification.setSourceUser(currentLoggedUser);
+                    notification.setDestinationUser(userService.loadUserByUsername(username));
+                    notification.setText(MessageUtil.YOU_HAVE_BEEN_MENTIONED_MESSAGE + username);
+                    notification.setSeen(false);
+                    notification.setAbstractPost(post);
+                    post.getNotifications().add(notification);
+                });
         return repository.save(post);
     }
 
