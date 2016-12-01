@@ -1,14 +1,15 @@
 package com.twitter.util.extractor;
 
-import com.twitter.model.Tag;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by mariusz on 01.12.16.
  */
+
+@Component
 public class SimpleUsernameExtractor implements UsernameExtractor {
 
     public static final String SPACE = " ";
