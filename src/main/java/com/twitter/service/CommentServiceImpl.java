@@ -5,6 +5,7 @@ import com.twitter.exception.PostNotFoundException;
 import com.twitter.exception.UserNotFoundException;
 import com.twitter.model.Comment;
 import com.twitter.util.MessageUtil;
+import com.twitter.util.extractor.UsernameExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,8 +23,8 @@ public class CommentServiceImpl extends PostServiceImpl<Comment, CommentDao> imp
     private TweetService tweetService;
 
     @Autowired
-    public CommentServiceImpl(CommentDao commentDao, TweetService tweetService, UserVoteService userVoteService, UserService userService) {
-        super(commentDao, userService, userVoteService);
+    public CommentServiceImpl(CommentDao commentDao, TweetService tweetService, UserVoteService userVoteService, UserService userService, UsernameExtractor usernameExtractor, NotificationService notificationService) {
+        super(commentDao, userService, userVoteService, usernameExtractor, notificationService);
         this.tweetService = tweetService;
     }
 

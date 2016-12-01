@@ -7,6 +7,7 @@ import com.twitter.exception.*;
 import com.twitter.model.*;
 import com.twitter.util.MessageUtil;
 import com.twitter.util.TestUtil;
+import com.twitter.util.extractor.UsernameExtractor;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,21 +58,22 @@ public class TweetServiceTest {
 
     @Mock
     private UserService userService;
-
     @Mock
     private TweetDao tweetDao;
-
     @Mock
     private UserVoteService userVoteService;
-
     @Mock
     private TagService tagService;
+    @Mock
+    private UsernameExtractor usernameExtractor;
+    @Mock
+    private NotificationService notificationService;
 
     private TweetService tweetService;
 
     @Before
     public void setUp() {
-        tweetService = new TweetServiceImpl(tweetDao, userService, userVoteService, tagService);
+        tweetService = new TweetServiceImpl(tweetDao, userService, userVoteService, tagService, usernameExtractor, notificationService);
     }
 
     @Test(expected = PostNotFoundException.class)

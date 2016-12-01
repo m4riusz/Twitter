@@ -9,6 +9,7 @@ import com.twitter.exception.UserNotFoundException;
 import com.twitter.model.*;
 import com.twitter.util.MessageUtil;
 import com.twitter.util.TestUtil;
+import com.twitter.util.extractor.UsernameExtractor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,12 +52,16 @@ public class CommentServiceTest {
     private UserService userService;
     @Mock
     private UserVoteService userVoteService;
+    @Mock
+    private UsernameExtractor usernameExtractor;
+    @Mock
+    private NotificationService notificationService;
 
     private CommentService commentService;
 
     @Before
     public void setUp() {
-        commentService = new CommentServiceImpl(commentDao, tweetService, userVoteService, userService);
+        commentService = new CommentServiceImpl(commentDao, tweetService, userVoteService, userService, usernameExtractor, notificationService);
     }
 
     @Test

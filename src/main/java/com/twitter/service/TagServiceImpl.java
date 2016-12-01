@@ -5,7 +5,7 @@ import com.twitter.exception.UserException;
 import com.twitter.model.Tag;
 import com.twitter.model.User;
 import com.twitter.util.MessageUtil;
-import com.twitter.util.TagExtractor;
+import com.twitter.util.extractor.TagExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

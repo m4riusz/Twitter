@@ -9,6 +9,7 @@ import com.twitter.model.Tweet;
 import com.twitter.model.User;
 import com.twitter.util.MessageUtil;
 import com.twitter.util.SecurityUtil;
+import com.twitter.util.extractor.UsernameExtractor;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by mariusz on 29.07.16.
@@ -31,8 +31,8 @@ public class TweetServiceImpl extends PostServiceImpl<Tweet, TweetDao> implement
     private final TagService tagService;
 
     @Autowired
-    public TweetServiceImpl(TweetDao tweetDao, UserService userService, UserVoteService userVoteService, TagService tagService) {
-        super(tweetDao, userService, userVoteService);
+    public TweetServiceImpl(TweetDao tweetDao, UserService userService, UserVoteService userVoteService, TagService tagService, UsernameExtractor usernameExtractor, NotificationService notificationService) {
+        super(tweetDao, userService, userVoteService, usernameExtractor, notificationService);
         this.tagService = tagService;
     }
 
