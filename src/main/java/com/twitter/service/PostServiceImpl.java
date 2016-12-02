@@ -39,18 +39,24 @@ abstract class PostServiceImpl<T extends AbstractPost, TRepository extends CrudR
         post.setOwner(currentLoggedUser);
         List<String> usernameList = usernameExtractor.extract(post.getContent());
         usernameList.stream()
+                .distinct()
                 .filter(userService::exists)
+                .filter(username -> usernameDoesNotBelongToLoggedUser(currentLoggedUser, username))
                 .limit(Config.MAX_USER_NOTIFICATION_IN_ONE_POST)
                 .forEach(username -> {
                     Notification notification = new Notification();
                     notification.setSourceUser(currentLoggedUser);
                     notification.setDestinationUser(userService.loadUserByUsername(username));
-                    notification.setText(MessageUtil.YOU_HAVE_BEEN_MENTIONED_MESSAGE + username);
+                    notification.setText(MessageUtil.YOU_HAVE_BEEN_MENTIONED_MESSAGE + currentLoggedUser.getUsername());
                     notification.setSeen(false);
                     notification.setAbstractPost(post);
                     post.getNotifications().add(notification);
                 });
         return repository.save(post);
+    }
+
+    private boolean usernameDoesNotBelongToLoggedUser(User currentLoggedUser, String username) {
+        return !username.equals(currentLoggedUser.getUsername());
     }
 
     @Override
