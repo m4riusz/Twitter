@@ -14,6 +14,6 @@ import java.util.List;
 
 @Repository
 public interface NotificationDao extends JpaRepository<Notification, Long> {
-    // TODO: 02.12.16 add tests
+
     List<Notification> findByDestinationUserAndSeenOrderByCreateDateDesc(User user,boolean seen, Pageable pageable);
 }

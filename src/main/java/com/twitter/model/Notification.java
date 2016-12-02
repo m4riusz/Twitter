@@ -1,5 +1,6 @@
 package com.twitter.model;
 
+import org.hibernate.annotations.Check;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ import javax.validation.constraints.NotNull;
         uniqueConstraints =
         @UniqueConstraint(columnNames = {"abstract_post_id", "destination_user_id", "source_user_id"})
 )
+@Check(constraints = "destination_user_id != source_user_id")
 public class Notification extends AbstractEntity {
 
     @ManyToOne
