@@ -7,6 +7,7 @@ import com.twitter.exception.PostDeleteException;
 import com.twitter.exception.PostNotFoundException;
 import com.twitter.exception.UserNotFoundException;
 import com.twitter.model.*;
+import com.twitter.util.Config;
 import com.twitter.util.MessageUtil;
 import com.twitter.util.TestUtil;
 import com.twitter.util.extractor.UsernameExtractor;
@@ -19,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.twitter.builders.CommentBuilder.comment;
@@ -31,9 +33,11 @@ import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -70,6 +74,54 @@ public class CommentServiceTest {
         when(commentDao.save(any(Comment.class))).thenReturn(comment);
         Comment savedComment = commentService.create(comment);
         assertThat(savedComment, is(comment));
+    }
+
+    @Test
+    public void createComment_saveTweet_notifyUserDoesNotExist() {
+        String username = "SUPER";
+        User user = a(user()
+                .withId(TestUtil.ID_ONE)
+        );
+        User notifedUser = a(user()
+                .withId(TestUtil.ID_TWO)
+                .withUsername(username)
+        );
+        Comment comment = a(comment()
+                .withOwner(user)
+        );
+        when(usernameExtractor.extract(anyString())).thenReturn(aListWith(username));
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
+        when(userService.exists(username)).thenReturn(true);
+        when(userService.loadUserByUsername(username)).thenReturn(notifedUser);
+        when(commentDao.save(comment)).thenReturn(comment);
+        Comment createdComment = commentService.create(comment);
+        assertThat(createdComment.getNotifications(), hasSize(1));
+        assertTrue(createdComment.getNotifications().stream().allMatch(notification -> notification.getSourceUser().equals(user)));
+        assertTrue(createdComment.getNotifications().stream().allMatch(notification -> notification.getDestinationUser().equals(notifedUser)));
+        assertTrue(createdComment.getNotifications().stream().allMatch(notification -> notification.getAbstractPost().equals(comment)));
+    }
+
+    @Test
+    public void createComment_saveTweet_maximumNumberOfNotifedUsers() {
+        User user = a(user()
+                .withId(TestUtil.ID_ONE)
+        );
+
+        Comment comment = a(comment()
+                .withOwner(user)
+        );
+        List<String> usernames = new ArrayList<>();
+        int startId = 10;
+        for (int userId = startId; userId < Config.MAX_USER_NOTIFICATION_IN_ONE_POST + startId + 1; userId++) {
+            usernames.add("USERNAME_" + userId);
+        }
+        when(usernameExtractor.extract(anyString())).thenReturn(usernames);
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
+        when(userService.exists(anyString())).thenReturn(true);
+        when(userService.loadUserByUsername(anyString())).thenReturn(a(user()));
+        when(commentDao.save(comment)).thenReturn(comment);
+        Comment createdComment = commentService.create(comment);
+        assertThat(createdComment.getNotifications(), hasSize(Config.MAX_USER_NOTIFICATION_IN_ONE_POST));
     }
 
     @Test(expected = PostNotFoundException.class)

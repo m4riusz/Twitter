@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface PostService<T extends AbstractPost> {
-    // TODO: 01.12.16 add notification tests
     @PreAuthorize(SecurityUtil.POST_PERSONAL)
     T create(@Param("post") T post);
 

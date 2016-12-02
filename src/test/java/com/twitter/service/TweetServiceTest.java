@@ -5,6 +5,7 @@ import com.twitter.dao.TweetDao;
 import com.twitter.dto.PostVote;
 import com.twitter.exception.*;
 import com.twitter.model.*;
+import com.twitter.util.Config;
 import com.twitter.util.MessageUtil;
 import com.twitter.util.TestUtil;
 import com.twitter.util.extractor.UsernameExtractor;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -41,6 +43,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
@@ -97,6 +100,54 @@ public class TweetServiceTest {
         when(tweetDao.save(tweet)).thenReturn(tweet);
         Tweet savedTweet = tweetService.create(tweet);
         assertThat(savedTweet, is(tweet));
+    }
+
+    @Test
+    public void createTweet_saveTweet_notifyUserDoesNotExist() {
+        String username = "SUPER";
+        User user = a(user()
+                .withId(TestUtil.ID_ONE)
+        );
+        User notifedUser = a(user()
+                .withId(TestUtil.ID_TWO)
+                .withUsername(username)
+        );
+        Tweet tweet = a(tweet()
+                .withOwner(user)
+        );
+        when(usernameExtractor.extract(anyString())).thenReturn(aListWith(username));
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
+        when(userService.exists(username)).thenReturn(true);
+        when(userService.loadUserByUsername(username)).thenReturn(notifedUser);
+        when(tweetDao.save(tweet)).thenReturn(tweet);
+        Tweet createdTweet = tweetService.create(tweet);
+        assertThat(createdTweet.getNotifications(), hasSize(1));
+        assertTrue(createdTweet.getNotifications().stream().allMatch(notification -> notification.getSourceUser().equals(user)));
+        assertTrue(createdTweet.getNotifications().stream().allMatch(notification -> notification.getDestinationUser().equals(notifedUser)));
+        assertTrue(createdTweet.getNotifications().stream().allMatch(notification -> notification.getAbstractPost().equals(tweet)));
+    }
+
+    @Test
+    public void createTweet_saveTweet_maximumNumberOfNotifedUsers() {
+        User user = a(user()
+                .withId(TestUtil.ID_ONE)
+        );
+
+        Tweet tweet = a(tweet()
+                .withOwner(user)
+        );
+        List<String> usernames = new ArrayList<>();
+        int startId = 10;
+        for (int userId = startId; userId < Config.MAX_USER_NOTIFICATION_IN_ONE_POST + startId +1; userId++) {
+            usernames.add("USERNAME_" + userId);
+        }
+        when(usernameExtractor.extract(anyString())).thenReturn(usernames);
+        when(userService.getCurrentLoggedUser()).thenReturn(user);
+        when(userService.exists(anyString())).thenReturn(true);
+        when(userService.loadUserByUsername(anyString())).thenReturn(a(user()));
+        when(tweetDao.save(tweet)).thenReturn(tweet);
+        Tweet createdTweet = tweetService.create(tweet);
+        assertThat(createdTweet.getNotifications(), hasSize(Config.MAX_USER_NOTIFICATION_IN_ONE_POST));
     }
 
     @Test(expected = PostNotFoundException.class)
