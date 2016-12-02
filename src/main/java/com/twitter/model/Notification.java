@@ -18,7 +18,7 @@ public class Notification extends AbstractEntity {
     @ManyToOne
     private User sourceUser;
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private User destinationUser;
     @NotNull
     private String text;
