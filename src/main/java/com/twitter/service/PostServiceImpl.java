@@ -4,10 +4,9 @@ import com.twitter.dto.PostVote;
 import com.twitter.exception.PostDeleteException;
 import com.twitter.exception.PostNotFoundException;
 import com.twitter.model.*;
+import com.twitter.util.Config;
 import com.twitter.util.MessageUtil;
 import com.twitter.util.extractor.UsernameExtractor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,8 +18,6 @@ import java.util.List;
  */
 @Transactional
 abstract class PostServiceImpl<T extends AbstractPost, TRepository extends CrudRepository<T, Long>> implements PostService<T> {
-
-    private Logger logger = LoggerFactory.getLogger(PostServiceImpl.class.getName());
 
     protected final TRepository repository;
     protected final UserService userService;
@@ -43,6 +40,7 @@ abstract class PostServiceImpl<T extends AbstractPost, TRepository extends CrudR
         List<String> usernameList = usernameExtractor.extract(post.getContent());
         usernameList.stream()
                 .filter(userService::exists)
+                .limit(Config.MAX_USER_NOTIFICATION_IN_ONE_POST)
                 .forEach(username -> {
                     Notification notification = new Notification();
                     notification.setSourceUser(currentLoggedUser);
