@@ -38,6 +38,10 @@ public final class Route {
     private static final String PASSWORD = "/password";
     private static final String ROLE = "/role";
     private static final String EMAIL = "/email";
+    private static final String NOTIFICATION = "/notification";
+    private static final String NOTIFICATION_ID = "/{notificationId}";
+    public static final String SEEN = "/{seen}";
+
 
 
     public static final String LOGIN_URL = API + "/login";
@@ -97,4 +101,7 @@ public final class Route {
     public static final String REPORT_GET_ALL_BY_STATUS_AND_CATEGORY = REPORT_URL + STATUS + REPORT_STATUS +
             CATEGORY + REPORT_CATEGORY + PAGE + SIZE;
 
+    public static final String NOTIFICATION_URL = API + NOTIFICATION;
+    public static final String NOTIFICATION_BY_ID = API + NOTIFICATION + NOTIFICATION_ID;
+    public static final String NOTIFICATION_GET = API + NOTIFICATION + SEEN + PAGE + SIZE;
 }
