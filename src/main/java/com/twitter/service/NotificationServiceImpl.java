@@ -42,13 +42,9 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public Notification changeNotificationSeen(long notificationId, boolean seen) {
-        User currentLoggedUser = userService.getCurrentLoggedUser();
         Notification notification = getNotificationById(notificationId);
-        if (userIsOwnerOfNotification(currentLoggedUser, notification)) {
-            notification.setSeen(seen);
-            return notification;
-        }
-        throw new AccessDeniedException(MessageUtil.ACCESS_DENIED);
+        notification.setSeen(seen);
+        return notification;
     }
 
     @Override

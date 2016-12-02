@@ -3,7 +3,10 @@ package com.twitter.model;
 import org.hibernate.annotations.Check;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -41,10 +44,6 @@ public class Notification extends AbstractEntity {
 
     public String getText() {
         return text;
-    }
-
-    public boolean hasBeenSeen() {
-        return seen;
     }
 
     public void setSourceUser(User sourceUser) {
