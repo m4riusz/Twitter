@@ -1,0 +1,25 @@
+<template>
+    <require from='../comment/comment-template'></require>
+    <require from='../tweet/tweet-template'></require>
+
+    <p>
+        <i class="glyphicon glyphicon-calendar"></i>
+        ${notification.createDate}
+    </p>
+    <strong>${notification.text}</strong>
+    <br/>
+    <comment-template if.bind="notification.abstractPost.type == 'comment'" comment.bind="notification.abstractPost"
+                      current-user.bind="currentUser"></comment-template>
+    <tweet-template if.bind="notification.abstractPost.type == 'tweet'" tweet.bind="notification.abstractPost"
+                    current-user.bind="currentUser"></tweet-template>
+    <div class="btn-group">
+        <a if.bind="notification.abstractPost.type == 'comment'" class="btn btn-default"
+           href="#/comment/${notification.abstractPost.tweet.id}"><i class="glyphicon glyphicon-map-marker"></i> See!
+        </a>
+        <a if.bind="notification.abstractPost.type == 'tweet'" class="btn btn-default"
+           href="#/comment/${notification.abstractPost.id}"><i class="glyphicon glyphicon-map-marker"></i> See!
+        </a>
+        <a if.bind = "notification.seen == false" click.delegate = "mark(true)" class="btn btn-default"><i class="glyphicon glyphicon-ok"></i> Mark as read!</a>
+        <a if.bind = "notification.seen == true" click.delegate = "mark(false)" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Mark as unread!</a>
+    </div>
+</template>
