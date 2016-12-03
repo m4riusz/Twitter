@@ -33,7 +33,6 @@ export class App {
             this.userService.getCurrentLoggedUser(),
             this.notificationService.getLatestNotifications(false, 0, 10)
         ]);
-        console.log(this.notifications);
         this.loggedUser.favouriteTags = await this.tagService.getUserFavouriteTags(this.loggedUser.id);
     }
 

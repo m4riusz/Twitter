@@ -1,3 +1,14 @@
 <template>
-    UNREAD
+    <require from='../../../templates/notification/notification-template'></require>
+
+    <hr/>
+    <div class="well well-sm" repeat.for="notification of notifications">
+        <notification-template notification.bind="notification"
+                               current-user.bind="currentLoggedUser"></notification-template>
+    </div>
+
+
+    <div class="well well-sm text-center" click.delegate="nextCommentPage()">
+        <h3 class="h3">More notifications</h3>
+    </div>
 </template>
