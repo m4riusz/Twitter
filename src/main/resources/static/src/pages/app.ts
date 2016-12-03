@@ -3,28 +3,37 @@ import {RouterConfiguration, Router} from "aurelia-router";
 import {inject} from "aurelia-dependency-injection";
 import {AuthService, IAuthService} from "../service/authService";
 import {TagService, ITagService} from "../service/tagService";
+import {NotificationService, INotificationService} from "../service/notificationService";
 import User = Models.User;
+import Notification = Models.Notification;
 
 /**
  * Created by mariusz on 22.08.16.
  */
 
-@inject(UserService, TagService, AuthService)
+@inject(UserService, TagService, NotificationService, AuthService)
 export class App {
     loggedUser:User;
     router:Router;
+    notifications:Notification[];
     private userService:IUserService;
     private authService:IAuthService;
     private tagService:ITagService;
+    private notificationService:INotificationService;
 
-    constructor(userService:IUserService, tagService:ITagService, authService:IAuthService) {
+    constructor(userService:IUserService, tagService:ITagService, notificationService:INotificationService, authService:IAuthService) {
         this.userService = userService;
         this.tagService = tagService;
+        this.notificationService = notificationService;
         this.authService = authService;
     }
 
     async activate() {
-        this.loggedUser = await this.userService.getCurrentLoggedUser();
+        [this.loggedUser, this.notifications] = await Promise.all([
+            this.userService.getCurrentLoggedUser(),
+            this.notificationService.getLatestNotifications(false, 0, 10)
+        ]);
+        console.log(this.notifications);
         this.loggedUser.favouriteTags = await this.tagService.getUserFavouriteTags(this.loggedUser.id);
     }
 
@@ -87,6 +96,13 @@ export class App {
                 title: 'Tag',
                 nav: false,
                 settings: {currentUser: this.loggedUser, favourite: false}
+            },
+            {
+                route: 'notifications',
+                moduleId: './notifications/menu',
+                title: 'Notifications',
+                nav: false,
+                settings: {currentUser: this.loggedUser}
             }
         ]);
         this.router = router;

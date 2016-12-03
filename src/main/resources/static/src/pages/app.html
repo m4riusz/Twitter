@@ -12,6 +12,12 @@
             </ul>
 
             <div class="navbar-right">
+                <p class="navbar-text">
+                    <a class="label" href="#/notifications">
+                        Notifications <span class="badge">${notifications.length}</span>
+                    </a>
+                </p>
+
                 <img class="navbar-brand" src="data:image/jpg;base64, ${loggedUser.avatar.bytes}"
                      alt="${loggedUser.avatar.fileName}">
                 <p class="navbar-text"><a href="#/profile" class="label">${loggedUser.username}</a> <i class="glyphicon glyphicon-log-out" click.delegate = "logout()"></i></p>
