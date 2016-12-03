@@ -9,11 +9,11 @@ import {
     COMMENT_VOTE,
     COMMENT_BY_ID,
     COMMENT_URL,
-    COMMENT_VOTE_COUNT,
     COMMENTS_LATEST_FROM_TWEET,
     COMMENTS_OLDEST_FROM_TWEET,
     COMMENTS_POPULAR_FROM_TWEET
 } from "../domain/route";
+import {PostHelper, IPostHelper} from "./postHelper";
 import Comment = Models.Comment;
 import UserVote = Models.UserVote;
 
@@ -24,9 +24,7 @@ import UserVote = Models.UserVote;
 export interface ICommentService {
     deleteComment(tweetId:number):Promise<{}>;
     getTweetComments(tweetId:number, page:number, size:number):Promise<Comment[]>;
-    getCurrentUserCommentVote(commentId:number):Promise<'UP'|'DOWN'|'NONE'>;
     voteComment(commentId:number, vote:'UP'|'DOWN'):Promise<'UP'|'DOWN'>;
-    getCommentVoteCount(commentId:number, vote:'UP'|'DOWN'):Promise<number>;
     deleteCommentVote(commentId:number):Promise<{}>;
     getCommentById(commentId:number):Promise<Comment>;
     getLatestCommentsFromTweet(tweetId:number, page:number, size:number):Promise<Comment[]>;
@@ -35,14 +33,16 @@ export interface ICommentService {
     commentTweet(comment:Comment):Promise<Comment>;
 }
 
-@inject(HttpClient)
+@inject(HttpClient, PostHelper)
 export class CommentService extends BasicService implements ICommentService {
 
     private authToken:string;
+    private postHelper:IPostHelper;
 
-    constructor(httpClient:HttpClient) {
+    constructor(httpClient:HttpClient, postHelper:IPostHelper) {
         super(httpClient);
         this.authToken = localStorage[Const.TOKEN_HEADER];
+        this.postHelper = postHelper;
     }
 
     deleteComment(tweetId:number):Promise<{}> {
@@ -70,27 +70,11 @@ export class CommentService extends BasicService implements ICommentService {
                 .then(response=> response.json())
                 .then((comments:Comment[]) => {
                     comments.forEach(comment => {
-                        this.getCommentCurrentUserData(comment);
+                        this.postHelper.getCurrentUserPostData(comment);
                     });
                     resolve(comments);
                 }, (error) => resolve([]));
         });
-    }
-
-    getCurrentUserCommentVote(commentId:number):Promise<'UP'|'DOWN'|'NONE'> {
-        return new Promise<'UP'|'DOWN'|'NONE'>((resolve, reject) => {
-            this.httpClient.fetch(BASE_URL + COMMENT_VOTE_BY_ID(commentId), {
-                headers: {
-                    [Const.TOKEN_HEADER]: this.authToken
-                }
-            })
-                .then(response => response.json())
-                .then((data:UserVote)=> {
-                    resolve(data.vote);
-                }, ()=> {
-                    resolve('NONE');
-                });
-        })
     }
 
     voteComment(commentId:number, vote:'UP'|'DOWN'):Promise<'UP'|'DOWN'> {
@@ -132,7 +116,7 @@ export class CommentService extends BasicService implements ICommentService {
             })
                 .then(response => response.json())
                 .then((comment:Comment) => {
-                    this.getCommentCurrentUserData(comment);
+                    this.postHelper.getCurrentUserPostData(comment);
                     resolve(comment);
                 })
         })
@@ -147,26 +131,14 @@ export class CommentService extends BasicService implements ICommentService {
                     [Const.TOKEN_HEADER]: this.authToken
                 }
             })
-                .then(response => {
-                    let data = response.json();
-                    if (response.ok) {
-                        data.then((data:Comment) => {
-                            data.upVoteCount = 0;
-                            data.downVoteCount = 0;
-                            resolve(data)
-                        });
-                    }
-                    else {
-                        data.then(res=> {
-                            if (response.status == 400) {
-                                console.log(res.errors[0].defaultMessage);
-                                reject(res.errors[0].defaultMessage);
-                            } else {
-                                reject(res.message);
-                            }
-                        })
-                    }
-                });
+                .then(response => response.json())
+                .then(data => {
+                    this.postHelper.getCurrentUserPostData(data);
+                    resolve(data);
+                })
+                .catch(error => {
+                    reject(error);
+                })
         })
     }
 
@@ -181,7 +153,7 @@ export class CommentService extends BasicService implements ICommentService {
                 .then(response=> response.json())
                 .then((comments:Comment[]) => {
                     comments.forEach(comment => {
-                        this.getCommentCurrentUserData(comment);
+                        this.postHelper.getCurrentUserPostData(comment);
                     });
                     resolve(comments);
                 }, (error) => resolve([]));
@@ -199,7 +171,7 @@ export class CommentService extends BasicService implements ICommentService {
                 .then(response=> response.json())
                 .then((comments:Comment[]) => {
                     comments.forEach(comment => {
-                        this.getCommentCurrentUserData(comment);
+                        this.postHelper.getCurrentUserPostData(comment);
                     });
                     resolve(comments);
                 }, (error) => resolve([]));
@@ -217,29 +189,11 @@ export class CommentService extends BasicService implements ICommentService {
                 .then(response=> response.json())
                 .then((comments:Comment[]) => {
                     comments.forEach(comment => {
-                        this.getCommentCurrentUserData(comment);
+                        this.postHelper.getCurrentUserPostData(comment);
                     });
                     resolve(comments);
                 }, (error) => resolve([]));
         });
     }
 
-    getCommentVoteCount(commentId:number, vote:'UP'|'DOWN'):Promise<number> {
-        return new Promise<number>((resolve, reject)=> {
-            this.httpClient.fetch(COMMENT_VOTE_COUNT(commentId, vote), {
-                method: 'get',
-                headers: {
-                    [Const.TOKEN_HEADER]: this.authToken
-                }
-            })
-                .then(response => response.json())
-                .then((data) => resolve(data));
-        })
-    };
-
-    private getCommentCurrentUserData(comment:Comment) {
-        this.getCurrentUserCommentVote(comment.id).then((vote) => comment.loggedUserVote = vote);
-        this.getCommentVoteCount(comment.id, "UP").then(data => comment.upVoteCount = data);
-        this.getCommentVoteCount(comment.id, "DOWN").then(data => comment.downVoteCount = data);
-    }
 }

@@ -13,10 +13,11 @@ import {
     TWEETS_FROM_USER,
     TWEETS_BY_TAGS,
     TWEETS_FROM_FOLLOWING_USERS,
-    TWEETS_MOST_VOTED, TWEETS_BY_TAGS_POPULAR
+    TWEETS_MOST_VOTED,
+    TWEETS_BY_TAGS_POPULAR
 } from "../domain/route";
 import {BasicService} from "./basicService";
-import {ITweetHelper, TweetHelper} from "./tweetHelper";
+import {PostHelper, IPostHelper} from "./postHelper";
 import Tweet = Models.Tweet;
 import UserVote =Models.UserVote;
 import Tag = Models.Tag;
@@ -43,15 +44,15 @@ export interface ITweetService {
     getMostPopularTweetsWithTags(tags:Tag[],hours:number, page:number, size:number):Promise<Tweet[]>;
 }
 
-@inject(HttpClient, TweetHelper)
+@inject(HttpClient, PostHelper)
 export class TweetService extends BasicService implements ITweetService {
 
     private authToken:string;
-    private tweetHelper:ITweetHelper;
+    private postHelper:IPostHelper;
 
-    constructor(httpClient:HttpClient, tweetHelper:ITweetHelper) {
+    constructor(httpClient:HttpClient, postHelper:IPostHelper) {
         super(httpClient);
-        this.tweetHelper = tweetHelper;
+        this.postHelper = postHelper;
         this.authToken = localStorage[Const.TOKEN_HEADER];
     }
 
@@ -66,6 +67,7 @@ export class TweetService extends BasicService implements ITweetService {
             })
                 .then(response => response.json())
                 .then(data => {
+                    this.postHelper.getCurrentUserPostData(data);
                     resolve(data);
                 })
                 .catch(error => {
@@ -84,7 +86,7 @@ export class TweetService extends BasicService implements ITweetService {
                 .then(response => response.json())
                 .then((data:Tweet[]) => {
                     data.forEach(tweet => {
-                        this.tweetHelper.getCurrentUserTweetData(tweet);
+                        this.postHelper.getCurrentUserPostData(tweet);
                     });
                     resolve(data);
                 })
@@ -101,7 +103,7 @@ export class TweetService extends BasicService implements ITweetService {
                 .then(response => response.json())
                 .then((data:Tweet[]) => {
                     data.forEach(tweet => {
-                        this.tweetHelper.getCurrentUserTweetData(tweet);
+                        this.postHelper.getCurrentUserPostData(tweet);
                     });
                     resolve(data);
                 })
@@ -132,7 +134,7 @@ export class TweetService extends BasicService implements ITweetService {
             })
                 .then(response => response.json())
                 .then((tweet:Tweet)=> {
-                    this.tweetHelper.getCurrentUserTweetData(tweet);
+                    this.postHelper.getCurrentUserPostData(tweet);
                     resolve(tweet);
                 })
         })
@@ -178,7 +180,7 @@ export class TweetService extends BasicService implements ITweetService {
                 .then(response => response.json())
                 .then((tweets:Tweet[])=> {
                     tweets.forEach(tweet => {
-                        this.tweetHelper.getCurrentUserTweetData(tweet);
+                        this.postHelper.getCurrentUserPostData(tweet);
                     });
                     resolve(tweets);
                 })
@@ -227,7 +229,7 @@ export class TweetService extends BasicService implements ITweetService {
                     let data = response.json();
                     if (response.ok) {
                         data.then((data:Tweet) => {
-                            this.tweetHelper.getCurrentUserTweetData(data);
+                            this.postHelper.getCurrentUserPostData(data);
                             resolve(data)
                         });
                     }
@@ -255,7 +257,7 @@ export class TweetService extends BasicService implements ITweetService {
                 .then(response => response.json())
                 .then((tweets:Tweet[])=> {
                     tweets.forEach(tweet => {
-                        this.tweetHelper.getCurrentUserTweetData(tweet);
+                        this.postHelper.getCurrentUserPostData(tweet);
                     });
                     resolve(tweets);
                 })
@@ -272,7 +274,9 @@ export class TweetService extends BasicService implements ITweetService {
             })
                 .then(response => response.json())
                 .then((data:Tweet[]) => {
-                    data.forEach(tweet => this.tweetHelper.getCurrentUserTweetData(tweet));
+                    if (data.length > 0) {
+                        data.forEach(tweet => this.postHelper.getCurrentUserPostData(tweet));
+                    }
                     resolve(data);
                 })
         });
@@ -288,7 +292,7 @@ export class TweetService extends BasicService implements ITweetService {
             })
                 .then(response => response.json())
                 .then((data:Tweet[]) => {
-                    data.forEach(tweet => this.tweetHelper.getCurrentUserTweetData(tweet));
+                    data.forEach(tweet => this.postHelper.getCurrentUserPostData(tweet));
                     resolve(data);
                 })
         });
@@ -304,7 +308,7 @@ export class TweetService extends BasicService implements ITweetService {
             })
                 .then(response => response.json())
                 .then((data:Tweet[]) => {
-                    data.forEach(tweet => this.tweetHelper.getCurrentUserTweetData(tweet));
+                    data.forEach(tweet => this.postHelper.getCurrentUserPostData(tweet));
                     resolve(data);
                 })
         });
