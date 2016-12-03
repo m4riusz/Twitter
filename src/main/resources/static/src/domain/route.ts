@@ -13,6 +13,7 @@ export const TWEET_URL = `/api/tweet`;
 export const COMMENT_URL = `/api/comment`;
 export const REPORT_URL = `/api/report`;
 export const TAG_URL = `/api/tweet/tags`;
+export const NOTIFICATION_URL = `/api/notification`;
 export const USER_BY_ID = (userId:number) => `${USER_URL}/${userId}`;
 export const USER_CHANGE_PASSWORD = (userId:number) => `${USER_BY_ID(userId)}/password`;
 export const USER_CHANGE_ROLE = (userId:number) => `${USER_BY_ID(userId)}/role`;
@@ -51,3 +52,5 @@ export const TWEETS_MOST_VOTED = (hours:number, page:number, size:number) => `${
 export const USER_FAVOURITE_TAGS = (userId:number) => `${USER_BY_ID(userId)}/tags`;
 export const TWEET_VOTE_COUNT = (tweetId:number, vote:string) => `${TWEET_BY_ID(tweetId)}/count/vote/${vote}`;
 export const COMMENT_VOTE_COUNT = (commentId:number, vote:string) => `${COMMENT_BY_ID(commentId)}/count/vote/${vote}`;
+export const NOTIFICATION_LATEST = (seen:boolean, page:number,size:number) => `${NOTIFICATION_URL}/${seen}/${page}/${size}`;
+export const NOTIFICATION_BY_ID = (notificationId:number) => `${NOTIFICATION_URL}/${notificationId}`;

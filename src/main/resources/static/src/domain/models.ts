@@ -29,6 +29,14 @@ module Models {
         deleted:boolean;
     }
 
+    export interface Notification extends AbstractEntity {
+        sourceUser:User;
+        destinationUser:User;
+        text:string;
+        seen:boolean;
+        abstractPost:AbstractPost;
+    }
+
     export interface Avatar extends AbstractEntity {
         fileName:string;
         bytes:number[];
