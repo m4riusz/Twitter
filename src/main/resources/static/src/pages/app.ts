@@ -4,6 +4,7 @@ import {inject} from "aurelia-dependency-injection";
 import {AuthService, IAuthService} from "../service/authService";
 import {TagService, ITagService} from "../service/tagService";
 import {NotificationService, INotificationService} from "../service/notificationService";
+import {EventAggregator} from "aurelia-event-aggregator";
 import User = Models.User;
 import Notification = Models.Notification;
 
@@ -11,7 +12,7 @@ import Notification = Models.Notification;
  * Created by mariusz on 22.08.16.
  */
 
-@inject(UserService, TagService, NotificationService, AuthService)
+@inject(UserService, TagService, NotificationService, AuthService, EventAggregator)
 export class App {
     loggedUser:User;
     router:Router;
@@ -20,12 +21,15 @@ export class App {
     private authService:IAuthService;
     private tagService:ITagService;
     private notificationService:INotificationService;
+    private eventAggregator:EventAggregator;
+    private agregator:any;
 
-    constructor(userService:IUserService, tagService:ITagService, notificationService:INotificationService, authService:IAuthService) {
+    constructor(userService:IUserService, tagService:ITagService, notificationService:INotificationService, authService:IAuthService, eventAggregator:EventAggregator) {
         this.userService = userService;
         this.tagService = tagService;
         this.notificationService = notificationService;
         this.authService = authService;
+        this.eventAggregator = eventAggregator;
     }
 
     async activate() {
@@ -34,6 +38,16 @@ export class App {
             this.notificationService.getLatestNotifications(false, 0, 10)
         ]);
         this.loggedUser.favouriteTags = await this.tagService.getUserFavouriteTags(this.loggedUser.id);
+    }
+
+    attached() {
+        this.agregator = this.eventAggregator.subscribe("notifications", notifications => {
+            this.notifications = notifications;
+        });
+    }
+
+    detached() {
+        this.agregator.dispose();
     }
 
     configureRouter(config:RouterConfiguration, router:Router) {
