@@ -1,3 +1,18 @@
 <template>
-    ALREADY READ
+    <require from='../../../templates/notification/notification-template'></require>
+
+    <hr/>
+    <div if.bind="notifications.length > 0">
+        <div class="well well-sm" repeat.for="notification of notifications">
+            <notification-template notification.bind="notification"
+                                   current-user.bind="currentLoggedUser"></notification-template>
+        </div>
+
+        <div class="well well-sm text-center" click.delegate="nextCommentPage()">
+            <h3 class="h3">More notifications</h3>
+        </div>
+    </div>
+    <div if.bind = "notifications.length == 0">
+        <h4 class="h4 text-center">You don't have any read notifications!</h4>
+    </div>
 </template>
