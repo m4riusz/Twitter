@@ -20,4 +20,5 @@ export class Const {
     public static PAGE_SIZE:number = 10;
     public static REPORT_MESSAGE_MAX_LENGTH:number = 100;
     public static SEPARATOR = ',';
+    public static NOTIFICATION_EVENT:string = 'notifications';
 }

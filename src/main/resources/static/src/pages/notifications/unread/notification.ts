@@ -16,7 +16,6 @@ export class UnreadNotifications{
     currentLoggedUser:User;
     private notificationService:INotificationService;
     private eventAggregator:EventAggregator;
-    private aggregator:any;
 
     constructor(notificationService:INotificationService, eventAggregator:EventAggregator) {
         this.page = 0;
@@ -27,7 +26,7 @@ export class UnreadNotifications{
     async activate(params, config) {
         this.currentLoggedUser = config.settings.currentUser;
         this.notifications = await this.notificationService.getLatestNotifications(false, this.page, Const.PAGE_SIZE);
-        this.eventAggregator.publish("notifications", this.notifications);
+        this.eventAggregator.publish(Const.NOTIFICATION_EVENT, this.notifications);
     }
 
     async nextCommentPage() {

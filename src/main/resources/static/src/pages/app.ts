@@ -7,6 +7,7 @@ import {NotificationService, INotificationService} from "../service/notification
 import {EventAggregator} from "aurelia-event-aggregator";
 import User = Models.User;
 import Notification = Models.Notification;
+import {Const} from "../domain/const";
 
 /**
  * Created by mariusz on 22.08.16.
@@ -41,7 +42,7 @@ export class App {
     }
 
     attached() {
-        this.agregator = this.eventAggregator.subscribe("notifications", notifications => {
+        this.agregator = this.eventAggregator.subscribe(Const.NOTIFICATION_EVENT, notifications => {
             this.notifications = notifications;
         });
     }
