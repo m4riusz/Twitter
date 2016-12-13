@@ -4,8 +4,8 @@ import com.twitter.dto.EmailChange;
 import com.twitter.dto.PasswordChange;
 import com.twitter.dto.RoleChange;
 import com.twitter.dto.UserCreateForm;
+import com.twitter.exception.TwitterException;
 import com.twitter.model.Avatar;
-import com.twitter.model.Password;
 import com.twitter.model.Tag;
 import com.twitter.model.User;
 import com.twitter.route.Route;
@@ -52,9 +52,12 @@ public class UserController {
     }
 
     @RequestMapping(value = Route.VERIFY_USER_URL, method = RequestMethod.GET)
-    public ResponseEntity verifyUser(@PathVariable String verifyKey) {
-        userService.activateAccount(verifyKey);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<String> verifyUser(@PathVariable String verifyKey) {
+        try {
+            return new ResponseEntity<>(userService.activateAccount(verifyKey), HttpStatus.OK);
+        } catch (TwitterException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+        }
     }
 
     @RequestMapping(value = Route.USER_URL, method = RequestMethod.GET)

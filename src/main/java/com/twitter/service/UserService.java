@@ -26,7 +26,7 @@ public interface UserService extends UserDetailsService {
 
     User loadUserByUsername(String username) throws UsernameNotFoundException;
 
-    void activateAccount(String verifyKey);
+    String activateAccount(String verifyKey);
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     User getCurrentLoggedUser();

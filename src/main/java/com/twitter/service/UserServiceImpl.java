@@ -227,12 +227,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void activateAccount(String verifyKey) {
+    public String activateAccount(String verifyKey) {
         User user = userDao.findOneByAccountStatusVerifyKey(verifyKey);
         if (userIsNotActivated(user)) {
             user.getAccountStatus().setEnable(true);
             user.getAccountStatus().setEnableDate(DateTime.now().toDate());
-            return;
+            return MessageUtil.ACCOUNT_HAS_BEEN_ENABLED;
         } else if (userIsActivated(user)) {
             throw new UserException(MessageUtil.ACCOUNT_HAS_BEEN_ALREADY_ENABLED);
         }
