@@ -37,7 +37,7 @@ export class Register {
             this.setErrorMessage('Wrong password length!');
         } else {
             try {
-                let response = await this.authService.register(this.username, this.password, this.email, this.gender);
+                let response = await this.authService.register(this.username, this.password, this.email, this.gender == null ? "UNDEFINED" : this.gender);
                 this.clearFields();
                 this.setSuccessMessage(response);
             } catch (error) {
