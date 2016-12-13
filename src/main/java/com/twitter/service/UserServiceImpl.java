@@ -158,6 +158,7 @@ public class UserServiceImpl implements UserService {
     public User changeUserPasswordById(long userId, String password) {
         User userToChange = getUserById(userId);
         userToChange.setPassword(new Password(passwordEncoder.encode(password)));
+        //// TODO: 13.12.16 podmienic security contex na usera i tam gdzie zmienia sie user
         return userToChange;
     }
 
@@ -204,6 +205,7 @@ public class UserServiceImpl implements UserService {
     public Avatar changeUserAvatar(long userId, Avatar avatar) throws IOException {
         User user = getUserById(userId);
         user.setAvatar(avatarUtil.resizeToStandardSize(avatar));
+        getCurrentLoggedUser().setAvatar(avatar);
         return user.getAvatar();
     }
 
@@ -222,6 +224,7 @@ public class UserServiceImpl implements UserService {
             throw new UserException(MessageUtil.USER_ALREADY_EXISTS_EMAIL_ERROR_MSG);
         }
         user.setEmail(email);
+        getCurrentLoggedUser().setEmail(email);
         sendEmail(user.getEmail(), MessageUtil.EMAIL_FROM, MessageUtil.EMAIL_SUBJECT, "You have changed email!");
         return user;
     }
