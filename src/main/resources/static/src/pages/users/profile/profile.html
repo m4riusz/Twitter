@@ -3,8 +3,11 @@
     <require from="../../../templates/tag/tag-template.html"></require>
 
     <user-template user.bind="currentLoggedUser" date.bind = "true"></user-template>
-    <h4>My favourite tags:</h4>
-    <tag-template repeat.for="tag of currentLoggedUser.favouriteTags" tag.bind="tag"></tag-template>
+
+    <div if.bind="currentLoggedUser.favouriteTags.length > 0">
+        <h4>My favourite tags:</h4>
+        <tag-template repeat.for="tag of currentLoggedUser.favouriteTags" tag.bind="tag"></tag-template>
+    </div>
     <hr/>
     <div class="panel-group">
         <div class="panel panel-default">

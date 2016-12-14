@@ -266,25 +266,31 @@ export class TweetService extends BasicService implements ITweetService {
 
     getTweetsByTags(tags:Tag[], page:number, size:number) {
         return new Promise<Tweet[]>((resolve, reject)=> {
-            this.httpClient.fetch(TWEETS_BY_TAGS(tags.map(tag => tag.text), page, size), {
-                method: 'get',
-                headers: {
-                    [Const.TOKEN_HEADER]: this.authToken
-                }
-            })
-                .then(response => response.json())
-                .then((data:Tweet[]) => {
-                    if (data.length > 0) {
-                        data.forEach(tweet => this.postHelper.getCurrentUserPostData(tweet));
+            if (tags.length > 0) {
+                this.httpClient.fetch(BASE_URL + TWEETS_BY_TAGS(tags.map(tag => tag.text), page, size), {
+                    method: 'get',
+                    headers: {
+                        [Const.TOKEN_HEADER]: this.authToken
                     }
-                    resolve(data);
                 })
+                    .then(response => response.json())
+                    .then((data:Tweet[]) => {
+                        if (data.length > 0) {
+                            data.forEach(tweet => this.postHelper.getCurrentUserPostData(tweet));
+                        }
+                        resolve(data);
+                    })
+
+            } else {
+                console.error("No tags!");
+                resolve([]);
+            }
         });
     }
 
     getMostPopularTweets(hours:number, page:number, size:number):Promise<Tweet[]> {
         return new Promise<Tweet[]>((resolve, reject)=> {
-            this.httpClient.fetch(TWEETS_MOST_VOTED(hours, page, size), {
+            this.httpClient.fetch(BASE_URL + TWEETS_MOST_VOTED(hours, page, size), {
                 method: 'get',
                 headers: {
                     [Const.TOKEN_HEADER]: this.authToken
@@ -300,17 +306,22 @@ export class TweetService extends BasicService implements ITweetService {
 
     getMostPopularTweetsWithTags(tags:Tag[], hours:number, page:number, size:number):Promise<Tweet[]> {
         return new Promise<Tweet[]>((resolve, reject)=> {
-            this.httpClient.fetch(TWEETS_BY_TAGS_POPULAR(tags.map(tag => tag.text),hours, page, size), {
-                method: 'get',
-                headers: {
-                    [Const.TOKEN_HEADER]: this.authToken
-                }
-            })
+            if (tags.length > 0) {
+                this.httpClient.fetch(BASE_URL + TWEETS_BY_TAGS_POPULAR(tags.map(tag => tag.text), hours, page, size), {
+                    method: 'get',
+                    headers: {
+                        [Const.TOKEN_HEADER]: this.authToken
+                    }
+                })
                 .then(response => response.json())
                 .then((data:Tweet[]) => {
                     data.forEach(tweet => this.postHelper.getCurrentUserPostData(tweet));
                     resolve(data);
                 })
+            } else {
+                console.error("No tags!");
+                resolve([]);
+            }
         });
     }
 }

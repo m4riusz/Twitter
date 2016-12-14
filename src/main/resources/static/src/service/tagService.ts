@@ -33,7 +33,10 @@ export class TagService extends BasicService implements ITagService {
                 }
             })
                 .then(response =>response.json())
-                .then(data => resolve(data))
+                .then(data => resolve(data), error => {
+                    console.error(error);
+                    resolve([]);
+                })
         });
     }
 
