@@ -117,6 +117,13 @@ export class App {
                 title: 'Notifications',
                 nav: false,
                 settings: {currentUser: this.loggedUser}
+            },
+            {
+                route: 'search',
+                moduleId: './search/search',
+                title: 'Search',
+                nav: true,
+                settings: {currentUser: this.loggedUser}
             }
         ]);
         this.router = router;
