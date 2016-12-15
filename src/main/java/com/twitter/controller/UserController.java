@@ -153,4 +153,14 @@ public class UserController {
         tagService.removeTagFromFavouriteTags(userId, tag);
         return new ResponseEntity(HttpStatus.OK);
     }
+
+    @RequestMapping(value = Route.USER_WITH_USERNAME_LIKE, method = RequestMethod.GET)
+    public ResponseEntity<List<User>> findUserByUsernameLike(@PathVariable String username, @PathVariable int page, @PathVariable int size) {
+        return new ResponseEntity<>(userService.queryForUser(username, new PageRequest(page, size)), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = Route.TAG_WITH_TEXT_LIKE, method = RequestMethod.GET)
+    public ResponseEntity<List<Tag>> findTagByTextLike(@PathVariable String tagText, @PathVariable int page, @PathVariable int size) {
+        return new ResponseEntity<>(tagService.queryForTag(tagText, new PageRequest(page, size)), HttpStatus.OK);
+    }
 }

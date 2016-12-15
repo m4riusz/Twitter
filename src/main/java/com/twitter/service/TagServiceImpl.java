@@ -7,6 +7,7 @@ import com.twitter.model.User;
 import com.twitter.util.MessageUtil;
 import com.twitter.util.extractor.TagExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,6 +73,11 @@ public class TagServiceImpl implements TagService {
             tags.add(tag);
         }
         return tags;
+    }
+
+    @Override
+    public List<Tag> queryForTag(String tagText, Pageable pageable) {
+        return tagDao.findByTextIgnoreCaseLike(tagText,pageable);
     }
 
 }

@@ -10,6 +10,7 @@ public final class Route {
     private static final String SIZE = "/{size}";
     private static final String PAGE = "/{page}";
     private static final String USER = "/user";
+    private static final String USERNAME = "/{username}";
     private static final String USER_ID = "/{userId}";
     private static final String TWEET = "/tweet";
     private static final String TWEET_ID = "/{tweetId}";
@@ -40,8 +41,8 @@ public final class Route {
     private static final String EMAIL = "/email";
     private static final String NOTIFICATION = "/notification";
     private static final String NOTIFICATION_ID = "/{notificationId}";
-    public static final String SEEN = "/{seen}";
-
+    private static final String SEEN = "/{seen}";
+    private static final String QUERY = "/query";
 
 
     public static final String LOGIN_URL = API + "/login";
@@ -59,12 +60,15 @@ public final class Route {
     public static final String USER_GET_ALL = USER_URL + PAGE + SIZE;
     public static final String USER_COUNT_GET_ALL = USER_URL + COUNT;
     public static final String REGISTER_USER = USER_URL;
+    public static final String USER_WITH_USERNAME_LIKE = USER_URL + QUERY + USERNAME + PAGE + SIZE;
     public static final String USER_GET_FOLLOWERS = USER_BY_ID + FOLLOWERS + PAGE + SIZE;
     public static final String USER_COUNT_GET_FOLLOWERS = USER_BY_ID + FOLLOWERS + COUNT;
     public static final String USER_GET_FOLLOWING = USER_BY_ID + FOLLOWING + PAGE + SIZE;
     public static final String USER_COUNT_GET_FOLLOWING = USER_BY_ID + FOLLOWING + COUNT;
     public static final String USER_AVATAR = USER_BY_ID + AVATAR;
     public static final String USER_FAVOURITE_TAGS = USER_BY_ID + TAGS;
+
+    public static final String TAG_WITH_TEXT_LIKE = API + TAGS + QUERY + "/{tagText}" + PAGE + SIZE;
 
     public static final String TWEET_URL = API + TWEET;
     public static final String TWEET_BY_ID = TWEET_URL + TWEET_ID;
@@ -75,7 +79,7 @@ public final class Route {
     public static final String TWEET_VOTE = TWEET_URL + VOTE;
     public static final String TWEET_USER_VOTE = TWEET_BY_ID + VOTE;
     public static final String TWEET_USER_VOTE_COUNT = TWEET_BY_ID + COUNT + VOTE + VOTE_ID;
-    public static final String TWEETS_WITH_TAGS = TWEET_URL + TAGS + "/{tags}"+PAGE + SIZE;
+    public static final String TWEETS_WITH_TAGS = TWEET_URL + TAGS + "/{tags}" + PAGE + SIZE;
     public static final String TWEETS_WITH_TAGS_POPULAR = TWEET_URL + TAGS + "/{tags}" + POPULAR + HOURS + PAGE + SIZE;
     public static final String TWEETS_FROM_USER_FAVOURITES = USER_BY_ID + FAVOURITES + PAGE + SIZE;
     public static final String TWEET_TO_USER_FAVOURITES = USER_URL + FAVOURITES + TWEET_ID;
@@ -102,6 +106,7 @@ public final class Route {
             CATEGORY + REPORT_CATEGORY + PAGE + SIZE;
 
     public static final String NOTIFICATION_URL = API + NOTIFICATION;
-    public static final String NOTIFICATION_BY_ID = API + NOTIFICATION + NOTIFICATION_ID;
-    public static final String NOTIFICATION_GET = API + NOTIFICATION + SEEN + PAGE + SIZE;
+    public static final String NOTIFICATION_BY_ID = NOTIFICATION_URL + NOTIFICATION_ID;
+    public static final String NOTIFICATION_GET = NOTIFICATION_URL + SEEN + PAGE + SIZE;
+
 }

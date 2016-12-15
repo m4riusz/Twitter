@@ -33,4 +33,7 @@ public interface UserDao extends JpaRepository<User, Long> {
     User findByEmail(String email);
 
     User findOneByAccountStatusVerifyKey(String verifyKey);
+
+    // TODO: 15.12.16 add tests
+    List<User> findByUsernameIgnoreCaseLike(String username, Pageable pageable);
 }

@@ -230,6 +230,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> queryForUser(String username,Pageable pageable) {
+        return userDao.findByUsernameIgnoreCaseLike(username, pageable);
+    }
+
+    @Override
     public String activateAccount(String verifyKey) {
         User user = userDao.findOneByAccountStatusVerifyKey(verifyKey);
         if (userIsNotActivated(user)) {

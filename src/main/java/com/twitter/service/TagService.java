@@ -2,6 +2,7 @@ package com.twitter.service;
 
 import com.twitter.model.Tag;
 import com.twitter.util.SecurityUtil;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -23,5 +24,9 @@ public interface TagService {
     void removeTagFromFavouriteTags(long userId, Tag tag);
 
     List<Tag> getTagsFromText(String string);
+
+    // TODO: 15.12.16 add tests
+    @PreAuthorize(SecurityUtil.AUTHENTICATED)
+    List<Tag> queryForTag(String tagText, Pageable pageable);
 
 }
