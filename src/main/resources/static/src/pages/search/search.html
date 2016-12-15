@@ -1,3 +1,14 @@
 <template>
-    SEARCH
+    <div class="form form-inline">
+        <label for="searchField">Search input: </label>
+        <input id="searchField" type="text" class="form-control" value.bind="inputText" placeholder="#tagOne, #tagTwo"/>
+        <label repeat.for="option of options">
+            <input type="radio" value.bind="option" checked.bind="$parent.selected" name="testOptions">${option}
+        </label>
+        <a class="btn btn-default form-control" click.delegate="query()">
+            <i class="glyphicon glyphicon-search"></i> Search</a>
+
+
+
+    </div>
 </template>
