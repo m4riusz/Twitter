@@ -21,6 +21,7 @@ import java.util.List;
 @Transactional
 public class TagServiceImpl implements TagService {
 
+    private static final String TAG_PREFIX = "#";
     private TagDao tagDao;
     private UserService userService;
     private TagExtractor tagExtractor;
@@ -77,7 +78,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public List<Tag> queryForTag(String tagText, Pageable pageable) {
-        return tagDao.findByTextIgnoreCaseLike(tagText,pageable);
+        return tagDao.findByTextContainingIgnoreCase(tagText.startsWith(TAG_PREFIX) ? tagText.substring(1) : tagText, pageable);
     }
 
 }

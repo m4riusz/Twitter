@@ -34,6 +34,7 @@ import java.util.UUID;
 @Transactional
 public class UserServiceImpl implements UserService {
 
+    private static final String USER_PREFIX = "@";
     private UserDao userDao;
     private JavaMailSender javaMailSender;
     private AvatarUtil avatarUtil;
@@ -158,7 +159,6 @@ public class UserServiceImpl implements UserService {
     public User changeUserPasswordById(long userId, String password) {
         User userToChange = getUserById(userId);
         userToChange.setPassword(new Password(passwordEncoder.encode(password)));
-        //// TODO: 13.12.16 podmienic security contex na usera i tam gdzie zmienia sie user
         return userToChange;
     }
 
@@ -204,8 +204,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public Avatar changeUserAvatar(long userId, Avatar avatar) throws IOException {
         User user = getUserById(userId);
+        User currentLoggedUser = getCurrentLoggedUser();
         user.setAvatar(avatarUtil.resizeToStandardSize(avatar));
-        getCurrentLoggedUser().setAvatar(avatar);
+        if (user.equals(currentLoggedUser)) {
+            currentLoggedUser.setAvatar(avatar);
+        }
         return user.getAvatar();
     }
 
@@ -220,18 +223,21 @@ public class UserServiceImpl implements UserService {
     public User changeUserEmail(long userId, String email) {
         User user = getUserById(userId);
         User userByEmail = userDao.findByEmail(email);
+        User currentLoggedUser = getCurrentLoggedUser();
         if (userByEmail != null) {
             throw new UserException(MessageUtil.USER_ALREADY_EXISTS_EMAIL_ERROR_MSG);
         }
         user.setEmail(email);
-        getCurrentLoggedUser().setEmail(email);
-        sendEmail(user.getEmail(), MessageUtil.EMAIL_FROM, MessageUtil.EMAIL_SUBJECT, "You have changed email!");
+        if (user.equals(currentLoggedUser)) {
+            currentLoggedUser.setEmail(email);
+        }
+        sendEmail(user.getEmail(), MessageUtil.EMAIL_FROM, MessageUtil.EMAIL_SUBJECT, MessageUtil.EMAIL_CHANGED);
         return user;
     }
 
     @Override
     public List<User> queryForUser(String username,Pageable pageable) {
-        return userDao.findByUsernameIgnoreCaseLike(username, pageable);
+        return userDao.findByUsernameContainingIgnoreCase(username.startsWith(USER_PREFIX) ? username.substring(1) : username, pageable);
     }
 
     @Override

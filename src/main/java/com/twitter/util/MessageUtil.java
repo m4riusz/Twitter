@@ -22,6 +22,7 @@ public final class MessageUtil {
     public static final String EMAIL_CONTENT = "Thank you for registration. Please click ling below to activate account!";
     public static final String EMAIL_FROM = "tw_it@o2.pl";
     public static final String EMAIL_VERIFY_LINK = "http://localhost:8080/api/user/verify/";
+    public static final String EMAIL_CHANGED = "You have changed email!";
     public static final String DATE_IS_NOT_SET = "Date is not set!";
     public static final String REPORT_DATE_IS_INVALID_ERROR_MSG = "Date until banned is invalid!";
     public static final String DELETE_ABSTRACT_POST_CONTENT = "[Content has been deleted by administration]";
