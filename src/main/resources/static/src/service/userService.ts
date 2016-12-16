@@ -11,7 +11,7 @@ import {
     USER_FOLLOWING,
     USER_FOLLOWING_COUNT,
     USER_CHANGE_ROLE,
-    USER_CHANGE_PASSWORD
+    FIND_USERS_BY_USERNAME
 } from "../domain/route";
 import {BasicService} from "./basicService";
 import User = Models.User;
@@ -31,7 +31,7 @@ export interface IUserService {
     getUserFollowingUsers(userId:number, page:number, size:number):Promise<User[]>;
     getUserFollowingUsersCount(userId:number):Promise<number>;
     changeUserRole(userId:number, role:'USER'|'MODERATOR'|'ADMIN'):Promise<'USER'|'MODERATOR'|'ADMIN'>;
-
+    findUsersByUsername(username:string, page:number, size:number):Promise<User[]>;
 }
 
 @inject(HttpClient)
@@ -185,5 +185,22 @@ export class UserService extends BasicService implements IUserService {
                 })
         });
     }
-    
+
+    findUsersByUsername(username:string, page:number, size:number):Promise<User[]> {
+        return new Promise<User[]>((resolve, reject) => {
+            if (username !== "") {
+                this.httpClient.fetch(BASE_URL + FIND_USERS_BY_USERNAME(username, page, size), {
+                    method: "get",
+                    headers: {
+                        [Const.TOKEN_HEADER]: this.authToken
+                    }
+                })
+                    .then(response => response.json())
+                    .then(count => resolve(count));
+            } else {
+                resolve([]);
+            }
+        });
+    }
+
 }

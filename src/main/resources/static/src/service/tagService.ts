@@ -3,7 +3,7 @@ import {inject} from "aurelia-dependency-injection";
 import {HttpClient, json} from "aurelia-fetch-client";
 import {BasicService} from "./basicService";
 import {Const} from "../domain/const";
-import {BASE_URL, USER_FAVOURITE_TAGS} from "../domain/route";
+import {BASE_URL, USER_FAVOURITE_TAGS, FIND_TAGS_BY_TEXT} from "../domain/route";
 /**
  * Created by mariusz on 22.10.16.
  */
@@ -13,6 +13,7 @@ export interface ITagService {
     getUserFavouriteTags(userId:number):Promise<Tag[]>;
     addTagToFavourites(userId:number, tag:string):Promise<Tag>;
     removeTagFromFavourites(userId:number, tag:string):Promise<any>;
+    findTagsByText(tagText:string, page:number, size:number):Promise<Tag[]>;
 }
 
 @inject(HttpClient)
@@ -75,6 +76,24 @@ export class TagService extends BasicService implements ITagService {
                         response.json().then(error => reject(error.message));
                     }
                 })
+        });
+    }
+
+    findTagsByText(tagText:string, page:number, size:number):Promise<Tag[]> {
+        return new Promise<Tag[]>((resolve, reject) => {
+            if (tagText !== "") {
+                this.httpClient.fetch(BASE_URL + FIND_TAGS_BY_TEXT(tagText, page, size), {
+                    method: 'get',
+                    headers: {
+                        [Const.TOKEN_HEADER]: this.authToken
+                    }
+                })
+                    .then(response => response.json())
+                    .then(tags => resolve(tags))
+            } else {
+                resolve([]);
+            }
+
         });
     }
 
