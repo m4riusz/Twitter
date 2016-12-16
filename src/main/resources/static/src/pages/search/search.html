@@ -1,14 +1,37 @@
 <template>
+    <require from='../../templates/tag/tag-template.html'></require>
+    <require from='../../templates/user/user-template.html'></require>
+
     <div class="form form-inline">
         <label for="searchField">Search input: </label>
-        <input id="searchField" type="text" class="form-control" value.bind="inputText" placeholder="#tagOne, #tagTwo"/>
+        <input id="searchField" type="text" class="form-control" value.bind="inputText"
+               placeholder="type username or tag"/>
         <label repeat.for="option of options">
-            <input type="radio" value.bind="option" checked.bind="$parent.selected" name="testOptions">${option}
+            <input type="radio" value.bind="option" checked.bind="$parent.selected" name="searchOptions">${option}
         </label>
         <a class="btn btn-default form-control" click.delegate="query()">
             <i class="glyphicon glyphicon-search"></i> Search</a>
-
-
-
     </div>
+    <hr/>
+    <div class="container-fluid">
+        <div>
+            <tag-template if.bind="selected == 'Tag'" repeat.for="current of tagResult"
+                          tag.bind="current"></tag-template>
+        </div>
+        <div if.bind="selected == 'User'" repeat.for="current of userResult" class="col-sm-4 col-md-3">
+            <user-template user.bind="current" date.bind="true"></user-template>
+        </div>
+    </div>
+
+    <br/>
+    <div if.bind="selected == 'Tag' && tagResult.length > 0" class="well well-sm text-center"
+         click.delegate="nextTagPage()">
+        <h3 class="h3">More</h3>
+    </div>
+
+    <div if.bind="selected == 'User' && userResult.length > 0" class="well well-sm text-center"
+         click.delegate="nextUserPage()">
+        <h3 class="h3">More</h3>
+    </div>
+
 </template>
