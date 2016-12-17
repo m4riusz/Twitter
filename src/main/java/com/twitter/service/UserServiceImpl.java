@@ -237,7 +237,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> queryForUser(String username,Pageable pageable) {
-        return userDao.findByUsernameContainingIgnoreCase(username.startsWith(USER_PREFIX) ? username.substring(1) : username, pageable);
+        return userDao.findByUsernameStartingWithIgnoreCase(username.startsWith(USER_PREFIX) ? username.substring(1) : username, pageable);
     }
 
     @Override

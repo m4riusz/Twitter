@@ -34,6 +34,5 @@ public interface UserDao extends JpaRepository<User, Long> {
 
     User findOneByAccountStatusVerifyKey(String verifyKey);
 
-    // TODO: 15.12.16 add tests
-    List<User> findByUsernameContainingIgnoreCase(String username, Pageable pageable);
+    List<User> findByUsernameStartingWithIgnoreCase(String username, Pageable pageable);
 }

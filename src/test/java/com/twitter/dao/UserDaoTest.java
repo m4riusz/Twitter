@@ -369,5 +369,67 @@ public class UserDaoTest {
         assertThat(user, is(userOne));
     }
 
+    @Test
+    public void findByUsernameStartingWithIgnoreCase_noText() {
+        User userOne = a(user().withUsername("USER_ONE"));
+        User userTwo = a(user().withUsername("USER_TWO"));
+        userDao.save(aListWith(userOne, userTwo));
+        List<User> usersFound = userDao.findByUsernameStartingWithIgnoreCase("", TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(usersFound, hasItems(userOne, userTwo));
+    }
+
+    @Test
+    public void findByUsernameStartingWithIgnoreCase_tagWitTextDoesNotExist() {
+        User userOne = a(user().withUsername("USER_ONE"));
+        User userTwo = a(user().withUsername("USER_TWO"));
+        userDao.save(aListWith(userOne, userTwo));
+        List<User> tagsFound = userDao.findByUsernameStartingWithIgnoreCase("USER_THREE", TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(tagsFound, is(emptyList()));
+    }
+
+    @Test
+    public void findByUsernameStartingWithIgnoreCase_tagWithTextExists_fullMatch() {
+        User userOne = a(user().withUsername("USER_ONE"));
+        User userTwo = a(user().withUsername("USER_TWO"));
+        userDao.save(aListWith(userOne, userTwo));
+        List<User> tagsFound = userDao.findByUsernameStartingWithIgnoreCase("USER_ONE", TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(tagsFound, contains(userOne));
+    }
+
+    @Test
+    public void findByUsernameStartingWithIgnoreCase_tagWithTextExists_partMatch() {
+        User userOne = a(user().withUsername("USER_ONE"));
+        User userTwo = a(user().withUsername("USER_TWO"));
+        userDao.save(aListWith(userOne, userTwo));
+        List<User> usersFound = userDao.findByUsernameStartingWithIgnoreCase("USER_", TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(usersFound, hasItems(userOne, userTwo));
+    }
+
+    @Test
+    public void findByUsernameStartingWithIgnoreCase_tagWithTextExists_caseTest_fullMatch() {
+        User userOne = a(user().withUsername("USER_ONE"));
+        User userTwo = a(user().withUsername("USER_TWO"));
+        userDao.save(aListWith(userOne, userTwo));
+        List<User> usersFound = userDao.findByUsernameStartingWithIgnoreCase("user_one", TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(usersFound, contains(userOne));
+    }
+
+    @Test
+    public void findByUsernameStartingWithIgnoreCase_tagWithTextExists_caseTest_partMatch() {
+        User userOne = a(user().withUsername("USER_ONE"));
+        User userTwo = a(user().withUsername("USER_TWO"));
+        userDao.save(aListWith(userOne, userTwo));
+        List<User> usersFound = userDao.findByUsernameStartingWithIgnoreCase("user", TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(usersFound, hasItems(userOne, userTwo));
+    }
+
+    @Test
+    public void findByUsernameStartingWithIgnoreCase_failSearch() {
+        User userOne = a(user().withUsername("USER_ONE"));
+        User userTwo = a(user().withUsername("USER_TWO"));
+        userDao.save(aListWith(userOne, userTwo));
+        List<User> tagsFound = userDao.findByUsernameStartingWithIgnoreCase("auser", TestUtil.ALL_IN_ONE_PAGE);
+        assertThat(tagsFound, is(emptyList()));
+    }
 
 }
