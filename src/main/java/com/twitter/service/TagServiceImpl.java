@@ -78,7 +78,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public List<Tag> queryForTag(String tagText, Pageable pageable) {
-        return tagDao.findByTextContainingIgnoreCase(tagText.startsWith(TAG_PREFIX) ? tagText.substring(1) : tagText, pageable);
+        return tagDao.findByTextStartingWithIgnoreCase(tagText.startsWith(TAG_PREFIX) ? tagText.substring(1) : tagText, pageable);
     }
 
 }

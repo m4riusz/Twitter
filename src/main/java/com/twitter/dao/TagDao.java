@@ -15,6 +15,5 @@ public interface TagDao extends JpaRepository<Tag, Long> {
 
     Tag findByText(String text);
 
-    // TODO: 15.12.16 add tests
-    List<Tag> findByTextContainingIgnoreCase(String tagText, Pageable pageable);
+    List<Tag> findByTextStartingWithIgnoreCase(String tagText, Pageable pageable);
 }
