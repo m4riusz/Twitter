@@ -312,4 +312,10 @@ public class UserServiceSecurityTest {
         userService.changeUserEmail(TestUtil.ID_ONE, "some@email.com");
     }
 
+    @WithAnonymousUser
+    @Test(expected = AccessDeniedException.class)
+    public void queryForUser_anonymousAccessDenied() throws IOException {
+        userService.queryForUser("USERNAME", TestUtil.ALL_IN_ONE_PAGE);
+    }
+
 }

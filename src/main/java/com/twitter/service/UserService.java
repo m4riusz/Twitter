@@ -91,7 +91,6 @@ public interface UserService extends UserDetailsService {
     @PreAuthorize(SecurityUtil.PERSONAL_USAGE)
     User changeUserEmail(long userId, String email);
 
-    // TODO: 15.12.16 tests
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     List<User> queryForUser(String username, Pageable pageable);
 }
