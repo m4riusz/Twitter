@@ -3,7 +3,7 @@
     <require from='../../templates/user/user-template.html'></require>
 
     <div class="form form-inline">
-        <label for="searchField">Search input: </label>
+        <label for="searchField">Search: </label>
         <input id="searchField" type="text" class="form-control" value.bind="inputText"
                placeholder="type username or tag"/>
         <label repeat.for="option of options">
@@ -18,9 +18,10 @@
             <tag-template if.bind="selected == 'Tag'" repeat.for="current of tagResult"
                           tag.bind="current"></tag-template>
         </div>
-        <div if.bind="selected == 'User'" repeat.for="current of userResult" class="col-sm-4 col-md-3">
+        <div if.bind="selected == 'User'" repeat.for="current of userResult" class="col-sm-4 col-md-3" style="padding-bottom: 7px">
             <user-template user.bind="current" date.bind="true"></user-template>
         </div>
+
     </div>
 
     <br/>

@@ -6,7 +6,7 @@
             </div>
 
             <ul class="nav navbar-nav">
-                <li repeat.for="item of router.navigation">
+                <li repeat.for="item of router.navigation" class="${item.isActive ? 'active' : ''}">
                     <a href.bind="item.href">${item.title}</a>
                 </li>
             </ul>
