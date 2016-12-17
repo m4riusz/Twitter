@@ -64,4 +64,10 @@ public class TagServiceSecurityTest {
     public void getTagsFromText_anonymousAccessDenied() {
         tagService.getTagsFromText("some #text");
     }
+
+    @Test(expected = AccessDeniedException.class)
+    @WithAnonymousUser
+    public void queryForTag_anonymousAccessDenied() {
+        tagService.queryForTag("Tag", TestUtil.ALL_IN_ONE_PAGE);
+    }
 }

@@ -25,7 +25,6 @@ public interface TagService {
 
     List<Tag> getTagsFromText(String string);
 
-    // TODO: 15.12.16 add tests
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     List<Tag> queryForTag(String tagText, Pageable pageable);
 
