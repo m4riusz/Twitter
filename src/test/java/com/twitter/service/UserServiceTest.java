@@ -40,7 +40,6 @@ import static com.twitter.util.Util.a;
 import static com.twitter.util.Util.aListWith;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
@@ -598,20 +597,14 @@ public class  UserServiceTest {
 
     @Test
     public void queryForUser_usernameWithUserPrefix() {
-        User user = a(user().withUsername("USER_ONE"));
-        when(userDao.findByUsernameStartingWithIgnoreCase("USER_ONE", TestUtil.ALL_IN_ONE_PAGE)).thenReturn(aListWith(user));
-        List<User> users = userService.queryForUser("@USER_ONE", TestUtil.ALL_IN_ONE_PAGE);
-        verify(userDao).findByUsernameStartingWithIgnoreCase("USER_ONE", TestUtil.ALL_IN_ONE_PAGE);
-        assertThat(users, contains(user));
+        userService.queryForUser("@USER_ONE", TestUtil.ALL_IN_ONE_PAGE);
+        verify(userDao, times(1)).findByUsernameStartingWithIgnoreCase("USER_ONE", TestUtil.ALL_IN_ONE_PAGE);
     }
 
     @Test
     public void queryForUser_usernameWithoutUserPrefix() {
-        User user = a(user().withUsername("USER_ONE"));
-        when(userDao.findByUsernameStartingWithIgnoreCase("USER_ONE", TestUtil.ALL_IN_ONE_PAGE)).thenReturn(aListWith(user));
-        List<User> users = userService.queryForUser("USER_ONE", TestUtil.ALL_IN_ONE_PAGE);
-        verify(userDao).findByUsernameStartingWithIgnoreCase("USER_ONE", TestUtil.ALL_IN_ONE_PAGE);
-        assertThat(users, contains(user));
+        userService.queryForUser("USER_ONE", TestUtil.ALL_IN_ONE_PAGE);
+        verify(userDao, times(1)).findByUsernameStartingWithIgnoreCase("USER_ONE", TestUtil.ALL_IN_ONE_PAGE);
     }
 
 }

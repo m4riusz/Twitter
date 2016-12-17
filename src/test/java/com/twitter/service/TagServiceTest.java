@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -25,7 +24,6 @@ import static com.twitter.util.Util.a;
 import static com.twitter.util.Util.aListWith;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
@@ -33,8 +31,7 @@ import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.hamcrest.core.IsNot.not;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by mariusz on 19.08.16.
@@ -200,12 +197,12 @@ public class TagServiceTest {
     @Test
     public void queryForTag_tagWithPrefix() {
         tagService.queryForTag("#TAG_ONE", TestUtil.ALL_IN_ONE_PAGE);
-        verify(tagDao).findByTextStartingWithIgnoreCase("TAG_ONE", TestUtil.ALL_IN_ONE_PAGE);
+        verify(tagDao, times(1)).findByTextStartingWithIgnoreCase("TAG_ONE", TestUtil.ALL_IN_ONE_PAGE);
     }
 
     @Test
     public void queryForTag_tagWithoutPrefix() {
         tagService.queryForTag("TAG_ONE", TestUtil.ALL_IN_ONE_PAGE);
-        verify(tagDao).findByTextStartingWithIgnoreCase("TAG_ONE", TestUtil.ALL_IN_ONE_PAGE);
+        verify(tagDao, times(1)).findByTextStartingWithIgnoreCase("TAG_ONE", TestUtil.ALL_IN_ONE_PAGE);
     }
 }
