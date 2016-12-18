@@ -43,6 +43,7 @@ export class PostHelper extends BasicService implements IPostHelper {
             console.warn(`Unknown type of post! ${abstractPost.type}`);
         }
         this.addTagsInText(abstractPost);
+        this.replaceNewLinesWithBrTag(abstractPost);
     }
 
 
@@ -132,5 +133,9 @@ export class PostHelper extends BasicService implements IPostHelper {
 
     private addTagsInText(abstractPost:AbstractPost) {
         abstractPost.content = abstractPost.content.replace(/\#([a-zA-Z0-9]+)/g, "<a class='label label-info' href='#/tags/$1'>#$1</a>");
+    }
+
+    private replaceNewLinesWithBrTag(abstractPost:AbstractPost) {
+        abstractPost.content = abstractPost.content.replace(new RegExp('\r?\n', 'g'), "<br/>");
     }
 }
