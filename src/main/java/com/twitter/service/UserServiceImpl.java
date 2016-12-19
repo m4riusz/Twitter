@@ -3,14 +3,12 @@ package com.twitter.service;
 import com.twitter.dao.UserDao;
 import com.twitter.dto.UserCreateForm;
 import com.twitter.exception.*;
-import com.twitter.model.Avatar;
-import com.twitter.model.Password;
-import com.twitter.model.Role;
-import com.twitter.model.User;
+import com.twitter.model.*;
 import com.twitter.util.AvatarUtil;
 import com.twitter.util.MessageUtil;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.SimpleMailMessage;
@@ -22,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -39,13 +38,15 @@ public class UserServiceImpl implements UserService {
     private JavaMailSender javaMailSender;
     private AvatarUtil avatarUtil;
     private PasswordEncoder passwordEncoder;
+    private NotificationService notificationService;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao, JavaMailSender javaMailSender, AvatarUtil avatarUtil, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserDao userDao, JavaMailSender javaMailSender, AvatarUtil avatarUtil, PasswordEncoder passwordEncoder, @Lazy NotificationService notificationService) {
         this.userDao = userDao;
         this.javaMailSender = javaMailSender;
         this.avatarUtil = avatarUtil;
         this.passwordEncoder = passwordEncoder;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -111,6 +112,7 @@ public class UserServiceImpl implements UserService {
             throw new UserFollowException(MessageUtil.FOLLOW_ALREADY_FOLLOWED_ERROR_MSG);
         }
         userToFollow.getFollowers().add(user);
+        notifyUser(user, userToFollow, user.getUsername() + " is now following you!");
     }
 
     @Override
@@ -134,19 +136,39 @@ public class UserServiceImpl implements UserService {
             throw new TwitterDateException(MessageUtil.REPORT_DATE_IS_INVALID_ERROR_MSG);
         }
         userToBan.getAccountStatus().setBannedUntil(date);
+        notifyUser(null, userToBan, "Your's account has been banned until " + DateFormat.getInstance().format(date) + "!");
     }
 
     @Override
     public void unbanUser(long userToUnbanId) {
         User userToUnban = getUserById(userToUnbanId);
         userToUnban.getAccountStatus().setBannedUntil(null);
+        notifyUser(null, userToUnban, "Your's account has been unlocked!");
     }
 
     @Override
     public User changeUserRole(long userToChangeId, Role role) {
         User userToChange = getUserById(userToChangeId);
-        userToChange.setRole(role);
+        User currentUser = getCurrentLoggedUser();
+        Role currentRole = userToChange.getRole();
+        if (currentRole != role) {
+            userToChange.setRole(role);
+            if (userIsPromoted(currentRole, role)) {
+                notifyUser(currentUser, userToChange, "You have been promoted to " + role.getAuthority());
+            } else {
+                notifyUser(currentUser, userToChange, "You have been demoted to " + role.getAuthority());
+            }
+        }
         return userToChange;
+    }
+
+    private boolean userIsPromoted(Role actualRole, Role newRole) {
+        if (actualRole == Role.USER && (newRole == Role.MODERATOR || newRole == Role.ADMIN)) {
+            return true;
+        } else if (actualRole == Role.MODERATOR && newRole == Role.ADMIN) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -251,6 +273,15 @@ public class UserServiceImpl implements UserService {
             throw new UserException(MessageUtil.ACCOUNT_HAS_BEEN_ALREADY_ENABLED);
         }
         throw new UserException(MessageUtil.INVALID_VERIFY_KEY);
+    }
+
+    private void notifyUser(User source, User recipient, String notificationText) {
+        Notification notification = new Notification();
+        notification.setSeen(false);
+        notification.setText(notificationText);
+        notification.setSourceUser(source);
+        notification.setDestinationUser(recipient);
+        notificationService.save(notification);
     }
 
     private boolean userIsActivated(User user) {

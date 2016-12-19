@@ -64,6 +64,8 @@ public class  UserServiceTest {
     private AvatarUtil avatarUtil;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private NotificationService notificationService;
 
     private UserService userService;
 
@@ -71,7 +73,7 @@ public class  UserServiceTest {
 
     @Before
     public void setUp() {
-        userService = new UserServiceImpl(userDao, javaMailSender, avatarUtil,passwordEncoder);
+        userService = new UserServiceImpl(userDao, javaMailSender, avatarUtil, passwordEncoder, notificationService);
         authentication = mock(Authentication.class);
         mockStatic(SecurityContextHolder.class);
         SecurityContext securityContext = mock(SecurityContext.class);

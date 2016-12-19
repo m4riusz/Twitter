@@ -29,7 +29,6 @@ public class Notification extends AbstractEntity {
     private String text;
     @NotNull
     private boolean seen;
-    @NotNull
     @ManyToOne
     private AbstractPost abstractPost;
 
