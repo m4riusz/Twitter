@@ -1,11 +1,10 @@
 import Notification = Models.Notification;
 import {BasicService} from "./basicService";
 import {inject} from "aurelia-dependency-injection";
-import {HttpClient} from "aurelia-fetch-client";
+import {HttpClient, json} from "aurelia-fetch-client";
 import {Const} from "../domain/const";
 import {BASE_URL, NOTIFICATION_LATEST, NOTIFICATION_BY_ID} from "../domain/route";
 import {PostHelper, IPostHelper} from "./postHelper";
-import {json} from "aurelia-fetch-client";
 /**
  * Created by mariusz on 03.12.16.
  */
@@ -40,9 +39,9 @@ export class NotificationService extends BasicService implements INotificationSe
                 .then(response => response.json())
                 .then(
                     notifications => {
-                        notifications.forEach(notification => {
-                            this.postHelper.getCurrentUserPostData(notification.abstractPost);
-                        });
+                        notifications
+                            .filter(notification => notification.abstractPost != null)
+                            .forEach(notification => this.postHelper.getCurrentUserPostData(notification.abstractPost));
                         resolve(notifications);
                     },
                     error => reject(error.message)
@@ -61,7 +60,9 @@ export class NotificationService extends BasicService implements INotificationSe
                 .then(response => response.json())
                 .then(
                     notification => {
-                        this.postHelper.getCurrentUserPostData(notification.abstractPost);
+                        if (notification.abstractPost != null) {
+                            this.postHelper.getCurrentUserPostData(notification.abstractPost);
+                        }
                         resolve(notification);
                     },
                     error => {
@@ -82,7 +83,9 @@ export class NotificationService extends BasicService implements INotificationSe
                 .then(response => response.json())
                 .then(
                     notification => {
-                        this.postHelper.getCurrentUserPostData(notification.abstractPost);
+                        if (notification.abstractPost != null) {
+                            this.postHelper.getCurrentUserPostData(notification.abstractPost);
+                        }
                         resolve(notification);
                     },
                     error => reject(error.message)
