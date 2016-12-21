@@ -73,7 +73,7 @@ public class ReportServiceImpl implements ReportService {
 
         setReportJudge(reportFromDb);
         updateReportStatus(reportSentence, reportFromDb);
-        addUserNotification(reportFromDb.getUser(), reportFromDb.getJudge(), "Your report has been arbitrated!");
+        addUserNotification(reportFromDb.getUser(), reportFromDb.getJudge(), "Your report has been arbitrated! (" + reportSentence.getReportStatus().name() + ")");
         return reportFromDb;
     }
 
