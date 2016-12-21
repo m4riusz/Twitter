@@ -54,12 +54,14 @@ public class ReportServiceTest {
     private ReportDao reportDao;
     @Mock
     private UserService userService;
+    @Mock
+    private NotificationService notificationService;
 
     private ReportService reportService;
 
     @Before
     public void setUp() {
-        reportService = new ReportServiceImpl(reportDao, userService);
+        reportService = new ReportServiceImpl(reportDao, userService, notificationService);
     }
 
     @Test(expected = ReportNotFoundException.class)

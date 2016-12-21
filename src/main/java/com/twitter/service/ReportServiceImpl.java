@@ -5,10 +5,7 @@ import com.twitter.dto.ReportSentence;
 import com.twitter.exception.ReportAlreadyExist;
 import com.twitter.exception.ReportNotFoundException;
 import com.twitter.exception.TwitterDateException;
-import com.twitter.model.Report;
-import com.twitter.model.ReportCategory;
-import com.twitter.model.ReportStatus;
-import com.twitter.model.User;
+import com.twitter.model.*;
 import com.twitter.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -29,11 +26,13 @@ public class ReportServiceImpl implements ReportService {
 
     private ReportDao reportDao;
     private UserService userService;
+    private NotificationService notificationService;
 
     @Autowired
-    public ReportServiceImpl(ReportDao reportDao, UserService userService) {
+    public ReportServiceImpl(ReportDao reportDao, UserService userService, NotificationService notificationService) {
         this.reportDao = reportDao;
         this.userService = userService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -71,9 +70,20 @@ public class ReportServiceImpl implements ReportService {
         } else if (isGuilty(reportSentence) && !newBanDateLastsLongerThanActualBanDate(reportSentence, reportFromDb)) {
             banPost(reportFromDb);
         }
+
         setReportJudge(reportFromDb);
         updateReportStatus(reportSentence, reportFromDb);
+        addUserNotification(reportFromDb.getUser(), reportFromDb.getJudge(), "Your report has been arbitrated!");
         return reportFromDb;
+    }
+
+    private void addUserNotification(User destination, User source, String text) {
+        Notification notification = new Notification();
+        notification.setSeen(false);
+        notification.setDestinationUser(destination);
+        notification.setSourceUser(source);
+        notification.setText(text);
+        notificationService.save(notification);
     }
 
     @Override
@@ -128,7 +138,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private void setUserBanDate(Date date, Report reportFromDb) {
-        reportFromDb.getAbstractPost().getOwner().getAccountStatus().setBannedUntil(date);
+        userService.banUser(reportFromDb.getAbstractPost().getOwner().getId(), date);
     }
 
     private void setReportJudge(Report reportFromDb) {
