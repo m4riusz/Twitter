@@ -5,6 +5,10 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
+import static com.twitter.config.DatabaseConfig.USERNAME_PATTERN;
+import static com.twitter.util.Config.*;
 
 /**
  * Created by mariusz on 22.11.16.
@@ -12,14 +16,15 @@ import javax.validation.constraints.NotNull;
 public class UserCreateForm {
 
     @NotNull
+    @Pattern(regexp = USERNAME_PATTERN, message = "Username should contains only letters, numbers and '_' sign!")
     @Length(
-            min = 3, max = 10,
+            min = MIN_USERNAME_LENGTH, max = MAX_USERNAME_LENGTH,
             message = "Username length should be between {min} and {max}!"
     )
     private String username;
     @NotNull
     @Length(
-            min = 6, max = 10,
+            min = MIN_PASSWORD_LENGTH, max = MAX_PASSWORD_LENGTH,
             message = "Password length should be between {min} and {max}!"
     )
     private String password;

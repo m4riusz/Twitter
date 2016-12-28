@@ -27,7 +27,7 @@ public class User extends AbstractEntity implements UserDetails {
     private Avatar avatar;
     @NotNull
     @Column(unique = true)
-    @Pattern(regexp = USERNAME_PATTERN)
+    @Pattern(regexp = USERNAME_PATTERN, message = "Username should contains only letters, numbers and '_' sign!")
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     @Length(
             min = MIN_USERNAME_LENGTH, max = MAX_USERNAME_LENGTH,
