@@ -8,17 +8,18 @@ import {Const} from "../../../domain/const";
 
 @inject(AuthService)
 export class Register {
-    authService:IAuthService;
-    error:string;
-    success:string;
-    username:string;
-    password:string;
-    passwordConfirm:string;
-    email:string;
-    emailConfirm:string;
-    gender:string;
+    authService: IAuthService;
+    error: string;
+    success: string;
+    warning: string;
+    username: string;
+    password: string;
+    passwordConfirm: string;
+    email: string;
+    emailConfirm: string;
+    gender: string;
 
-    constructor(authService:IAuthService) {
+    constructor(authService: IAuthService) {
         this.authService = authService;
     }
 
@@ -37,6 +38,7 @@ export class Register {
             this.setErrorMessage('Wrong password length!');
         } else {
             try {
+                this.setWarningMessage("Creating account! Please wait...");
                 let response = await this.authService.register(this.username, this.password, this.email, this.gender == null ? "UNDEFINED" : this.gender);
                 this.clearFields();
                 this.setSuccessMessage(response);
@@ -46,9 +48,8 @@ export class Register {
         }
     }
 
-    private clearFields():void {
-        this.error = '';
-        this.success = '';
+    private clearFields(): void {
+        this.clearAlerts();
         this.username = '';
         this.password = '';
         this.passwordConfirm = '';
@@ -56,22 +57,33 @@ export class Register {
         this.emailConfirm = '';
     }
 
-    private setSuccessMessage(message:string):void {
-        this.error = '';
+    private setSuccessMessage(message: string): void {
+        this.clearAlerts();
         this.success = message;
     }
 
-    private setErrorMessage(message:string):void {
-        this.success = '';
+
+    private setErrorMessage(message: string): void {
+        this.clearAlerts();
         this.error = message;
     }
 
-    public usernameHasValidLength():boolean {
+    private setWarningMessage(message: string): void {
+        this.clearAlerts();
+        this.warning = message;
+    }
+
+    private clearAlerts() {
+        this.error = '';
+        this.warning = '';
+        this.success = '';
+    }
+
+    public usernameHasValidLength(): boolean {
         return this.username !== undefined && this.username.length >= Const.LOGIN_LENGTH.MIN && this.username.length <= Const.LOGIN_LENGTH.MAX;
     }
 
-    public passwordHasValidLength():boolean {
+    public passwordHasValidLength(): boolean {
         return this.password !== undefined && this.password.length >= Const.PASSWORD_LENGTH.MIN && this.password.length <= Const.PASSWORD_LENGTH.MAX;
     }
-
 }
