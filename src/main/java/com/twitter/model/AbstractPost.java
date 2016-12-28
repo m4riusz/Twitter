@@ -13,6 +13,7 @@ import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import static com.twitter.util.Config.*;
 
 /**
  * Created by mariusz on 21.07.16.
@@ -35,7 +36,7 @@ public abstract class AbstractPost extends AbstractEntity {
     private boolean banned;
     @NotNull
     @Length(
-            min = 1, max = 100,
+            min = MIN_POST_TEXT_LENGTH, max = MAX_POST_TEXT_LENGTH,
             message = "Post length should be between {min} and {max}!"
     )
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)

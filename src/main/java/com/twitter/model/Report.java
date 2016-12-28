@@ -6,6 +6,9 @@ import org.hibernate.validator.constraints.Length;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
+import static com.twitter.util.Config.MAX_REPORT_TEXT_LENGTH;
+import static com.twitter.util.Config.MIN_REPORT_TEXT_LENGTH;
+
 /**
  * Created by mariusz on 11.07.16.
  */
@@ -23,8 +26,8 @@ public class Report extends AbstractEntity{
     private ReportCategory category;
     @NotNull
     @Length(
-            max = 100,
-            message = "Report length should be smaller than {max}!"
+            min = MIN_REPORT_TEXT_LENGTH, max = MAX_REPORT_TEXT_LENGTH,
+            message = "Report length should be smaller than {max} and bigger than {min}!"
     )
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private String message;

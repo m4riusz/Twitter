@@ -8,7 +8,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.*;
+
+import static com.twitter.config.DatabaseConfig.USERNAME_PATTERN;
+import static com.twitter.util.Config.MAX_USERNAME_LENGTH;
+import static com.twitter.util.Config.MIN_USERNAME_LENGTH;
 
 /**
  * Created by mariusz on 11.07.16.
@@ -22,9 +27,10 @@ public class User extends AbstractEntity implements UserDetails {
     private Avatar avatar;
     @NotNull
     @Column(unique = true)
+    @Pattern(regexp = USERNAME_PATTERN)
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     @Length(
-            min = 3, max = 10,
+            min = MIN_USERNAME_LENGTH, max = MAX_USERNAME_LENGTH,
             message = "Username length should be between {min} and {max}!"
     )
     private String username;
@@ -200,6 +206,7 @@ public class User extends AbstractEntity implements UserDetails {
     public boolean isAccountNonLocked() {
         return (accountStatus.getBannedUntil() == null || accountStatus.getBannedUntil().before(Calendar.getInstance().getTime()));
     }
+
     @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {

@@ -6,6 +6,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
 
+import static com.twitter.util.Config.MAX_TAG_TEXT_LENGTH;
+import static com.twitter.util.Config.MIN_TAG_TEXT_LENGTH;
+
 /**
  * Created by mariusz on 11.07.16.
  */
@@ -14,8 +17,8 @@ public class Tag extends AbstractEntity {
 
     @NotNull
     @Length(
-            min = 1,
-            max = 30,
+            min = MIN_TAG_TEXT_LENGTH,
+            max = MAX_TAG_TEXT_LENGTH,
             message = "Tag length should be between {min} and {max}!"
     )
     @Column(unique = true)

@@ -1,6 +1,7 @@
 package com.twitter.model;
 
 import com.twitter.config.DatabaseConfig;
+import com.twitter.util.Config;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.Length;
 
@@ -8,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import static com.twitter.util.Config.*;
 
 /**
  * Created by mariusz on 11.07.16.
@@ -17,7 +20,7 @@ import javax.validation.constraints.Size;
 public class Avatar extends AbstractEntity{
     @NotNull
     @Length(
-            min = 1, max = 100,
+            min = MIN_AVATAR_FILENAME_LENGTH, max = MAX_AVATAR_FILENAME_LENGTH,
             message = "Avatar file name length should be between {min} and {max}!"
     )
     private String fileName;
