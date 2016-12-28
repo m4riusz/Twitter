@@ -31,7 +31,7 @@ export class ReportModal {
 
     activate() {
         this.message = '';
-        this.maxLength = Const.REPORT_MESSAGE_MAX_LENGTH;
+        this.maxLength = Const.REPORT_LENGTH.max;
     }
 
 }

@@ -1,5 +1,9 @@
 img.post, iframe.post {
-    max-width:100%;
-    height:auto
+    max-width: 100%;
+    height: auto
+}
+
+.post {
+    word-break: break-all;
 }
 
