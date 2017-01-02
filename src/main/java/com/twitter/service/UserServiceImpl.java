@@ -6,25 +6,30 @@ import com.twitter.exception.*;
 import com.twitter.model.*;
 import com.twitter.util.AvatarUtil;
 import com.twitter.util.MessageUtil;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+
+import static com.twitter.util.MessageUtil.TEXT_HTML;
 
 /**
  * Created by mariusz on 14.07.16.
@@ -39,6 +44,8 @@ public class UserServiceImpl implements UserService {
     private AvatarUtil avatarUtil;
     private PasswordEncoder passwordEncoder;
     private NotificationService notificationService;
+    @Autowired
+    private Configuration configuration;
 
     @Autowired
     public UserServiceImpl(UserDao userDao, JavaMailSender javaMailSender, AvatarUtil avatarUtil, PasswordEncoder passwordEncoder, @Lazy NotificationService notificationService) {
@@ -87,11 +94,6 @@ public class UserServiceImpl implements UserService {
             throw new UserAlreadyExistsException(MessageUtil.USER_ALREADY_EXISTS_EMAIL_ERROR_MSG);
         }
         String verifyKey = UUID.randomUUID().toString();
-        sendEmail(userCreateForm.getEmail(),
-                MessageUtil.EMAIL_FROM,
-                MessageUtil.EMAIL_SUBJECT,
-                MessageUtil.EMAIL_CONTENT + "\n" + MessageUtil.EMAIL_VERIFY_LINK + verifyKey
-        );
         User user = new User();
         user.getAccountStatus().setVerifyKey(verifyKey);
         user.setAvatar(avatarUtil.getDefaultAvatar());
@@ -99,7 +101,26 @@ public class UserServiceImpl implements UserService {
         user.setEmail(userCreateForm.getEmail());
         user.setGender(userCreateForm.getGender());
         user.setPassword(new Password(passwordEncoder.encode(userCreateForm.getPassword())));
-        return userDao.save(user);
+        User createdUser = userDao.save(user);
+        try {
+            sendEmail(userCreateForm.getEmail(),
+                    MessageUtil.EMAIL_FROM,
+                    MessageUtil.EMAIL_SUBJECT,
+                    generateEmailContent(user)
+            );
+        } catch (TemplateException | MessagingException e) {
+            e.printStackTrace();
+        }
+        return createdUser;
+    }
+
+    private String generateEmailContent(User user) throws IOException, TemplateException {
+        Map<String, Object> model = new HashMap<>();
+        model.put("user", user);
+        model.put("link", MessageUtil.EMAIL_VERIFY_LINK);
+        model.put("verifyKey", user.getAccountStatus().getVerifyKey());
+        Template template = configuration.getTemplate("email.ftl");
+        return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
     }
 
     @Override
@@ -253,12 +274,16 @@ public class UserServiceImpl implements UserService {
         if (user.equals(currentLoggedUser)) {
             currentLoggedUser.setEmail(email);
         }
-        sendEmail(user.getEmail(), MessageUtil.EMAIL_FROM, MessageUtil.EMAIL_SUBJECT, MessageUtil.EMAIL_CHANGED);
+        try {
+            sendEmail(user.getEmail(), MessageUtil.EMAIL_FROM, MessageUtil.EMAIL_SUBJECT, MessageUtil.EMAIL_CHANGED);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
         return user;
     }
 
     @Override
-    public List<User> queryForUser(String username,Pageable pageable) {
+    public List<User> queryForUser(String username, Pageable pageable) {
         return userDao.findByUsernameStartingWithIgnoreCase(username.startsWith(USER_PREFIX) ? username.substring(1) : username, pageable);
     }
 
@@ -292,13 +317,14 @@ public class UserServiceImpl implements UserService {
         return user != null && !user.getAccountStatus().isEnable();
     }
 
-    private void sendEmail(String to, String from, String subject, String content) {
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(to);
-        mailMessage.setFrom(from);
-        mailMessage.setSubject(subject);
-        mailMessage.setText(content);
-        javaMailSender.send(mailMessage);
+    private void sendEmail(String to, String from, String subject, String content) throws MessagingException {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        mimeMessage.setContent(content, TEXT_HTML);
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
+        mimeMessageHelper.setTo(to);
+        mimeMessageHelper.setFrom(from);
+        mimeMessageHelper.setSubject(subject);
+        javaMailSender.send(mimeMessage);
     }
 
     private void checkIfUserExist(long userId) {

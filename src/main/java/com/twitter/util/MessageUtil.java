@@ -41,4 +41,5 @@ public final class MessageUtil {
     public static final String YOU_HAVE_BEEN_MENTIONED_MESSAGE = "You have been mentioned by @";
     public static final String NOTIFICATION_DOES_NOT_EXISTS = "Notification does not exist!";
     public static final String ACCESS_DENIED = "Access denied";
+    public static final String TEXT_HTML = "text/html";
 }
