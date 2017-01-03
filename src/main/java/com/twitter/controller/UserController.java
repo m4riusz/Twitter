@@ -73,7 +73,7 @@ public class UserController {
     }
 
     @RequestMapping(value = Route.USER_PASSWORD_CHANGE, method = RequestMethod.PUT)
-    public ResponseEntity<User> changeUserPassword(@PathVariable long userId, @RequestBody @Valid PasswordChange passwordChange) {
+    public ResponseEntity<User> changeUserPassword(@PathVariable long userId, @RequestBody @Valid PasswordChange passwordChange) throws TemplateException, IOException, MessagingException {
         return new ResponseEntity<>(userService.changeUserPasswordById(userId, passwordChange.getPassword()), HttpStatus.OK);
     }
 
@@ -83,7 +83,7 @@ public class UserController {
     }
 
     @RequestMapping(value = Route.USER_EMAIL_CHANGE, method = RequestMethod.PUT)
-    public ResponseEntity<User> changeUserRole(@PathVariable long userId, @RequestBody @Valid EmailChange emailChange) throws MessagingException {
+    public ResponseEntity<User> changeUserRole(@PathVariable long userId, @RequestBody @Valid EmailChange emailChange) throws MessagingException, IOException, TemplateException {
         return new ResponseEntity<>(userService.changeUserEmail(userId, emailChange.getEmail()), HttpStatus.OK);
     }
 

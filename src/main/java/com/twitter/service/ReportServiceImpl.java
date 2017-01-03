@@ -3,19 +3,20 @@ package com.twitter.service;
 import com.twitter.dao.ReportDao;
 import com.twitter.dto.ReportSentence;
 import com.twitter.exception.ReportAlreadyExist;
+import com.twitter.exception.ReportException;
 import com.twitter.exception.ReportNotFoundException;
 import com.twitter.exception.TwitterDateException;
 import com.twitter.model.*;
 import com.twitter.util.MessageUtil;
+import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import javax.mail.MessagingException;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Created by mariusz on 31.07.16.
@@ -27,12 +28,14 @@ public class ReportServiceImpl implements ReportService {
     private ReportDao reportDao;
     private UserService userService;
     private NotificationService notificationService;
+    private EmailService emailService;
 
     @Autowired
-    public ReportServiceImpl(ReportDao reportDao, UserService userService, NotificationService notificationService) {
+    public ReportServiceImpl(ReportDao reportDao, UserService userService, NotificationService notificationService, EmailService emailService) {
         this.reportDao = reportDao;
         this.userService = userService;
         this.notificationService = notificationService;
+        this.emailService = emailService;
     }
 
     @Override
@@ -55,7 +58,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Report judgeReport(ReportSentence reportSentence) {
+    public Report judgeReport(ReportSentence reportSentence) throws TemplateException, IOException, MessagingException {
         Report reportFromDb = reportDao.findOne(reportSentence.getReportId());
         if (!doesReportExist(reportSentence.getReportId())) {
             throw new ReportNotFoundException(MessageUtil.REPORT_NOT_FOUND_BY_ID_ERROR_MSG);
@@ -73,8 +76,26 @@ public class ReportServiceImpl implements ReportService {
 
         setReportJudge(reportFromDb);
         updateReportStatus(reportSentence, reportFromDb);
+        if (reportFromDb.getUser().equals(reportFromDb.getJudge())) {
+            throw new ReportException(MessageUtil.REPORT_JUDGE_SELF_EXCEPTION);
+        }
         addUserNotification(reportFromDb.getUser(), reportFromDb.getJudge(), "Your report has been arbitrated! (" + reportSentence.getReportStatus().name() + ")");
+        Map<String, Object> model = getReportModel(reportFromDb, reportSentence);
+        emailService.sendEmail(reportFromDb.getUser().getEmail(), MessageUtil.EMAIL_FROM, MessageUtil.EMAIL_SUBJECT, "report_judge_email.ftl", model, EmailType.TEXT_HTML);
+        emailService.sendEmail(reportFromDb.getAbstractPost().getOwner().getEmail(), MessageUtil.EMAIL_FROM, MessageUtil.EMAIL_SUBJECT, "banned_user_email.ftl", model, EmailType.TEXT_HTML);
+
         return reportFromDb;
+    }
+
+    private Map<String, Object> getReportModel(Report reportFromDb, ReportSentence reportSentence) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("user", reportFromDb.getUser());
+        model.put("judge", reportFromDb.getJudge());
+        model.put("suspectedUser", reportFromDb.getAbstractPost().getOwner());
+        model.put("category", reportFromDb.getCategory().name());
+        model.put("status", reportFromDb.getStatus().name());
+        model.put("banDate", reportSentence.getDateToBlock());
+        return model;
     }
 
     private void addUserNotification(User destination, User source, String text) {

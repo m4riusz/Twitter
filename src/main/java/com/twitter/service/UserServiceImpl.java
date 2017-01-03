@@ -180,9 +180,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User changeUserPasswordById(long userId, String password) {
+    public User changeUserPasswordById(long userId, String password) throws TemplateException, IOException, MessagingException {
         User userToChange = getUserById(userId);
         userToChange.setPassword(new Password(passwordEncoder.encode(password)));
+        Map<String, Object> model = new HashMap<>();
+        model.put("user", userToChange);
+        emailService.sendEmail(userToChange.getEmail(), MessageUtil.EMAIL_FROM, MessageUtil.EMAIL_SUBJECT, "password_change.ftl", model, EmailType.TEXT_HTML);
         return userToChange;
     }
 
@@ -244,7 +247,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User changeUserEmail(long userId, String email) throws MessagingException {
+    public User changeUserEmail(long userId, String email) throws MessagingException, IOException, TemplateException {
         User user = getUserById(userId);
         User userByEmail = userDao.findByEmail(email);
         User currentLoggedUser = getCurrentLoggedUser();
@@ -254,8 +257,10 @@ public class UserServiceImpl implements UserService {
         user.setEmail(email);
         if (user.equals(currentLoggedUser)) {
             currentLoggedUser.setEmail(email);
+            Map<String, Object> model = new HashMap<>();
+            model.put("user", user);
+            emailService.sendEmail(user.getEmail(), MessageUtil.EMAIL_FROM, MessageUtil.EMAIL_SUBJECT, "email_change.ftl", model, EmailType.TEXT_HTML);
         }
-        emailService.sendEmail(user.getEmail(), MessageUtil.EMAIL_FROM, MessageUtil.EMAIL_SUBJECT, MessageUtil.EMAIL_CHANGED, EmailType.TEXT_PLAIN);
         return user;
     }
 

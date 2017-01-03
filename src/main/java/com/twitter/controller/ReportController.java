@@ -6,13 +6,16 @@ import com.twitter.model.ReportCategory;
 import com.twitter.model.ReportStatus;
 import com.twitter.route.Route;
 import com.twitter.service.ReportService;
+import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 import static org.springframework.data.domain.Sort.Direction;
@@ -36,7 +39,7 @@ public class ReportController {
     }
 
     @RequestMapping(value = Route.REPORT_URL, method = RequestMethod.PUT)
-    public ResponseEntity<Report> judgeReport(@Valid @RequestBody ReportSentence reportSentence) {
+    public ResponseEntity<Report> judgeReport(@Valid @RequestBody ReportSentence reportSentence) throws TemplateException, IOException, MessagingException {
         return new ResponseEntity<>(reportService.judgeReport(reportSentence), HttpStatus.OK);
     }
 

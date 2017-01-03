@@ -5,10 +5,13 @@ import com.twitter.model.Report;
 import com.twitter.model.ReportCategory;
 import com.twitter.model.ReportStatus;
 import com.twitter.util.SecurityUtil;
+import freemarker.template.TemplateException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -24,7 +27,7 @@ public interface ReportService {
     Report createReport(Report report);
 
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
-    Report judgeReport(ReportSentence reportSentence);
+    Report judgeReport(ReportSentence reportSentence) throws TemplateException, IOException, MessagingException;
 
     @PreAuthorize(SecurityUtil.ADMIN_OR_MODERATOR)
     List<Report> findLatestByStatus(ReportStatus reportStatus, Pageable pageable);

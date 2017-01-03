@@ -6,6 +6,7 @@ import com.twitter.model.ReportStatus;
 import com.twitter.service.ReportService;
 import com.twitter.util.TestUtil;
 import com.twitter.util.WithCustomMockUser;
+import freemarker.template.TemplateException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import javax.mail.MessagingException;
+import java.io.IOException;
 
 import static com.twitter.builders.ReportBuilder.report;
 import static com.twitter.builders.ReportSentenceBuilder.reportSentence;
@@ -70,13 +74,13 @@ public class ReportServiceSecurityTest {
 
     @Test(expected = AccessDeniedException.class)
     @WithAnonymousUser
-    public void judgeReport_anonymousAccessDenied() {
+    public void judgeReport_anonymousAccessDenied() throws TemplateException, IOException, MessagingException {
         reportService.judgeReport(a(reportSentence()));
     }
 
     @Test(expected = AccessDeniedException.class)
     @WithCustomMockUser(authorities = TestUtil.USER)
-    public void judgeReport_userAccessDenied() {
+    public void judgeReport_userAccessDenied() throws TemplateException, IOException, MessagingException {
         reportService.judgeReport(a(reportSentence()));
     }
 

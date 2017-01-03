@@ -453,13 +453,13 @@ public class UserServiceTest {
     }
 
     @Test(expected = UserNotFoundException.class)
-    public void changeUserPasswordById_userDoesNotExist() {
+    public void changeUserPasswordById_userDoesNotExist() throws TemplateException, IOException, MessagingException {
         when(userDao.findOne(anyLong())).thenReturn(null);
         userService.changeUserPasswordById(1L, "NewPass");
     }
 
     @Test
-    public void changeUserPasswordById_userExists() {
+    public void changeUserPasswordById_userExists() throws TemplateException, IOException, MessagingException {
         User user = a(user());
         when(userDao.exists(anyLong())).thenReturn(true);
         when(userDao.findOne(anyLong())).thenReturn(user);
@@ -570,14 +570,14 @@ public class UserServiceTest {
     }
 
     @Test(expected = UserNotFoundException.class)
-    public void changeUserEmail_userDoesNotExist() throws MessagingException {
+    public void changeUserEmail_userDoesNotExist() throws MessagingException, IOException, TemplateException {
         User user = a(user());
         when(userDao.exists(user.getId())).thenReturn(false);
         userService.changeUserEmail(user.getId(), "some@email.com");
     }
 
     @Test(expected = UserException.class)
-    public void changeUserEmail_userExistsEmailIsAlreadyTaken() throws MessagingException {
+    public void changeUserEmail_userExistsEmailIsAlreadyTaken() throws MessagingException, IOException, TemplateException {
         User user = a(user());
         when(userDao.exists(user.getId())).thenReturn(true);
         when(userDao.findByEmail(anyString())).thenReturn(a(user()));
@@ -585,7 +585,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void changeUserEmail_userExistsEmailIsFree() throws MessagingException {
+    public void changeUserEmail_userExistsEmailIsFree() throws MessagingException, IOException, TemplateException {
         String newEmail = "myNew@email.com";
         String oldEmail = "old@email.com";
         User user = a(user().withEmail(oldEmail));

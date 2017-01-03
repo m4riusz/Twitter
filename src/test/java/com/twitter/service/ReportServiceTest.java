@@ -9,6 +9,7 @@ import com.twitter.exception.TwitterDateException;
 import com.twitter.model.*;
 import com.twitter.util.MessageUtil;
 import com.twitter.util.TestUtil;
+import freemarker.template.TemplateException;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +21,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.mail.MessagingException;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -56,12 +59,14 @@ public class ReportServiceTest {
     private UserService userService;
     @Mock
     private NotificationService notificationService;
+    @Mock
+    private EmailService emailService;
 
     private ReportService reportService;
 
     @Before
     public void setUp() {
-        reportService = new ReportServiceImpl(reportDao, userService, notificationService);
+        reportService = new ReportServiceImpl(reportDao, userService, notificationService, emailService);
     }
 
     @Test(expected = ReportNotFoundException.class)
@@ -118,7 +123,7 @@ public class ReportServiceTest {
     }
 
     @Test(expected = ReportNotFoundException.class)
-    public void judgeReport_reportDoesNotExist() {
+    public void judgeReport_reportDoesNotExist() throws TemplateException, IOException, MessagingException {
         when(reportDao.exists(anyLong())).thenReturn(false);
         ReportSentence reportSentence = a(reportSentence()
                 .withReportStatus(ReportStatus.GUILTY)
@@ -128,7 +133,7 @@ public class ReportServiceTest {
     }
 
     @Test(expected = TwitterDateException.class)
-    public void judgeReport_userIsGuiltyAndDataIsNotSet() {
+    public void judgeReport_userIsGuiltyAndDataIsNotSet() throws TemplateException, IOException, MessagingException {
         User postOwner = a(user());
         User accuser = a(user());
         Tweet tweet = a(tweet()
@@ -149,7 +154,7 @@ public class ReportServiceTest {
     }
 
     @Test(expected = TwitterDateException.class)
-    public void judgeReport_userIsGuiltyAndDataIsInvalid() {
+    public void judgeReport_userIsGuiltyAndDataIsInvalid() throws TemplateException, IOException, MessagingException {
         Report report = a(report());
         Date dateBeforeNow = DateTime.now().minusDays(1).toDate();
         ReportSentence reportSentence = a(reportSentence()
@@ -163,7 +168,7 @@ public class ReportServiceTest {
     }
 
     @Test
-    public void judgeReport_bannedUserIsBannedAgainWithShortBanDate_banDateShouldNotBeShorten() {
+    public void judgeReport_bannedUserIsBannedAgainWithShortBanDate_banDateShouldNotBeShorten() throws TemplateException, IOException, MessagingException {
         Date newDateToBlock = DateTime.now().plusDays(7).toDate();
         Date oldBanDate = DateTime.now().plusDays(10).toDate();
 
@@ -202,7 +207,7 @@ public class ReportServiceTest {
     }
 
     @Test
-    public void judgeReport_bannedUserIsBannedAgainWithLongerBanDate_banDateShouldBeLonger() {
+    public void judgeReport_bannedUserIsBannedAgainWithLongerBanDate_banDateShouldBeLonger() throws TemplateException, IOException, MessagingException {
         Date dateBeforeNewBanDate = DateTime.now().plusDays(7).toDate();
         Date newLongerBanDate = DateTime.now().plusDays(10).toDate();
 
@@ -241,7 +246,7 @@ public class ReportServiceTest {
     }
 
     @Test
-    public void judgeReport_userIsGuilty() {
+    public void judgeReport_userIsGuilty() throws TemplateException, IOException, MessagingException {
         Date dateWhenBanExpired = DateTime.now().plusDays(2).toDate();
         User tweetOwner = a(user());
         User accuser = a(user());

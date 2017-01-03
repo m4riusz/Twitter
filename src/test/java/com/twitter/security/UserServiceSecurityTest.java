@@ -219,19 +219,19 @@ public class UserServiceSecurityTest {
 
     @WithCustomMockUser(authorities = TestUtil.ANONYMOUS)
     @Test(expected = AccessDeniedException.class)
-    public void changeUserPasswordById_anonymousAccessDenied() {
+    public void changeUserPasswordById_anonymousAccessDenied() throws TemplateException, IOException, MessagingException {
         userService.changeUserPasswordById(TestUtil.ID_ONE, "newPassword");
     }
 
     @WithCustomMockUser(id = TestUtil.ID_ONE)
     @Test(expected = AccessDeniedException.class)
-    public void changeUserPasswordById_wrongUserAccessDenied() {
+    public void changeUserPasswordById_wrongUserAccessDenied() throws TemplateException, IOException, MessagingException {
         userService.changeUserPasswordById(TestUtil.ID_TWO, "newPassword");
     }
 
     @WithCustomMockUser(id = TestUtil.ID_TWO, authorities = TestUtil.USER)
     @Test
-    public void changeUserPasswordById_userAuthenticatedAccess() {
+    public void changeUserPasswordById_userAuthenticatedAccess() throws TemplateException, IOException, MessagingException {
         userService.changeUserPasswordById(TestUtil.ID_TWO, "newPassword");
     }
 
@@ -310,7 +310,7 @@ public class UserServiceSecurityTest {
 
     @WithCustomMockUser(id = TestUtil.ID_TWO)
     @Test(expected = AccessDeniedException.class)
-    public void changeUserEmail_wrongUser() throws IOException, MessagingException {
+    public void changeUserEmail_wrongUser() throws IOException, MessagingException, TemplateException {
         userService.changeUserEmail(TestUtil.ID_ONE, "some@email.com");
     }
 

@@ -61,7 +61,7 @@ public interface UserService extends UserDetailsService {
     void deleteUserById(long userId);
 
     @PreAuthorize(SecurityUtil.PERSONAL_USAGE)
-    User changeUserPasswordById(@Param("userId") long userId, String password);
+    User changeUserPasswordById(@Param("userId") long userId, String password) throws TemplateException, IOException, MessagingException;
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     Long getAllUsersCount();
@@ -91,7 +91,7 @@ public interface UserService extends UserDetailsService {
     Boolean isFollowed(long userId);
 
     @PreAuthorize(SecurityUtil.PERSONAL_USAGE)
-    User changeUserEmail(long userId, String email) throws MessagingException;
+    User changeUserEmail(long userId, String email) throws MessagingException, IOException, TemplateException;
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     List<User> queryForUser(String username, Pageable pageable);
