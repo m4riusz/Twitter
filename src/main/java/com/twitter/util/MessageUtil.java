@@ -19,7 +19,6 @@ public final class MessageUtil {
     public static final String POST_DOES_NOT_EXISTS_BY_ID_ERROR_MSG = "Post with this id does not exists!";
     public static final String HOURS_CANT_BE_LESS_OR_EQUAL_0_ERROR_MSG = "Hours cant be less or equal 0!";
     public static final String EMAIL_SUBJECT = "Twitter Registration!";
-    public static final String EMAIL_CONTENT = "Thank you for registration. Please click ling below to activate account!";
     public static final String EMAIL_FROM = "tw_it@o2.pl";
     public static final String EMAIL_VERIFY_LINK = "http://localhost:8080/api/user/verify/";
     public static final String EMAIL_CHANGED = "You have changed email!";
@@ -41,5 +40,4 @@ public final class MessageUtil {
     public static final String YOU_HAVE_BEEN_MENTIONED_MESSAGE = "You have been mentioned by @";
     public static final String NOTIFICATION_DOES_NOT_EXISTS = "Notification does not exist!";
     public static final String ACCESS_DENIED = "Access denied";
-    public static final String TEXT_HTML = "text/html";
 }

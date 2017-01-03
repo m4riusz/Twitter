@@ -7,6 +7,7 @@ import com.twitter.exception.*;
 import com.twitter.model.*;
 import com.twitter.util.AvatarUtil;
 import com.twitter.util.TestUtil;
+import freemarker.template.TemplateException;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,8 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +26,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -54,12 +54,12 @@ import static org.powermock.api.mockito.PowerMockito.when;
 @ActiveProfiles(Profiles.DEV)
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({SecurityContextHolder.class})
-public class  UserServiceTest {
+public class UserServiceTest {
 
     @Mock
     private UserDao userDao;
     @Mock
-    private JavaMailSender javaMailSender;
+    private EmailService emailService;
     @Mock
     private AvatarUtil avatarUtil;
     @Mock
@@ -73,7 +73,7 @@ public class  UserServiceTest {
 
     @Before
     public void setUp() {
-        userService = new UserServiceImpl(userDao, javaMailSender, avatarUtil, passwordEncoder, notificationService);
+        userService = new UserServiceImpl(userDao, avatarUtil, passwordEncoder, notificationService, emailService);
         authentication = mock(Authentication.class);
         mockStatic(SecurityContextHolder.class);
         SecurityContext securityContext = mock(SecurityContext.class);
@@ -114,31 +114,31 @@ public class  UserServiceTest {
     }
 
     @Test
-    public void create_userCreateTest() throws IOException {
+    public void create_userCreateTest() throws IOException, MessagingException, TemplateException {
         User user = a(user());
         when(userDao.findByUsername(anyString())).thenReturn(null);
         when(userDao.findByEmail(anyString())).thenReturn(null);
         when(passwordEncoder.encode(any())).thenReturn("ENCRYPTED_PASSWORD");
         when(userDao.save(any(User.class))).thenReturn(user);
-        UserCreateForm userCreateForm = new UserCreateForm(user.getUsername(),user.getPassword(),user.getEmail(),user.getGender());
+        UserCreateForm userCreateForm = new UserCreateForm(user.getUsername(), user.getPassword(), user.getEmail(), user.getGender());
         User createResult = userService.create(userCreateForm);
         assertThat(createResult, is(user));
-        verify(javaMailSender, times(1)).send(any(SimpleMailMessage.class));
+        verify(emailService, times(1)).sendEmail(anyString(), anyString(), anyString(), anyString(), any(EmailType.class));
     }
 
     @Test(expected = UserAlreadyExistsException.class)
-    public void create_usernameAlreadyExist() throws IOException {
+    public void create_usernameAlreadyExist() throws IOException, MessagingException, TemplateException {
         when(userDao.findByUsername(anyString())).thenReturn(a(user()));
-        UserCreateForm userCreateForm = new UserCreateForm("user","password","email@email.com", Gender.FEMALE);
+        UserCreateForm userCreateForm = new UserCreateForm("user", "password", "email@email.com", Gender.FEMALE);
         userService.create(userCreateForm);
     }
 
     @Test(expected = UserAlreadyExistsException.class)
-    public void create_emailAlreadyExist() throws IOException {
+    public void create_emailAlreadyExist() throws IOException, MessagingException, TemplateException {
         User user = a(user());
         when(userDao.findByUsername(anyString())).thenReturn(null);
         when(userDao.findByEmail(anyString())).thenReturn(user);
-        UserCreateForm userCreateForm = new UserCreateForm(user.getUsername(),user.getPassword(),user.getEmail(),user.getGender());
+        UserCreateForm userCreateForm = new UserCreateForm(user.getUsername(), user.getPassword(), user.getEmail(), user.getGender());
         userService.create(userCreateForm);
     }
 
@@ -570,14 +570,14 @@ public class  UserServiceTest {
     }
 
     @Test(expected = UserNotFoundException.class)
-    public void changeUserEmail_userDoesNotExist() {
+    public void changeUserEmail_userDoesNotExist() throws MessagingException {
         User user = a(user());
         when(userDao.exists(user.getId())).thenReturn(false);
         userService.changeUserEmail(user.getId(), "some@email.com");
     }
 
     @Test(expected = UserException.class)
-    public void changeUserEmail_userExistsEmailIsAlreadyTaken() {
+    public void changeUserEmail_userExistsEmailIsAlreadyTaken() throws MessagingException {
         User user = a(user());
         when(userDao.exists(user.getId())).thenReturn(true);
         when(userDao.findByEmail(anyString())).thenReturn(a(user()));
@@ -585,7 +585,7 @@ public class  UserServiceTest {
     }
 
     @Test
-    public void changeUserEmail_userExistsEmailIsFree() {
+    public void changeUserEmail_userExistsEmailIsFree() throws MessagingException {
         String newEmail = "myNew@email.com";
         String oldEmail = "old@email.com";
         User user = a(user().withEmail(oldEmail));
@@ -594,7 +594,7 @@ public class  UserServiceTest {
         when(userDao.findByEmail(anyString())).thenReturn(null);
         userService.changeUserEmail(user.getId(), newEmail);
         assertThat(user.getEmail(), is(newEmail));
-        verify(javaMailSender, times(1)).send(any(SimpleMailMessage.class));
+        verify(emailService, times(1)).sendEmail(anyString(), anyString(), anyString(), anyString(), any(EmailType.class));
     }
 
     @Test

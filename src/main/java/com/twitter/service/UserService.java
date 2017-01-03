@@ -5,6 +5,7 @@ import com.twitter.model.Avatar;
 import com.twitter.model.Role;
 import com.twitter.model.User;
 import com.twitter.util.SecurityUtil;
+import freemarker.template.TemplateException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -22,7 +24,7 @@ import java.util.List;
 @Service
 public interface UserService extends UserDetailsService {
 
-    User create(UserCreateForm userCreateForm) throws IOException;
+    User create(UserCreateForm userCreateForm) throws IOException, MessagingException, TemplateException;
 
     User loadUserByUsername(String username) throws UsernameNotFoundException;
 
@@ -89,7 +91,7 @@ public interface UserService extends UserDetailsService {
     Boolean isFollowed(long userId);
 
     @PreAuthorize(SecurityUtil.PERSONAL_USAGE)
-    User changeUserEmail(long userId, String email);
+    User changeUserEmail(long userId, String email) throws MessagingException;
 
     @PreAuthorize(SecurityUtil.AUTHENTICATED)
     List<User> queryForUser(String username, Pageable pageable);

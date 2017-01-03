@@ -11,12 +11,14 @@ import com.twitter.model.User;
 import com.twitter.route.Route;
 import com.twitter.service.TagService;
 import com.twitter.service.UserService;
+import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
@@ -37,7 +39,7 @@ public class UserController {
     }
 
     @RequestMapping(value = Route.REGISTER_USER, method = RequestMethod.POST)
-    public ResponseEntity<User> createUser(@Valid @RequestBody UserCreateForm user) throws IOException {
+    public ResponseEntity<User> createUser(@Valid @RequestBody UserCreateForm user) throws IOException, MessagingException, TemplateException {
         return new ResponseEntity<>(userService.create(user), HttpStatus.CREATED);
     }
 
@@ -81,7 +83,7 @@ public class UserController {
     }
 
     @RequestMapping(value = Route.USER_EMAIL_CHANGE, method = RequestMethod.PUT)
-    public ResponseEntity<User> changeUserRole(@PathVariable long userId, @RequestBody @Valid EmailChange emailChange) {
+    public ResponseEntity<User> changeUserRole(@PathVariable long userId, @RequestBody @Valid EmailChange emailChange) throws MessagingException {
         return new ResponseEntity<>(userService.changeUserEmail(userId, emailChange.getEmail()), HttpStatus.OK);
     }
 

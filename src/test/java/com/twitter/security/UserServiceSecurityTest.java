@@ -7,6 +7,7 @@ import com.twitter.model.Role;
 import com.twitter.service.UserService;
 import com.twitter.util.TestUtil;
 import com.twitter.util.WithCustomMockUser;
+import freemarker.template.TemplateException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +18,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.Date;
 
@@ -272,7 +274,7 @@ public class UserServiceSecurityTest {
 
     @WithAnonymousUser
     @Test
-    public void create_anonymousAccess() throws IOException {
+    public void create_anonymousAccess() throws IOException, MessagingException, TemplateException {
         userService.create(new UserCreateForm("user", "password", "email@email.com", Gender.FEMALE));
     }
 
@@ -308,7 +310,7 @@ public class UserServiceSecurityTest {
 
     @WithCustomMockUser(id = TestUtil.ID_TWO)
     @Test(expected = AccessDeniedException.class)
-    public void changeUserEmail_wrongUser() throws IOException {
+    public void changeUserEmail_wrongUser() throws IOException, MessagingException {
         userService.changeUserEmail(TestUtil.ID_ONE, "some@email.com");
     }
 
