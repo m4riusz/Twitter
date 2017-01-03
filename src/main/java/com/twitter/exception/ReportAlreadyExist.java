@@ -1,9 +1,13 @@
 package com.twitter.exception;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 /**
  * Created by mariusz on 22.11.16.
  */
-public class ReportAlreadyExist extends TwitterException {
+@ResponseStatus(HttpStatus.CONFLICT)
+public class ReportAlreadyExist extends ReportException {
 
     public ReportAlreadyExist() {
         super();
