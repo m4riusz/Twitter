@@ -24,4 +24,6 @@ public interface NotificationService {
     Notification changeNotificationSeen(long notificationId, boolean seen);
 
     Notification getNotificationById(long notificationId) throws NotificationNotFound;
+
+    void deleteNotificationById(long notificationId);
 }

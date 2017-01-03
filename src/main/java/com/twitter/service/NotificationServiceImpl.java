@@ -59,6 +59,11 @@ public class NotificationServiceImpl implements NotificationService {
         return notification;
     }
 
+    @Override
+    public void deleteNotificationById(long notificationId) {
+        notificationDao.delete(notificationId);
+    }
+
     private boolean userIsOwnerOfNotification(User currentLoggedUser, Notification notification) {
         return notification.getDestinationUser().equals(currentLoggedUser);
     }

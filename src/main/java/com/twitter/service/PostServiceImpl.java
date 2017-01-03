@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 /**
  * Created by mariusz on 08.08.16.
  */
@@ -44,13 +46,7 @@ abstract class PostServiceImpl<T extends AbstractPost, TRepository extends CrudR
                 .filter(username -> usernameDoesNotBelongToLoggedUser(currentLoggedUser, username))
                 .limit(Config.MAX_USER_NOTIFICATION_IN_ONE_POST)
                 .forEach(username -> {
-                    Notification notification = new Notification();
-                    notification.setSourceUser(currentLoggedUser);
-                    notification.setDestinationUser(userService.loadUserByUsername(username));
-                    notification.setText(MessageUtil.YOU_HAVE_BEEN_MENTIONED_MESSAGE + currentLoggedUser.getUsername());
-                    notification.setSeen(false);
-                    notification.setAbstractPost(post);
-                    post.getNotifications().add(notification);
+                    notifyUser(currentLoggedUser, post, userService.loadUserByUsername(username), MessageUtil.YOU_HAVE_BEEN_MENTIONED_MESSAGE + currentLoggedUser.getUsername());
                 });
         return repository.save(post);
     }
@@ -91,32 +87,71 @@ abstract class PostServiceImpl<T extends AbstractPost, TRepository extends CrudR
         UserVote userVote = userVoteService.findUserVoteForPost(user, post);
         if (userVote == null) {
             userVote = new UserVote(postVote.getVote(), user, post);
+            notifyUser(user, post, post.getOwner(), formatNotificationMessage(user, userVote.getVote()));
             return userVoteService.save(userVote);
         } else {
             userVote.setVote(postVote.getVote());
+            updateNotification(postVote, user, post);
         }
         return userVote;
     }
 
     @Override
-    public void deleteVote(long tweetId) {
+    public void deleteVote(long postId) {
         User user = userService.getCurrentLoggedUser();
-        T post = getById(tweetId);
+        T post = getById(postId);
         post.getVotes().stream()
                 .filter(userVote -> userVote.getUser().equals(user))
                 .findFirst()
                 .ifPresent(userVote -> post.getVotes().remove(userVote));
+
+        removeUserNotification(user, post);
     }
 
     @Override
     public UserVote getPostVote(long postId) {
         User user = userService.getCurrentLoggedUser();
-        return userVoteService.findUserVoteForPost(user, repository.findOne(postId)) ;
+        return userVoteService.findUserVoteForPost(user, repository.findOne(postId));
     }
 
     @Override
     public long getPostVoteCount(long postId, Vote vote) {
         return userVoteService.getPostVoteCount(postId, vote);
+    }
+
+    private void updateNotification(PostVote postVote, User user, T post) {
+        post.getNotifications().stream()
+                .filter(notification -> notification.getSourceUser().equals(user))
+                .findFirst()
+                .ifPresent(notification -> {
+                    notification.setText(formatNotificationMessage(user, postVote.getVote()));
+                    notification.setSeen(false);
+                });
+    }
+
+    private String formatNotificationMessage(User user, Vote vote) {
+        return "User @" + user.getUsername() + " has voted " + vote.name() + " on yours post!";
+    }
+
+    private void notifyUser(User source, T post, User destination, String text) {
+        if (source.equals(destination)) {
+            return;
+        }
+        Notification notification = new Notification();
+        notification.setSourceUser(source);
+        notification.setDestinationUser(destination);
+        notification.setText(text);
+        notification.setSeen(false);
+        notification.setAbstractPost(post);
+        notificationService.save(notification);
+    }
+
+    private void removeUserNotification(User user, T post) {
+        post.getNotifications().removeAll(
+                post.getNotifications().stream()
+                        .filter(notification -> notification.getSourceUser().equals(user))
+                        .collect(toList())
+        );
     }
 
     protected void checkIfPostExists(long postId) {
