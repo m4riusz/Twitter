@@ -18,7 +18,9 @@
             </div>
 
             <div class="panel-body">
-
+                <div if.bind = "avatarMessage.text != '' && avatarMessage.type == 'SUCCESS'" class="alert alert-success">${avatarMessage.text}</div>
+                <div if.bind = "avatarMessage.text != '' && avatarMessage.type == 'PROGRESS'" class="alert alert-warning">${avatarMessage.text}</div>
+                <div if.bind = "avatarMessage.text != '' && avatarMessage.type == 'FAIL'" class="alert alert-danger">${avatarMessage.text}</div>
                 <input type="file" id="fileInput" class="file" files.bind="selectedFiles"
                        accept="image/png, image/jpeg, image/jpg"
                        style="visibility: hidden; position: absolute;">
@@ -40,6 +42,10 @@
                 </h4>
             </div>
             <div class="panel-body">
+                <div if.bind = "passwordMessage.text != '' && passwordMessage.type == 'SUCCESS'" class="alert alert-success">${passwordMessage.text}</div>
+                <div if.bind = "passwordMessage.text != '' && passwordMessage.type == 'PROGRESS'" class="alert alert-warning">${passwordMessage.text}</div>
+                <div if.bind = "passwordMessage.text != '' && passwordMessage.type == 'FAIL'" class="alert alert-danger">${passwordMessage.text}</div>
+
                 <form class="form-horizontal">
                     <div class="form-group">
                         <label for="newPassword" class="col-sm-2 control-label">New password</label>
@@ -72,6 +78,10 @@
                 </h4>
             </div>
             <div class="panel-body">
+                <div if.bind = "emailMessage.text != '' && emailMessage.type == 'SUCCESS'" class="alert alert-success">${emailMessage.text}</div>
+                <div if.bind = "emailMessage.text != '' && emailMessage.type == 'PROGRESS'" class="alert alert-warning">${emailMessage.text}</div>
+                <div if.bind = "emailMessage.text != '' && emailMessage.type == 'FAIL'" class="alert alert-danger">${emailMessage.text}</div>
+
                 <form class="form-horizontal">
                     <div class="form-group">
                         <label for="newEmail" class="col-sm-2 control-label">New email</label>
