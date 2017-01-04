@@ -182,6 +182,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User changeUserPasswordById(long userId, String password) throws TemplateException, IOException, MessagingException {
         User userToChange = getUserById(userId);
+        if (passwordEncoder.matches(password, userToChange.getPassword())) {
+            throw new UserException(MessageUtil.USER_SAME_PASSWORD_ERROR_MSG);
+        }
         userToChange.setPassword(new Password(passwordEncoder.encode(password)));
         Map<String, Object> model = new HashMap<>();
         model.put("user", userToChange);
@@ -251,6 +254,9 @@ public class UserServiceImpl implements UserService {
         User user = getUserById(userId);
         User userByEmail = userDao.findByEmail(email);
         User currentLoggedUser = getCurrentLoggedUser();
+        if (currentLoggedUser.getEmail().equals(email)){
+            throw new UserException(MessageUtil.USER_SAME_EMAIL_CHANGE_ERROR_MSG);
+        }
         if (userByEmail != null) {
             throw new UserException(MessageUtil.USER_ALREADY_EXISTS_EMAIL_ERROR_MSG);
         }

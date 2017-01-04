@@ -10,6 +10,8 @@ public final class MessageUtil {
     public static final String UNFOLLOW_UNFOLLOWED_ERROR_MSG = "You cant unfollow user who is not followed!";
     public static final String USER_ALREADY_EXISTS_USERNAME_ERROR_MSG = "User with this username already exists!";
     public static final String USER_ALREADY_EXISTS_EMAIL_ERROR_MSG = "User with this email already exists!";
+    public static final String USER_SAME_PASSWORD_ERROR_MSG = "Your new password should be different!";
+    public static final String USER_SAME_EMAIL_CHANGE_ERROR_MSG = "Your new email should be different!";
     public static final String ACCOUNT_HAS_BEEN_ENABLED = "You have successfully enabled account!";
     public static final String ACCOUNT_HAS_BEEN_ALREADY_ENABLED = "Account has been already enabled!";
     public static final String REPORT_NOT_FOUND_BY_ID_ERROR_MSG = "Report with this id does not exists!";
