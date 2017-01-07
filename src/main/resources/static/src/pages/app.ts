@@ -5,9 +5,9 @@ import {AuthService, IAuthService} from "../service/authService";
 import {TagService, ITagService} from "../service/tagService";
 import {NotificationService, INotificationService} from "../service/notificationService";
 import {EventAggregator} from "aurelia-event-aggregator";
+import {Const} from "../domain/const";
 import User = Models.User;
 import Notification = Models.Notification;
-import {Const} from "../domain/const";
 
 /**
  * Created by mariusz on 22.08.16.
@@ -15,17 +15,17 @@ import {Const} from "../domain/const";
 
 @inject(UserService, TagService, NotificationService, AuthService, EventAggregator)
 export class App {
-    loggedUser:User;
-    router:Router;
-    notifications:Notification[];
-    private userService:IUserService;
-    private authService:IAuthService;
-    private tagService:ITagService;
-    private notificationService:INotificationService;
-    private eventAggregator:EventAggregator;
-    private agregator:any;
+    loggedUser: User;
+    router: Router;
+    notifications: Notification[];
+    private userService: IUserService;
+    private authService: IAuthService;
+    private tagService: ITagService;
+    private notificationService: INotificationService;
+    private eventAggregator: EventAggregator;
+    private agregator: any;
 
-    constructor(userService:IUserService, tagService:ITagService, notificationService:INotificationService, authService:IAuthService, eventAggregator:EventAggregator) {
+    constructor(userService: IUserService, tagService: ITagService, notificationService: INotificationService, authService: IAuthService, eventAggregator: EventAggregator) {
         this.userService = userService;
         this.tagService = tagService;
         this.notificationService = notificationService;
@@ -51,7 +51,7 @@ export class App {
         this.agregator.dispose();
     }
 
-    configureRouter(config:RouterConfiguration, router:Router) {
+    configureRouter(config: RouterConfiguration, router: Router) {
         config.map([
             {
                 route: ['', 'home'],
@@ -124,6 +124,10 @@ export class App {
                 title: 'Search',
                 nav: true,
                 settings: {currentUser: this.loggedUser}
+            },
+            {
+                route: 'verify/:key',
+                redirect: "/"
             }
         ]);
         this.router = router;

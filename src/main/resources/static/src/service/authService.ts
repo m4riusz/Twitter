@@ -1,30 +1,33 @@
 import {HttpClient, json} from "aurelia-fetch-client";
 import {inject} from "aurelia-dependency-injection";
-import {BASE_URL, LOGIN, REGISTER, CURRENT_USER, LOGOUT} from "../domain/route";
+import {BASE_URL, LOGIN, REGISTER, CURRENT_USER, LOGOUT, USER_ACTIVATE_ACCOUNT} from "../domain/route";
 import {BasicService} from "./basicService";
 import {Const} from "../domain/const";
+import VerifyResult = Models.VerifyResult;
 
 /**
  * Created by mariusz on 23.08.16.
  */
 
 export interface IAuthService {
-    isTokenValid(token:string):Promise<boolean>;
-    login(username:string, password:string):Promise<string>;
-    logout():Promise<any>;
-    register(username:string, password:string, email:string, gender:string):Promise<string>;
+    isTokenValid(token: string): Promise<boolean>;
+    login(username: string, password: string): Promise<string>;
+    logout(): Promise<any>;
+    register(username: string, password: string, email: string, gender: string): Promise<string>;
+    verify(verifyKey: string): Promise<VerifyResult>;
 }
 
 @inject(HttpClient)
 export class AuthService extends BasicService implements IAuthService {
-    private authToken:string;
 
-    constructor(httpClient:HttpClient) {
+    private authToken: string;
+
+    constructor(httpClient: HttpClient) {
         super(httpClient);
     }
 
-    public login(username:string, password:string):Promise<string> {
-        return new Promise<string>((resolve, reject)=> {
+    public login(username: string, password: string): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
             this.httpClient
                 .fetch(BASE_URL + LOGIN, {
                     method: 'post',
@@ -48,8 +51,8 @@ export class AuthService extends BasicService implements IAuthService {
         });
     }
 
-    public logout():Promise<any> {
-        return new Promise<string>((resolve, reject)=> {
+    public logout(): Promise<any> {
+        return new Promise<string>((resolve, reject) => {
             this.httpClient
                 .fetch(BASE_URL + LOGOUT, {
                     method: 'post',
@@ -70,7 +73,7 @@ export class AuthService extends BasicService implements IAuthService {
         });
     }
 
-    public register(username:string, password:string, email:string, gender:string):Promise<string> {
+    public register(username: string, password: string, email: string, gender: string): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             this.httpClient
                 .fetch(BASE_URL + REGISTER, {
@@ -103,7 +106,7 @@ export class AuthService extends BasicService implements IAuthService {
         });
     }
 
-    public isTokenValid(token:string):Promise<boolean> {
+    public isTokenValid(token: string): Promise<boolean> {
         return this.httpClient
             .fetch(BASE_URL + CURRENT_USER, {
                 headers: {
@@ -113,4 +116,23 @@ export class AuthService extends BasicService implements IAuthService {
             })
             .then(response => response.ok);
     }
+
+    public verify(verifyKey: string): Promise<VerifyResult> {
+        return new Promise<VerifyResult>((resolve, reject) => {
+            this.httpClient
+                .fetch(BASE_URL + USER_ACTIVATE_ACCOUNT(verifyKey), {
+                    method: 'get'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        response.json().then(result => resolve(result));
+                    } else {
+                        response.json().then(result => reject(result.message));
+                    }
+                })
+
+        })
+
+    }
 }
+

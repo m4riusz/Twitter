@@ -1,0 +1,10 @@
+<template>
+    <div class="container-fluid  col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
+        <h4 class="h2">Twitter App Clone activation result</h4>
+        <div if.bind="message.text != '' "
+             class="alert ${message.type == 'SUCCESS'? 'alert-success' : 'alert-danger' }">
+            <strong>${message.type}</strong> ${message.text}
+        </div>
+        <a href="#/" class="btn btn-primary">Back to login</a>
+    </div>
+</template>

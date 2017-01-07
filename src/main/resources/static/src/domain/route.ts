@@ -15,6 +15,7 @@ export const REPORT_URL = `/api/report`;
 export const TAG_URL = `/api/tweet/tags`;
 export const TAGS_URL = `/api/tags`;
 export const NOTIFICATION_URL = `/api/notification`;
+export const USER_ACTIVATE_ACCOUNT = (verifyKey:string) => `${USER_URL}/verify/${verifyKey}`;
 export const USER_BY_ID = (userId:number) => `${USER_URL}/${userId}`;
 export const USER_CHANGE_PASSWORD = (userId:number) => `${USER_BY_ID(userId)}/password`;
 export const USER_CHANGE_ROLE = (userId:number) => `${USER_BY_ID(userId)}/role`;

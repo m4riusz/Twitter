@@ -5,54 +5,54 @@
 module Models {
 
     export interface AbstractEntity {
-        id:number;
-        createDate:string;
+        id: number;
+        createDate: string;
     }
 
     export interface AbstractPost extends AbstractEntity {
-        type:string;
-        deleted:boolean;
-        banned:boolean;
-        content:string;
-        owner:User;
-        votes:UserVote[];
-        reports:Report[];
-        loggedUserVote:'UP'|'DOWN'|'NONE';
-        upVoteCount?:number;
-        downVoteCount?:number;
+        type: string;
+        deleted: boolean;
+        banned: boolean;
+        content: string;
+        owner: User;
+        votes: UserVote[];
+        reports: Report[];
+        loggedUserVote: 'UP'|'DOWN'|'NONE';
+        upVoteCount?: number;
+        downVoteCount?: number;
     }
 
     export interface AccountStatus extends AbstractEntity {
-        enable:boolean;
-        enableDate:string;
-        bannedUntil:string;
-        deleted:boolean;
+        enable: boolean;
+        enableDate: string;
+        bannedUntil: string;
+        deleted: boolean;
     }
 
     export interface Notification extends AbstractEntity {
-        sourceUser:User;
-        destinationUser:User;
-        text:string;
-        seen:boolean;
-        abstractPost:AbstractPost;
+        sourceUser: User;
+        destinationUser: User;
+        text: string;
+        seen: boolean;
+        abstractPost: AbstractPost;
     }
 
     export interface Avatar extends AbstractEntity {
-        fileName:string;
-        bytes:number[];
+        fileName: string;
+        bytes: number[];
     }
 
     export interface Comment extends AbstractPost {
-        tweet:Tweet;
+        tweet: Tweet;
     }
 
     export interface Report extends AbstractEntity {
-        status:ReportStatus;
-        category:ReportCategory;
-        message:string;
-        user:User;
-        judge:User;
-        abstractPost:AbstractPost;
+        status: ReportStatus;
+        category: ReportCategory;
+        message: string;
+        user: User;
+        judge: User;
+        abstractPost: AbstractPost;
     }
 
     export enum ReportCategory{
@@ -73,33 +73,37 @@ module Models {
 
 
     export interface Tag extends AbstractEntity {
-        text:string;
+        text: string;
     }
 
     export interface Tweet extends AbstractPost {
-        favourite:boolean;
-        tags:Tag[];
-        comments:Comment[];
+        favourite: boolean;
+        tags: Tag[];
+        comments: Comment[];
     }
 
     export interface User extends AbstractEntity {
-        avatar:Avatar;
-        username:string;
-        email:string;
-        role:'USER' | 'ADMIN' | 'MODERATOR';
-        gender:'MALE' | 'FEMALE' | 'UNDEFINED';
-        accountStatus:AccountStatus;
-        reports:Report[];
-        tweets:Tweet[];
-        favouriteTags:Tag[];
-        followers:User[];
-        favouriteTweets:Tweet[];
-        authorities:any;
+        avatar: Avatar;
+        username: string;
+        email: string;
+        role: 'USER' | 'ADMIN' | 'MODERATOR';
+        gender: 'MALE' | 'FEMALE' | 'UNDEFINED';
+        accountStatus: AccountStatus;
+        reports: Report[];
+        tweets: Tweet[];
+        favouriteTags: Tag[];
+        followers: User[];
+        favouriteTweets: Tweet[];
+        authorities: any;
     }
 
     export interface UserVote extends AbstractEntity {
-        vote:'UP' |'DOWN';
-        user:User;
-        abstractPost:AbstractPost;
+        vote: 'UP' |'DOWN';
+        user: User;
+        abstractPost: AbstractPost;
+    }
+
+    export interface VerifyResult {
+        message: string;
     }
 }
