@@ -5,19 +5,19 @@
 module Models {
 
     export interface AbstractEntity {
-        id: number;
-        createDate: string;
+        id?: number;
+        createDate?: string;
     }
 
     export interface AbstractPost extends AbstractEntity {
-        type: string;
-        deleted: boolean;
-        banned: boolean;
+        type?: string;
+        deleted?: boolean;
+        banned?: boolean;
         content: string;
-        owner: User;
-        votes: UserVote[];
-        reports: Report[];
-        loggedUserVote: 'UP'|'DOWN'|'NONE';
+        owner?: User;
+        votes?: UserVote[];
+        reports?: Report[];
+        loggedUserVote?: 'UP'|'DOWN'|'NONE';
         upVoteCount?: number;
         downVoteCount?: number;
     }
@@ -38,12 +38,12 @@ module Models {
     }
 
     export interface Avatar extends AbstractEntity {
-        fileName: string;
+        fileName?: string;
         bytes: number[];
     }
 
     export interface Comment extends AbstractPost {
-        tweet: Tweet;
+        tweet?: Tweet;
     }
 
     export interface Report extends AbstractEntity {
@@ -77,24 +77,24 @@ module Models {
     }
 
     export interface Tweet extends AbstractPost {
-        favourite: boolean;
-        tags: Tag[];
-        comments: Comment[];
+        favourite?: boolean;
+        tags?: Tag[];
+        comments?: Comment[];
     }
 
     export interface User extends AbstractEntity {
-        avatar: Avatar;
-        username: string;
-        email: string;
-        role: 'USER' | 'ADMIN' | 'MODERATOR';
-        gender: 'MALE' | 'FEMALE' | 'UNDEFINED';
-        accountStatus: AccountStatus;
-        reports: Report[];
-        tweets: Tweet[];
-        favouriteTags: Tag[];
-        followers: User[];
-        favouriteTweets: Tweet[];
-        authorities: any;
+        avatar?: Avatar;
+        username?: string;
+        email?: string;
+        role?: 'USER' | 'ADMIN' | 'MODERATOR';
+        gender?: 'MALE' | 'FEMALE' | 'UNDEFINED';
+        accountStatus?: AccountStatus;
+        reports?: Report[];
+        tweets?: Tweet[];
+        favouriteTags?: Tag[];
+        followers?: User[];
+        favouriteTweets?: Tweet[];
+        authorities?: any;
     }
 
     export interface UserVote extends AbstractEntity {
