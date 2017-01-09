@@ -82,7 +82,9 @@ public class ReportServiceImpl implements ReportService {
         addUserNotification(reportFromDb.getUser(), reportFromDb.getJudge(), "Your report has been arbitrated! (" + reportSentence.getReportStatus().name() + ")");
         Map<String, Object> model = getReportModel(reportFromDb, reportSentence);
         emailService.sendEmail(reportFromDb.getUser().getEmail(), MessageUtil.EMAIL_FROM, MessageUtil.EMAIL_SUBJECT, "report_judge_email.ftl", model, EmailType.TEXT_HTML);
-        emailService.sendEmail(reportFromDb.getAbstractPost().getOwner().getEmail(), MessageUtil.EMAIL_FROM, MessageUtil.EMAIL_SUBJECT, "banned_user_email.ftl", model, EmailType.TEXT_HTML);
+        if (reportSentence.getReportStatus() == ReportStatus.GUILTY) {
+            emailService.sendEmail(reportFromDb.getAbstractPost().getOwner().getEmail(), MessageUtil.EMAIL_FROM, MessageUtil.EMAIL_SUBJECT, "banned_user_email.ftl", model, EmailType.TEXT_HTML);
+        }
 
         return reportFromDb;
     }
