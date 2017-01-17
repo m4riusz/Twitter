@@ -95,8 +95,7 @@ public class UserServiceImpl implements UserService {
 
         Map<String, Object> model = new HashMap<>();
         model.put("user", user);
-        model.put("link", MessageUtil.EMAIL_VERIFY_LINK);
-        model.put("verifyKey", user.getAccountStatus().getVerifyKey());
+        model.put("verifyLink", MessageUtil.EMAIL_VERIFY_LINK + user.getAccountStatus().getVerifyKey());
 
         emailService.sendEmail(userCreateForm.getEmail(), MessageUtil.EMAIL_FROM, MessageUtil.EMAIL_SUBJECT, "create_user_email.ftl", model, EmailType.TEXT_HTML);
 
@@ -254,7 +253,7 @@ public class UserServiceImpl implements UserService {
         User user = getUserById(userId);
         User userByEmail = userDao.findByEmail(email);
         User currentLoggedUser = getCurrentLoggedUser();
-        if (currentLoggedUser.getEmail().equals(email)){
+        if (currentLoggedUser.getEmail().equals(email)) {
             throw new UserException(MessageUtil.USER_SAME_EMAIL_CHANGE_ERROR_MSG);
         }
         if (userByEmail != null) {
