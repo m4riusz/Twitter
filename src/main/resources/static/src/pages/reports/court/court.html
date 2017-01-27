@@ -21,7 +21,7 @@
             <th if.bind="status == 'ALL'">Status</th>
             <th if.bind="category == 'ALL'">Category</th>
             <th>Message</th>
-            <th>Judge</th>
+            <th if.bind="status != 'WAITING_FOR_REALIZATION'">Judge</th>
             <th if.bind="status == 'WAITING_FOR_REALIZATION' || status == 'ALL'">Operations</th>
         </tr>
         </thead>
@@ -31,7 +31,7 @@
             <td if.bind="status == 'ALL'">${report.status}</td>
             <td if.bind="category == 'ALL'">${report.category}</td>
             <td>${report.message}</td>
-            <td>${report.judge.username}</td>
+            <td if.bind="status != 'WAITING_FOR_REALIZATION'">${report.judge.username}</td>
             <td if.bind="status =='WAITING_FOR_REALIZATION' || status =='ALL' ">
                 <a if.bind="report.status != 'INNOCENT' && report.status != 'GUILTY'"
                    class="btn btn-default" click.delegate="judge(report)">Judge</a>
