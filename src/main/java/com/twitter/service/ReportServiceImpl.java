@@ -18,6 +18,8 @@ import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.*;
 
+import static java.util.Collections.emptyList;
+
 /**
  * Created by mariusz on 31.07.16.
  */
@@ -171,6 +173,10 @@ public class ReportServiceImpl implements ReportService {
 
     private void banPost(Report report) {
         report.getAbstractPost().setBanned(true);
+        report.getAbstractPost().setReports(emptyList());
+        if (report.getAbstractPost() instanceof Tweet) {
+            ((Tweet) report.getAbstractPost()).setTags(emptyList());
+        }
         report.getAbstractPost().setContent(MessageUtil.DELETE_ABSTRACT_POST_CONTENT);
     }
 
