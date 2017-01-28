@@ -130,7 +130,7 @@ abstract class PostServiceImpl<T extends AbstractPost, TRepository extends CrudR
     }
 
     private String formatNotificationMessage(User user, Vote vote) {
-        return "User @" + user.getUsername() + " has voted " + vote.name() + " on yours post!";
+        return "User @" + user.getUsername() + " has voted " + vote.name() + " on your post!";
     }
 
     private void notifyUser(User source, T post, User destination, String text) {

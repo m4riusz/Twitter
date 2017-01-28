@@ -136,7 +136,8 @@ public class UserServiceImpl implements UserService {
         } else if (isBanDateBeforeNow(date)) {
             throw new TwitterDateException(MessageUtil.REPORT_DATE_IS_INVALID_ERROR_MSG);
         }
-        userToBan.getAccountStatus().setBannedUntil(date);
+
+        userToBan.getAccountStatus().setBannedUntil(setTimeToMidnight(date));
         notifyUser(null, userToBan, "Your's account has been banned until " + DateFormat.getInstance().format(date) + "!");
     }
 
@@ -316,5 +317,15 @@ public class UserServiceImpl implements UserService {
 
     private boolean isBanDateBeforeNow(Date date) {
         return date.before(Calendar.getInstance().getTime());
+    }
+
+    private Date setTimeToMidnight(Date date) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
     }
 }

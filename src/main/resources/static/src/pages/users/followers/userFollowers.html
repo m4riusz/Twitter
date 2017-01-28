@@ -1,10 +1,11 @@
 <template>
     <require from='../../../templates/user/user-template.html'></require>
     <p><label class="label label-default">Number of followers: ${followersCount}</label></p>
-    <div class="row" repeat.for="follower of followers">
-        <user-template user.bind="follower"></user-template>
+    <div class="container-fluid">
+        <div class="row" repeat.for="follower of followers">
+            <user-template user.bind="follower"></user-template>
+        </div>
     </div>
-
     <div if.bind="followers.length != followersCount" class="well well-sm text-center" click.delegate="nextPage()">
         <h3 class="h3">More</h3>
     </div>

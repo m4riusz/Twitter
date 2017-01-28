@@ -21,7 +21,7 @@
             <a click.delegate="changeUserRole()" class="btn btn-default">Change</a>
         </div>
         <br/>
-        <div class="btn-group">
+        <div class="btn-group" if.bind="currentLoggedUser.id != user.id">
             <a class="btn btn-primary" if.bind="followed == false" click.delegate="followUser(user.id)">
                 <i class="glyphicon glyphicon-star-empty"></i> Follow
             </a>

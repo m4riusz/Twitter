@@ -173,7 +173,6 @@ public class ReportServiceImpl implements ReportService {
 
     private void banPost(Report report) {
         report.getAbstractPost().setBanned(true);
-        report.getAbstractPost().setReports(emptyList());
         if (report.getAbstractPost() instanceof Tweet) {
             ((Tweet) report.getAbstractPost()).setTags(emptyList());
         }
