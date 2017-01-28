@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
  */
 public class EmailChange {
     @NotNull
-    @Email
+    @Email(message = "Wrong email format!")
     private String email;
 
     public String getEmail() {
