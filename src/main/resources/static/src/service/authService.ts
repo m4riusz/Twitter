@@ -24,6 +24,7 @@ export class AuthService extends BasicService implements IAuthService {
 
     constructor(httpClient: HttpClient) {
         super(httpClient);
+        this.authToken = localStorage[Const.TOKEN_HEADER];
     }
 
     public login(username: string, password: string): Promise<string> {

@@ -4,7 +4,9 @@
     <require from='../../templates/tag/tag-input'></require>
 
     <div class="alert alert-info">
-        <h4>Tags: </h4>
+        <h4 if.bind="tags.length > 1">Tags:</h4>
+        <h4 if.bind="tags.length == 1">Tag:</h4>
+        <h4 if.bind="tags.length == 0">No tags found!</h4>
         <tag-template repeat.for="tag of tags" tag.bind="tag"></tag-template>
         <a if.bind="tags.length == 1 && currentTagFollowed == false"
            class="btn btn-primary btn-xs pull-right" click.delegate="addTagToFavourites(tags[0])">
